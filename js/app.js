@@ -71,6 +71,11 @@
     if (form) {
       form.addEventListener("submit", (e) => {
         e.preventDefault();
+        const idEditando = UI.obtenerIdSesionEditando();
+        if (!idEditando && StudyTracker.Timer) {
+          StudyTracker.Timer.prepararAntesDeGuardarFormulario();
+        }
+
         const chips = UI.obtenerValoresChips();
         const datosFormulario = {
           fecha: document.getElementById("fecha").value,
@@ -88,7 +93,6 @@
           notas: document.getElementById("notas").value.trim()
         };
 
-        const idEditando = UI.obtenerIdSesionEditando();
         if (idEditando) {
           store.actualizarSesionPorId(idEditando, datosFormulario);
           UI.salirModoEdicion();
@@ -96,6 +100,9 @@
           store.agregarSesion(datosFormulario);
           document.getElementById("tema").value = "";
           document.getElementById("notas").value = "";
+          if (StudyTracker.Timer) {
+            StudyTracker.Timer.limpiarDespuesDeGuardarFormulario();
+          }
         }
       });
     }
@@ -224,6 +231,9 @@
 
   window.addEventListener("DOMContentLoaded", async () => {
     UI.inicializarFormulario();
+    if (StudyTracker.Timer) {
+      StudyTracker.Timer.init();
+    }
     vincularEventosDOM();
 
     // Suscribir la UI y el sincronizador Excel a cualquier cambio del Store

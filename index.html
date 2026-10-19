@@ -16,6 +16,7 @@
   <script src="js/services/excel-sync.js" defer></script>
   <script src="js/ui/charts.js" defer></script>
   <script src="js/ui/dashboard.js" defer></script>
+  <script src="js/ui/timer.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
 <body>
@@ -113,7 +114,63 @@
         <h2>
           <span id="formTitle">➕ Registrar Sesión</span>
         </h2>
-        <div class="subtitle">Selección rápida con 1 clic. Cada cambio actualiza <code>data/study-tracker.xlsx</code> automáticamente.</div>
+        <div class="subtitle">Mide tu sesión en vivo o regístrala en 1 clic. Sin anuncios y sincronizado con <code>data/study-tracker.xlsx</code>.</div>
+
+        <!-- CRONÓMETRO Y POMODORO INTEGRADO (SIN ANUNCIOS) -->
+        <div class="timer-widget" id="timerWidgetCard">
+          <div class="timer-header">
+            <div class="timer-tabs">
+              <button type="button" class="timer-mode-tab active" data-mode="cronometro" title="Cuenta hacia adelante y captura inicio y fin">
+                ⏱️ Cronómetro
+              </button>
+              <button type="button" class="timer-mode-tab" data-mode="pomodoro" title="Temporizador por bloques 100% libre de anuncios">
+                🍅 Pomodoro
+              </button>
+            </div>
+            <button type="button" id="btnTimerMute" class="timer-mute-btn" title="Sonido al finalizar activo">
+              🔔
+            </button>
+          </div>
+
+          <!-- Controles de bloques cuando está en modo Pomodoro -->
+          <div class="pomodoro-controls" id="pomodoroControls" style="display:none;">
+            <button type="button" class="pomo-preset-btn active" data-minutes="25" data-phase="enfoque">🎯 25m</button>
+            <button type="button" class="pomo-preset-btn" data-minutes="50" data-phase="enfoque">🔥 50m</button>
+            <button type="button" class="pomo-preset-btn pomo-break-btn" data-minutes="5" data-phase="descanso">☕ 5m</button>
+            <button type="button" class="pomo-preset-btn pomo-break-btn" data-minutes="15" data-phase="descanso">🌴 15m</button>
+            <div class="pomo-custom-wrap" title="Personalizar minutos del bloque">
+              <input type="number" id="pomodoroCustomMin" min="1" max="180" value="25" aria-label="Minutos personalizados">
+              <span>min</span>
+            </div>
+          </div>
+
+          <div class="timer-display-box">
+            <div class="timer-digits" id="timerDisplay">00:00:00</div>
+            <div class="timer-status-text" id="timerStatusText">
+              Pulsa Iniciar para capturar la Hora de Inicio automáticamente
+            </div>
+            <div class="timer-progress-bg">
+              <div class="timer-progress-fill" id="timerProgressFill"></div>
+            </div>
+          </div>
+
+          <div class="timer-captured-bar">
+            <span class="timer-badge" id="timerBadgeInicio">🟢 Inicio: --:--</span>
+            <span class="timer-badge" id="timerBadgeFin">🏁 Fin: --:--</span>
+          </div>
+
+          <div class="timer-actions">
+            <button type="button" id="btnTimerStartPause" class="btn timer-btn timer-btn-start">
+              ▶️ Iniciar Sesión
+            </button>
+            <button type="button" id="btnTimerFinish" class="btn timer-btn timer-btn-finish" disabled title="Detiene el reloj y registra la Hora de Fin en el formulario">
+              ⏹️ Terminar
+            </button>
+            <button type="button" id="btnTimerReset" class="btn timer-btn timer-btn-reset" disabled title="Reiniciar contador a cero">
+              🔄
+            </button>
+          </div>
+        </div>
 
         <div class="preview-pill">
           <span id="previewDuracion">⏱️ Duración: 25 min</span>

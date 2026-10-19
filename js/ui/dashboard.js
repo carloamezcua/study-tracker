@@ -234,7 +234,10 @@
     const inputFin = document.getElementById("horaFin");
 
     if (inputFecha) {
-      inputFecha.value = ahora.toISOString().split("T")[0];
+      const y = ahora.getFullYear();
+      const m = String(ahora.getMonth() + 1).padStart(2, "0");
+      const d = String(ahora.getDate()).padStart(2, "0");
+      inputFecha.value = `${y}-${m}-${d}`;
     }
     const hace25 = new Date(ahora.getTime() - 25 * 60000);
     if (inputInicio) {
