@@ -7,6 +7,33 @@
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
   const { store, UI, ExcelService } = StudyTracker;
 
+  // Registro del último estado de sincronización para re-traducirlo al cambiar de idioma
+  let ultimoEstadoArchivo = {
+    key: "statusConnecting",
+    params: {},
+    tipo: "default",
+    customText: null
+  };
+
+  function t(key, params) {
+    if (StudyTracker.I18n && typeof StudyTracker.I18n.t === "function") {
+      return StudyTracker.I18n.t(key, params);
+    }
+    return key;
+  }
+
+  function fijarEstadoArchivo(key, params = {}, tipo = "default", customText = null) {
+    ultimoEstadoArchivo = { key, params, tipo, customText };
+    const texto = customText || t(key, params);
+    UI.actualizarEstadoArchivo(texto, tipo);
+  }
+
+  function refrescarEstadoArchivo() {
+    const { key, params, tipo, customText } = ultimoEstadoArchivo;
+    const texto = customText || t(key, params);
+    UI.actualizarEstadoArchivo(texto, tipo);
+  }
+
   function manejarEditarSesion(sesion) {
     UI.cargarSesionEnFormulario(sesion);
   }
@@ -27,21 +54,29 @@
     const resultado = await ExcelService.guardarEnServidorLocal(sesiones);
     if (resultado.ok) {
       const hora = new Date().toLocaleTimeString().slice(0, 5);
-      UI.actualizarEstadoArchivo(
-        `🟢 Sincronizado en vivo: ${resultado.excelPath} (${hora})`,
+      fijarEstadoArchivo(
+        "statusLiveSynced",
+        { path: `${resultado.excelPath} (${hora})` },
         "connected"
       );
     } else if (resultado.bloqueado) {
-      UI.actualizarEstadoArchivo(
-        "⚠️ Archivo abierto en Excel — Ciérralo y pulsa 'Sincronizar'",
-        "warning"
-      );
+      fijarEstadoArchivo("statusExcelLocked", {}, "warning");
     } else if (resultado.mensaje) {
-      UI.actualizarEstadoArchivo(`⚠️ ${resultado.mensaje}`, "warning");
+      fijarEstadoArchivo("", {}, "warning", `⚠️ ${resultado.mensaje}`);
     }
   }
 
   function vincularEventosDOM() {
+    // Conmutador de idioma (ES / EN)
+    const langSwitch = document.getElementById("langSwitch");
+    if (langSwitch && StudyTracker.I18n) {
+      langSwitch.addEventListener("click", (e) => {
+        const btn = e.target.closest(".lang-switch-btn");
+        if (!btn) return;
+        StudyTracker.I18n.setLang(btn.dataset.lang);
+      });
+    }
+
     // Barra de filtro rápido por Contexto en el Dashboard
     const filterBar = document.getElementById("contextFilterBar");
     if (filterBar) {
@@ -56,7 +91,7 @@
       });
     }
 
-    // Selectores de chips de 1 clic (Contexto, Actividad, Energía, Complejidad y Objetivo)
+    // Selectores de chips de 1 clic (Contexto, Actividad, Energía, Complejidad, Objetivo y Modo IA)
     document.querySelectorAll(".chip-group").forEach((grupoEl) => {
       const nombreGrupo = grupoEl.dataset.group;
       grupoEl.addEventListener("click", (e) => {
@@ -152,9 +187,7 @@
         if (!ExcelService.estaServidorConectado()) {
           const conexion = await ExcelService.inicializarConexionServidor(store.getSesiones());
           if (!conexion.conectado) {
-            alert(
-              "El servidor local no está activo. Ejecuta 'start.bat' o 'npm start' para activar el guardado directo en data/study-tracker.xlsx."
-            );
+            alert(t("alertServerOffline"));
             return;
           }
         }
@@ -170,14 +203,9 @@
           const sesionesDisco = await ExcelService.recargarDesdeServidorLocal();
           UI.salirModoEdicion();
           store.reemplazarSesiones(sesionesDisco, "servidor_recarga");
-          UI.actualizarEstadoArchivo(
-            "🟢 Recargado desde: data/study-tracker.xlsx",
-            "connected"
-          );
+          fijarEstadoArchivo("statusReloaded", {}, "connected");
         } catch (err) {
-          alert(
-            "No se pudo leer data/study-tracker.xlsx desde el servidor local. Asegúrate de haber iniciado 'start.bat' o 'npm start'."
-          );
+          alert(t("alertReloadError"));
         }
       });
     }
@@ -194,12 +222,12 @@
             UI.salirModoEdicion();
             store.reemplazarSesiones(sesiones, "importar");
             if (!ExcelService.estaServidorConectado()) {
-              UI.actualizarEstadoArchivo(`Cargado: ${nombreArchivo}`, "connected");
+              fijarEstadoArchivo("statusLoadedFile", { file: nombreArchivo }, "connected");
             }
           }
         } catch (err) {
           console.error("Error al importar archivo Excel:", err);
-          alert("No se pudo leer el archivo seleccionado. Verifica que sea un .xlsx válido.");
+          alert(t("alertImportError"));
         } finally {
           event.target.value = "";
         }
@@ -218,11 +246,7 @@
     const btnVaciarTodo = document.getElementById("btnVaciarTodo");
     if (btnVaciarTodo) {
       btnVaciarTodo.addEventListener("click", () => {
-        if (
-          confirm(
-            "¿Seguro que deseas vaciar todas las sesiones registradas en el dashboard y en el Excel?"
-          )
-        ) {
+        if (confirm(t("confirmClearAll"))) {
           UI.salirModoEdicion();
           store.vaciarSesiones();
         }
@@ -231,6 +255,21 @@
   }
 
   window.addEventListener("DOMContentLoaded", async () => {
+    if (StudyTracker.I18n) {
+      StudyTracker.I18n.init();
+      StudyTracker.I18n.subscribe(() => {
+        UI.refrescarTextosFormulario();
+        if (StudyTracker.Timer && typeof StudyTracker.Timer.renderizarWidget === "function") {
+          StudyTracker.Timer.renderizarWidget();
+        }
+        refrescarEstadoArchivo();
+        UI.renderizarDashboard(store.getSesiones(), {
+          onEditarSesion: manejarEditarSesion,
+          onEliminarSesion: manejarEliminarSesion
+        });
+      });
+    }
+
     UI.inicializarFormulario();
     if (StudyTracker.Timer) {
       StudyTracker.Timer.init();
@@ -266,15 +305,9 @@
       if (conexion.origen === "leido_de_disco" && conexion.sesiones.length > 0) {
         store.reemplazarSesiones(conexion.sesiones, "servidor_init");
       }
-      UI.actualizarEstadoArchivo(
-        `🟢 Sincronizado en vivo: ${conexion.excelPath}`,
-        "connected"
-      );
+      fijarEstadoArchivo("statusLiveSynced", { path: conexion.excelPath }, "connected");
     } else {
-      UI.actualizarEstadoArchivo(
-        "Modo navegador (Ejecuta start.bat para sincronizar data/study-tracker.xlsx)",
-        "default"
-      );
+      fijarEstadoArchivo("statusBrowserMode", {}, "default");
     }
   });
 })(window);

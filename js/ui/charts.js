@@ -10,6 +10,20 @@
   let chartMateriaInstance = null;
   let chartActividadInstance = null;
 
+  function t(key) {
+    if (StudyTracker.I18n && typeof StudyTracker.I18n.t === "function") {
+      return StudyTracker.I18n.t(key);
+    }
+    return key;
+  }
+
+  function trVal(cat, val) {
+    if (StudyTracker.I18n && typeof StudyTracker.I18n.traducirValor === "function") {
+      return StudyTracker.I18n.traducirValor(cat, val);
+    }
+    return val;
+  }
+
   /**
    * Actualiza o inicializa el gráfico de rendimiento por hora del día.
    */
@@ -17,14 +31,20 @@
     const canvas = document.getElementById("chartPorHora");
     if (!canvas) return;
 
-    const labels = datosHora.horasOrdenadas.length ? datosHora.horasOrdenadas : ["Sin datos"];
+    const labels = datosHora.horasOrdenadas.length
+      ? datosHora.horasOrdenadas
+      : [t("chartNoData")];
     const dataCalidad = datosHora.calidadPorHora.length ? datosHora.calidadPorHora : [0];
     const dataMinutos = datosHora.minutosPorHora.length ? datosHora.minutosPorHora : [0];
 
     if (chartHoraInstance) {
       chartHoraInstance.data.labels = labels;
+      chartHoraInstance.data.datasets[0].label = t("chartDsAssimilationAvg");
       chartHoraInstance.data.datasets[0].data = dataCalidad;
+      chartHoraInstance.data.datasets[1].label = t("chartDsMinutesStudied");
       chartHoraInstance.data.datasets[1].data = dataMinutos;
+      chartHoraInstance.options.scales.yMinutos.title.text = t("chartAxisMinutes");
+      chartHoraInstance.options.scales.yCalidad.title.text = t("chartAxisAssimilation");
       chartHoraInstance.update();
       return;
     }
@@ -37,7 +57,7 @@
         datasets: [
           {
             type: "line",
-            label: "Calidad Promedio (1-5)",
+            label: t("chartDsAssimilationAvg"),
             data: dataCalidad,
             borderColor: "#10b981",
             backgroundColor: "#10b981",
@@ -47,7 +67,7 @@
           },
           {
             type: "bar",
-            label: "Minutos Estudiados",
+            label: t("chartDsMinutesStudied"),
             data: dataMinutos,
             backgroundColor: "rgba(99, 102, 241, 0.65)",
             borderRadius: 6,
@@ -65,7 +85,7 @@
             type: "linear",
             position: "left",
             beginAtZero: true,
-            title: { display: true, text: "Minutos", color: "#94a3b8" },
+            title: { display: true, text: t("chartAxisMinutes"), color: "#94a3b8" },
             ticks: { color: "#94a3b8" },
             grid: { color: "rgba(51,65,85,0.4)" }
           },
@@ -74,7 +94,7 @@
             position: "right",
             min: 0,
             max: 5,
-            title: { display: true, text: "Calidad (1-5)", color: "#10b981" },
+            title: { display: true, text: t("chartAxisAssimilation"), color: "#10b981" },
             ticks: { color: "#10b981", stepSize: 1 },
             grid: { drawOnChartArea: false }
           }
@@ -92,7 +112,9 @@
     const canvas = document.getElementById("chartPorMateria");
     if (!canvas) return;
 
-    const labels = datosMateria.materiasLabels.length ? datosMateria.materiasLabels : ["Sin datos"];
+    const labels = datosMateria.materiasLabels.length
+      ? datosMateria.materiasLabels
+      : [t("chartNoData")];
     const dataAprendizaje = datosMateria.minutosAprendizaje.length
       ? datosMateria.minutosAprendizaje
       : [0];
@@ -103,9 +125,14 @@
 
     if (chartMateriaInstance) {
       chartMateriaInstance.data.labels = labels;
+      chartMateriaInstance.data.datasets[0].label = t("chartDsAssimilationShort");
       chartMateriaInstance.data.datasets[0].data = dataCalidad;
+      chartMateriaInstance.data.datasets[1].label = t("chartDsMinLearning");
       chartMateriaInstance.data.datasets[1].data = dataAprendizaje;
+      chartMateriaInstance.data.datasets[2].label = t("chartDsMinMechanical");
       chartMateriaInstance.data.datasets[2].data = dataMecanico;
+      chartMateriaInstance.options.scales.yMin.title.text = t("chartAxisMinutes");
+      chartMateriaInstance.options.scales.yCalMat.title.text = t("chartAxisAssimilation");
       chartMateriaInstance.update();
       return;
     }
@@ -118,7 +145,7 @@
         datasets: [
           {
             type: "line",
-            label: "Asimilación (1-5)",
+            label: t("chartDsAssimilationShort"),
             data: dataCalidad,
             borderColor: "#10b981",
             backgroundColor: "#10b981",
@@ -128,7 +155,7 @@
           },
           {
             type: "bar",
-            label: "Min. Aprendizaje (Autónomo / Diálogo / Copiloto)",
+            label: t("chartDsMinLearning"),
             data: dataAprendizaje,
             backgroundColor: "rgba(59, 130, 246, 0.72)",
             borderRadius: 6,
@@ -136,7 +163,7 @@
           },
           {
             type: "bar",
-            label: "Min. Mecánico (Copy-Paste IA)",
+            label: t("chartDsMinMechanical"),
             data: dataMecanico,
             backgroundColor: "rgba(239, 68, 68, 0.75)",
             borderRadius: 6,
@@ -154,7 +181,7 @@
             type: "linear",
             position: "left",
             beginAtZero: true,
-            title: { display: true, text: "Minutos", color: "#94a3b8" },
+            title: { display: true, text: t("chartAxisMinutes"), color: "#94a3b8" },
             ticks: { color: "#94a3b8" },
             grid: { color: "rgba(51,65,85,0.4)" }
           },
@@ -163,7 +190,7 @@
             position: "right",
             min: 0,
             max: 5,
-            title: { display: true, text: "Asimilación (1-5)", color: "#10b981" },
+            title: { display: true, text: t("chartAxisAssimilation"), color: "#10b981" },
             ticks: { color: "#10b981", stepSize: 1 },
             grid: { drawOnChartArea: false }
           }
@@ -180,8 +207,8 @@
     if (!canvas) return;
 
     const labels = datosHabitos.actividadesLabels.length
-      ? datosHabitos.actividadesLabels
-      : ["Sin datos"];
+      ? datosHabitos.actividadesLabels.map((act) => trVal("tipoActividad", act))
+      : [t("chartNoData")];
     const dataMinutos = datosHabitos.minutosPorActividad.length
       ? datosHabitos.minutosPorActividad
       : [0];
@@ -191,8 +218,12 @@
 
     if (chartActividadInstance) {
       chartActividadInstance.data.labels = labels;
+      chartActividadInstance.data.datasets[0].label = t("chartDsAssimilationAvg");
       chartActividadInstance.data.datasets[0].data = dataCalidad;
+      chartActividadInstance.data.datasets[1].label = t("chartDsMinByActivity");
       chartActividadInstance.data.datasets[1].data = dataMinutos;
+      chartActividadInstance.options.scales.yMinAct.title.text = t("chartAxisMinutes");
+      chartActividadInstance.options.scales.yCalAct.title.text = t("chartAxisAssimilation");
       chartActividadInstance.update();
       return;
     }
@@ -205,7 +236,7 @@
         datasets: [
           {
             type: "line",
-            label: "Calidad Promedio (1-5)",
+            label: t("chartDsAssimilationAvg"),
             data: dataCalidad,
             borderColor: "#a855f7",
             backgroundColor: "#a855f7",
@@ -215,7 +246,7 @@
           },
           {
             type: "bar",
-            label: "Minutos por Actividad",
+            label: t("chartDsMinByActivity"),
             data: dataMinutos,
             backgroundColor: "rgba(16, 185, 129, 0.65)",
             borderRadius: 6,
@@ -233,7 +264,7 @@
             type: "linear",
             position: "left",
             beginAtZero: true,
-            title: { display: true, text: "Minutos", color: "#94a3b8" },
+            title: { display: true, text: t("chartAxisMinutes"), color: "#94a3b8" },
             ticks: { color: "#94a3b8" },
             grid: { color: "rgba(51,65,85,0.4)" }
           },
@@ -242,7 +273,7 @@
             position: "right",
             min: 0,
             max: 5,
-            title: { display: true, text: "Calidad (1-5)", color: "#a855f7" },
+            title: { display: true, text: t("chartAxisAssimilation"), color: "#a855f7" },
             ticks: { color: "#a855f7", stepSize: 1 },
             grid: { drawOnChartArea: false }
           }

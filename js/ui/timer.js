@@ -270,6 +270,11 @@
     }
 
     // 3. Texto de estado y título de la pestaña del navegador
+    const t =
+      StudyTracker.I18n && typeof StudyTracker.I18n.t === "function"
+        ? StudyTracker.I18n.t
+        : (k) => k;
+
     if (estado.corriendo) {
       const iconoTitulo =
         estado.modo === "cronometro"
@@ -281,29 +286,37 @@
 
       if (statusTextEl) {
         if (estado.modo === "cronometro") {
-          statusTextEl.textContent = "En curso...";
+          statusTextEl.textContent = t("timerStatusRunning");
         } else if (estado.fasePomodoro === "descanso") {
-          statusTextEl.textContent = `Descanso en curso (${estado.minutosPomodoro} min)`;
+          statusTextEl.textContent = t("timerStatusBreakRunning", {
+            min: estado.minutosPomodoro
+          });
         } else {
-          statusTextEl.textContent = `Enfoque en curso (${estado.minutosPomodoro} min)`;
+          statusTextEl.textContent = t("timerStatusFocusRunning", {
+            min: estado.minutosPomodoro
+          });
         }
       }
     } else if (estado.enPausa) {
-      document.title = `(Pausado ${textoReloj}) StudyTracker`;
+      document.title = `(${t("timerStatusPaused")} ${textoReloj}) StudyTracker`;
       if (statusTextEl) {
-        statusTextEl.textContent = "En pausa";
+        statusTextEl.textContent = t("timerStatusPaused");
       }
     } else {
       document.title = TITULO_ORIGINAL;
       if (statusTextEl) {
         if (estado.horaInicioCapturada && estado.horaFinCapturada) {
-          statusTextEl.textContent = "Horario aplicado al formulario";
+          statusTextEl.textContent = t("timerStatusCaptured");
         } else if (estado.modo === "cronometro") {
-          statusTextEl.textContent = "Listo para iniciar";
+          statusTextEl.textContent = t("timerStatusReady");
         } else if (estado.fasePomodoro === "descanso") {
-          statusTextEl.textContent = `Descanso · ${estado.minutosPomodoro} min`;
+          statusTextEl.textContent = t("timerStatusBreakReady", {
+            min: estado.minutosPomodoro
+          });
         } else {
-          statusTextEl.textContent = `Enfoque · ${estado.minutosPomodoro} min`;
+          statusTextEl.textContent = t("timerStatusFocusReady", {
+            min: estado.minutosPomodoro
+          });
         }
       }
     }
@@ -311,32 +324,32 @@
     // 4. Badges de Hora Inicio y Hora Fin capturadas
     if (badgeInicioEl) {
       badgeInicioEl.textContent = estado.horaInicioCapturada
-        ? `🟢 Inicio: ${estado.horaInicioCapturada}`
-        : "🟢 Inicio: --:--";
+        ? t("timerBadgeStartVal", { time: estado.horaInicioCapturada })
+        : t("timerBadgeStartEmpty");
       badgeInicioEl.classList.toggle("captured", Boolean(estado.horaInicioCapturada));
     }
     if (badgeFinEl) {
       badgeFinEl.textContent = estado.horaFinCapturada
-        ? `🏁 Fin: ${estado.horaFinCapturada}`
+        ? t("timerBadgeEndVal", { time: estado.horaFinCapturada })
         : estado.corriendo
-        ? "🏁 Fin: en curso..."
-        : "🏁 Fin: --:--";
+        ? t("timerBadgeEndRunning")
+        : t("timerBadgeEndEmpty");
       badgeFinEl.classList.toggle("captured", Boolean(estado.horaFinCapturada));
     }
 
     // 5. Botones de acción
     if (btnStartPause) {
       if (estado.corriendo) {
-        btnStartPause.textContent = "⏸️ Pausar";
+        btnStartPause.textContent = t("timerBtnPause");
         btnStartPause.className = "btn timer-btn timer-btn-pause";
       } else if (estado.enPausa) {
-        btnStartPause.textContent = "▶️ Reanudar";
+        btnStartPause.textContent = t("timerBtnResume");
         btnStartPause.className = "btn timer-btn timer-btn-start";
       } else {
         btnStartPause.textContent =
           estado.modo === "pomodoro" && estado.fasePomodoro === "descanso"
-            ? "▶️ Iniciar Descanso"
-            : "▶️ Iniciar Sesión";
+            ? t("timerBtnStartBreak")
+            : t("timerBtnStartSession");
         btnStartPause.className = "btn timer-btn timer-btn-start";
       }
     }
@@ -344,10 +357,11 @@
     const hayTiempoCorrido = transcurridoMs > 0 || estado.corriendo || estado.enPausa;
     if (btnFinish) {
       btnFinish.disabled = !hayTiempoCorrido;
+      btnFinish.textContent = t("timerBtnFinish");
       btnFinish.title =
         estado.modo === "pomodoro" && estado.fasePomodoro === "descanso"
-          ? "Terminar descanso"
-          : "Detiene el reloj y registra la Hora de Fin en el formulario";
+          ? t("timerBtnFinishBreakTitle")
+          : t("timerBtnFinishTitle");
     }
     if (btnReset) {
       btnReset.disabled = !hayTiempoCorrido && !estado.horaInicioCapturada;
@@ -356,8 +370,8 @@
     if (btnMute) {
       btnMute.textContent = estado.sonidoActivo ? "🔔" : "🔕";
       btnMute.title = estado.sonidoActivo
-        ? "Sonido al finalizar activo (clic para silenciar)"
-        : "Sonido silenciado (clic para activar)";
+        ? t("timerSoundOnTitle")
+        : t("timerSoundOffTitle");
     }
   }
 
@@ -661,6 +675,7 @@
 
   StudyTracker.Timer = {
     init,
+    renderizarWidget,
     iniciarOReanudar,
     finalizarMedicion,
     reiniciarTimer,

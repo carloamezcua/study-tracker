@@ -180,6 +180,20 @@
     }
   }
 
+  function t(key, params) {
+    if (StudyTracker.I18n && typeof StudyTracker.I18n.t === "function") {
+      return StudyTracker.I18n.t(key, params);
+    }
+    return key;
+  }
+
+  function trVal(categoria, valor) {
+    if (StudyTracker.I18n && typeof StudyTracker.I18n.traducirValor === "function") {
+      return StudyTracker.I18n.traducirValor(categoria, valor);
+    }
+    return valor;
+  }
+
   /**
    * Carga los datos de una sesión existente en el formulario para editarla.
    */
@@ -218,8 +232,8 @@
     const btnCancel = document.getElementById("btnCancelEdit");
 
     if (formPanel) formPanel.classList.add("panel-editing");
-    if (formTitle) formTitle.textContent = "✏️ Editando Sesión";
-    if (btnSubmit) btnSubmit.textContent = "💾 Actualizar Sesión y Sincronizar Excel";
+    if (formTitle) formTitle.textContent = t("formTitleEdit");
+    if (btnSubmit) btnSubmit.textContent = t("btnSubmitEdit");
     if (btnCancel) btnCancel.style.display = "inline-flex";
 
     // Resaltar fila activa en la tabla
@@ -244,8 +258,8 @@
     const btnCancel = document.getElementById("btnCancelEdit");
 
     if (formPanel) formPanel.classList.remove("panel-editing");
-    if (formTitle) formTitle.textContent = "➕ Registrar Sesión";
-    if (btnSubmit) btnSubmit.textContent = "💾 Registrar Sesión y Sumar XP";
+    if (formTitle) formTitle.textContent = t("formTitleNew");
+    if (btnSubmit) btnSubmit.textContent = t("btnSubmitNew");
     if (btnCancel) btnCancel.style.display = "none";
 
     document.querySelectorAll("#tablaBody tr.row-editing").forEach((tr) => {
@@ -256,6 +270,25 @@
     const inputNotas = document.getElementById("notas");
     if (inputTema) inputTema.value = "";
     if (inputNotas) inputNotas.value = "";
+  }
+
+  /**
+   * Refresca los textos dinámicos del formulario (título modo edición/creación, ayudas y preview) al cambiar de idioma.
+   */
+  function refrescarTextosFormulario() {
+    const formTitle = document.getElementById("formTitle");
+    const btnSubmit = document.getElementById("btnSubmitForm");
+    if (sesionEditandoId) {
+      if (formTitle) formTitle.textContent = t("formTitleEdit");
+      if (btnSubmit) btnSubmit.textContent = t("btnSubmitEdit");
+    } else {
+      if (formTitle) formTitle.textContent = t("formTitleNew");
+      if (btnSubmit) btnSubmit.textContent = t("btnSubmitNew");
+    }
+    actualizarAyudaObjetivo();
+    actualizarAyudaIA({ desdeChip: true });
+    actualizarAyudaCalidad();
+    actualizarPreview();
   }
 
   /**
@@ -308,7 +341,16 @@
   function actualizarAyudaObjetivo() {
     const boxAyuda = document.getElementById("ayudaObjetivo");
     if (!boxAyuda) return;
-    boxAyuda.textContent = obtenerTextoAyudaObjetivo(estadoChips.objetivoCumplido);
+    if (StudyTracker.I18n) {
+      const mapaKey = {
+        Sí: "helpGoalYes",
+        Parcial: "helpGoalPartial",
+        No: "helpGoalNo"
+      };
+      boxAyuda.textContent = t(mapaKey[estadoChips.objetivoCumplido] || "helpGoalYes");
+    } else {
+      boxAyuda.textContent = obtenerTextoAyudaObjetivo(estadoChips.objetivoCumplido);
+    }
   }
 
   /**
@@ -320,11 +362,27 @@
     const inputIA = document.getElementById("usoIA");
     if (!selectCalidad || !boxAyuda) return;
     const valIA = inputIA ? Number(inputIA.value) : 0;
-    boxAyuda.textContent = obtenerTextoAyudaCalidad(
-      selectCalidad.value,
-      estadoChips.modoIA,
-      valIA
-    );
+
+    if (StudyTracker.I18n) {
+      const nivel = Math.min(5, Math.max(1, Number(selectCalidad.value) || 3));
+      let base = t(`helpQuality${nivel}`);
+      if (estadoChips.modoIA === "Mecánico / Copy-Paste" && nivel >= 4) {
+        base += t("helpQualityWarnMech");
+      } else if (
+        valIA >= 70 &&
+        estadoChips.modoIA !== "Diálogo / Tutoría" &&
+        nivel >= 4
+      ) {
+        base += t("helpQualityWarnHighAi", { ai: valIA });
+      }
+      boxAyuda.textContent = base;
+    } else {
+      boxAyuda.textContent = obtenerTextoAyudaCalidad(
+        selectCalidad.value,
+        estadoChips.modoIA,
+        valIA
+      );
+    }
   }
 
   /**
@@ -351,7 +409,19 @@
     }
 
     if (labelIA) labelIA.textContent = `${val}%`;
-    if (boxAyuda) boxAyuda.textContent = obtenerTextoAyudaIA(val, estadoChips.modoIA);
+    if (boxAyuda) {
+      if (StudyTracker.I18n) {
+        const mapaModo = {
+          Autónomo: "helpAiAuton",
+          "Diálogo / Tutoría": "helpAiDialogue",
+          "Copiloto / Apoyo": "helpAiCopilot",
+          "Mecánico / Copy-Paste": "helpAiMech"
+        };
+        boxAyuda.textContent = t(mapaModo[estadoChips.modoIA] || "helpAiCopilot");
+      } else {
+        boxAyuda.textContent = obtenerTextoAyudaIA(val, estadoChips.modoIA);
+      }
+    }
   }
 
   /**
@@ -372,20 +442,20 @@
     );
 
     const bonosActivos = [];
-    if (estadoChips.complejidad === "Desafiante") bonosActivos.push("+10% reto");
-    if (estadoChips.complejidad === "Muy difícil") bonosActivos.push("+20% difícil");
-    if (estadoChips.objetivoCumplido === "Sí") bonosActivos.push("+10% meta");
-    if (estadoChips.objetivoCumplido === "Parcial") bonosActivos.push("+5% avance");
-    if (estadoChips.modoIA === "Autónomo") bonosActivos.push("+5% autónomo");
-    if (estadoChips.modoIA === "Diálogo / Tutoría") bonosActivos.push("+5% diálogo IA");
-    if (estadoChips.modoIA === "Mecánico / Copy-Paste") bonosActivos.push("-15% mecánico");
+    if (estadoChips.complejidad === "Desafiante") bonosActivos.push(t("bonusChallenge"));
+    if (estadoChips.complejidad === "Muy difícil") bonosActivos.push(t("bonusHard"));
+    if (estadoChips.objetivoCumplido === "Sí") bonosActivos.push(t("bonusGoalYes"));
+    if (estadoChips.objetivoCumplido === "Parcial") bonosActivos.push(t("bonusGoalPartial"));
+    if (estadoChips.modoIA === "Autónomo") bonosActivos.push(t("bonusAiAuton"));
+    if (estadoChips.modoIA === "Diálogo / Tutoría") bonosActivos.push(t("bonusAiDialogue"));
+    if (estadoChips.modoIA === "Mecánico / Copy-Paste") bonosActivos.push(t("bonusAiMech"));
 
     const elDuracion = document.getElementById("previewDuracion");
     const elXP = document.getElementById("previewXP");
     if (elDuracion) {
       elDuracion.textContent = bonosActivos.length
-        ? `⏱️ ${min} min (${bonosActivos.join(", ")})`
-        : `⏱️ Duración: ${min} min`;
+        ? t("previewDurationBonuses", { min, bonuses: bonosActivos.join(", ") })
+        : t("previewDurationBase", { min });
     }
     if (elXP) elXP.textContent = `+${xp} XP`;
   }
@@ -414,7 +484,7 @@
     const lista = Array.isArray(todasLasSesiones) ? todasLasSesiones : [];
     const btnTodos = document.querySelector('#contextFilterBar .filter-pill[data-filter="Todos"]');
     if (btnTodos) {
-      btnTodos.textContent = `🌐 Todos (${lista.length})`;
+      btnTodos.textContent = `${t("filterAll")} (${lista.length})`;
     }
 
     CONTEXTOS.forEach((ctx) => {
@@ -423,7 +493,8 @@
       );
       if (btn) {
         const conteo = lista.filter((s) => (s.contexto || "Académico") === ctx.valor).length;
-        btn.textContent = `${ctx.icono} ${ctx.etiqueta} (${conteo})`;
+        const etiquetaTraducida = trVal("contexto", ctx.valor);
+        btn.textContent = `${ctx.icono} ${etiquetaTraducida} (${conteo})`;
       }
     });
   }
@@ -442,12 +513,13 @@
 
       const title = document.createElement("span");
       title.className = "habit-stat-title";
-      title.textContent = `${item.icono} Energía ${item.etiqueta}:`;
+      const energiaTrad = trVal("energiaPrevia", item.etiqueta);
+      title.textContent = `${item.icono} ${t("habitEnergyPrefix")} ${energiaTrad}:`;
 
       const val = document.createElement("strong");
       val.textContent = item.conteo
-        ? `⭐️ ${item.calidadProm} (${item.conteo} ses.)`
-        : "Sin registros";
+        ? `⭐️ ${item.calidadProm} (${item.conteo} ${t("habitSessionsShort")})`
+        : t("habitNoRecords");
 
       pill.append(title, val);
       contenedor.appendChild(pill);
@@ -470,7 +542,9 @@
     divFecha.textContent = sesion.fecha;
     const subDia = document.createElement("small");
     subDia.className = "cell-sub";
-    subDia.textContent = `${sesion.diaSemana || ""} · ${sesion.franjaHoraria || ""}`;
+    const diaTrad = trVal("diaSemana", sesion.diaSemana || "");
+    const franjaTrad = trVal("franjaHoraria", sesion.franjaHoraria || "");
+    subDia.textContent = `${diaTrad} · ${franjaTrad}`;
     tdFecha.append(divFecha, subDia);
 
     // Horario (Inicio - Fin)
@@ -483,14 +557,16 @@
     strongMateria.textContent = sesion.materia;
     const subTema = document.createElement("small");
     subTema.className = "cell-sub";
-    const icCtx = ICONOS_CONTEXTO[sesion.contexto] || "🎓";
-    subTema.textContent = `${icCtx} ${sesion.contexto || "Académico"} · ${sesion.tema || "General"}`;
+    const ctxVal = sesion.contexto || "Académico";
+    const icCtx = ICONOS_CONTEXTO[ctxVal] || "🎓";
+    subTema.textContent = `${icCtx} ${trVal("contexto", ctxVal)} · ${sesion.tema || "General"}`;
     tdMateriaTema.append(strongMateria, subTema);
 
     // Actividad
     const tdActividad = document.createElement("td");
-    const iconoAct = ICONOS_ACTIVIDAD[sesion.tipoActividad] || "💻";
-    tdActividad.textContent = `${iconoAct} ${sesion.tipoActividad || "Desarrollo / Código"}`;
+    const actVal = sesion.tipoActividad || "Desarrollo / Código";
+    const iconoAct = ICONOS_ACTIVIDAD[actVal] || "💻";
+    tdActividad.textContent = `${iconoAct} ${trVal("tipoActividad", actVal)}`;
 
     // Contexto Operativo (Energía + Complejidad + Objetivo)
     const tdContexto = document.createElement("td");
@@ -499,7 +575,13 @@
     const icEnergia = ICONOS_ENERGIA[sesion.energiaPrevia] || "⚡";
     const icComp = ICONOS_COMPLEJIDAD[sesion.complejidad] || "🟡";
     const icObj = ICONOS_OBJETIVO[sesion.objetivoCumplido] || "✅";
-    spanContexto.textContent = `${icEnergia} ${sesion.energiaPrevia} · ${icComp} ${sesion.complejidad} · ${icObj} ${sesion.objetivoCumplido}`;
+    spanContexto.textContent = `${icEnergia} ${trVal(
+      "energiaPrevia",
+      sesion.energiaPrevia
+    )} · ${icComp} ${trVal("complejidad", sesion.complejidad)} · ${icObj} ${trVal(
+      "objetivoCumplido",
+      sesion.objetivoCumplido
+    )}`;
     tdContexto.appendChild(spanContexto);
 
     // Duración
@@ -526,10 +608,10 @@
         : modoActual === "Diálogo / Tutoría" || modoActual === "Autónomo"
         ? "ia-mode-tag ia-mode-aprendizaje"
         : "ia-mode-tag";
-    divModoIA.textContent = `${icModoIA} ${modoActual}`;
+    divModoIA.textContent = `${icModoIA} ${trVal("modoIA", modoActual)}`;
     const subPorcentajeIA = document.createElement("small");
     subPorcentajeIA.className = "cell-sub";
-    subPorcentajeIA.textContent = `${sesion.usoIA}% apoyo IA`;
+    subPorcentajeIA.textContent = t("tableAiSupportSub", { pct: sesion.usoIA });
     tdIA.append(divModoIA, subPorcentajeIA);
 
     // XP Ganados
@@ -549,14 +631,14 @@
     const btnEditar = document.createElement("button");
     btnEditar.type = "button";
     btnEditar.className = "action-icon-btn edit-btn";
-    btnEditar.title = "Editar esta sesión";
+    btnEditar.title = t("btnEditSessionTitle");
     btnEditar.textContent = "✏️";
     btnEditar.addEventListener("click", () => onEditar(sesion));
 
     const btnEliminar = document.createElement("button");
     btnEliminar.type = "button";
     btnEliminar.className = "action-icon-btn delete-btn";
-    btnEliminar.title = "Eliminar esta sesión";
+    btnEliminar.title = t("btnDeleteSessionTitle");
     btnEliminar.textContent = "✖";
     btnEliminar.addEventListener("click", () => onEliminar(sesion.id));
 
@@ -593,10 +675,10 @@
     const progreso = calcularProgresoRPG(kpisGlobales.totalXP);
 
     document.getElementById("uiNivel").textContent = progreso.nivel;
-    document.getElementById("uiRango").textContent = progreso.rango;
+    document.getElementById("uiRango").textContent = trVal("rango", progreso.rango);
     document.getElementById("uiXpActual").textContent = progreso.xpEnNivelActual;
     document.getElementById("uiXpSiguiente").textContent = progreso.esNivelMaximo
-      ? "MÁX"
+      ? t("rpgMaxLevel")
       : progreso.xpSiguienteNivel;
     document.getElementById("uiXpBar").style.width = `${progreso.porcentajeBarra}%`;
     document.getElementById("uiXpTotalBadge").textContent = `${progreso.totalXP} XP`;
@@ -611,24 +693,34 @@
 
     // 2. Tarjetas KPI (filtradas por el contexto seleccionado)
     document.getElementById("kpiHoras").textContent = `${kpis.totalHoras} h`;
-    document.getElementById("kpiMinutos").textContent = `${kpis.totalMinutos} minutos en total`;
+    document.getElementById("kpiMinutos").textContent = t("kpiTotalMinutesSub", {
+      min: kpis.totalMinutos
+    });
     document.getElementById("kpiSesiones").textContent = kpis.totalSesiones;
     document.getElementById("kpiPromedioMin").textContent = kpis.totalSesiones
-      ? `${kpis.promedioMinutos} min promedio / sesión`
-      : "0 min promedio";
+      ? t("kpiAvgMinSub", { min: kpis.promedioMinutos })
+      : t("kpiAvgMinZero");
     document.getElementById("kpiCalidad").textContent = `${kpis.promedioCalidad} / 5`;
     document.getElementById("kpiIA").textContent = `${kpis.promedioIA}%`;
 
     const elKpiIASub = document.getElementById("kpiIASub");
     if (elKpiIASub) {
-      elKpiIASub.textContent = `💬 ${kpis.iaDialogo} diálogo · 🧠 ${kpis.iaAutonomo} autón. · 🤖 ${kpis.iaMecanico} mec.`;
+      elKpiIASub.textContent = t("kpiAiSub", {
+        dial: kpis.iaDialogo,
+        auton: kpis.iaAutonomo,
+        mech: kpis.iaMecanico
+      });
     }
 
     const elKpiObjetivos = document.getElementById("kpiObjetivos");
     const elKpiObjetivosSub = document.getElementById("kpiObjetivosSub");
     if (elKpiObjetivos) elKpiObjetivos.textContent = `${kpis.tasaObjetivos}%`;
     if (elKpiObjetivosSub) {
-      elKpiObjetivosSub.textContent = `${kpis.cumplidosSi} sí · ${kpis.cumplidosParcial} parc. · ${kpis.bloqueosNo} bloq.`;
+      elKpiObjetivosSub.textContent = t("kpiGoalsSub", {
+        yes: kpis.cumplidosSi,
+        partial: kpis.cumplidosParcial,
+        no: kpis.bloqueosNo
+      });
     }
 
     // 3. Tabla de Historial (usando nodos seguros e IDs únicos)
@@ -662,9 +754,12 @@
     const elMejorHora = document.getElementById("kpiMejorHora");
     if (elMejorHora) {
       if (datosHora.mejorHora) {
-        elMejorHora.textContent = `Pico de foco: ~${datosHora.mejorHora} (⭐️ ${datosHora.mejorCalidad.toFixed(1)})`;
+        elMejorHora.textContent = t("kpiBestHourPeak", {
+          hour: datosHora.mejorHora,
+          quality: datosHora.mejorCalidad.toFixed(1)
+        });
       } else {
-        elMejorHora.textContent = "Mejor hora: --:--";
+        elMejorHora.textContent = t("kpiBestHourNone");
       }
     }
   }
@@ -676,6 +771,7 @@
     seleccionarChip,
     cargarSesionEnFormulario,
     salirModoEdicion,
+    refrescarTextosFormulario,
     inicializarFormulario,
     ponerHoraActual,
     actualizarAyudaObjetivo,

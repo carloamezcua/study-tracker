@@ -14,6 +14,7 @@
   <script src="js/domain/metrics.js" defer></script>
   <script src="js/state/store.js" defer></script>
   <script src="js/services/excel-sync.js" defer></script>
+  <script src="js/ui/i18n.js" defer></script>
   <script src="js/ui/charts.js" defer></script>
   <script src="js/ui/dashboard.js" defer></script>
   <script src="js/ui/timer.js" defer></script>
@@ -21,25 +22,29 @@
 </head>
 <body>
   <div class="app-wrapper">
-    <!-- BARRA SUPERIOR: SINCRONIZACIÓN AUTOMÁTICA CON EXCEL LOCAL -->
+    <!-- BARRA SUPERIOR: SINCRONIZACIÓN AUTOMÁTICA CON EXCEL LOCAL E IDIOMA -->
     <div class="top-bar">
       <div class="brand">
-        <h1>⚔️ StudyTracker &mdash; Analytics &amp; RPG</h1>
-        <p>Sincronización en vivo con <code>data/study-tracker.xlsx</code> (Altas, ediciones y bajas en tiempo real)</p>
+        <h1 data-i18n="brandTitle">⚔️ StudyTracker &mdash; Analytics &amp; RPG</h1>
+        <p data-i18n-html="brandSubtitle">Sincronización en vivo con <code>data/study-tracker.xlsx</code> (Altas, ediciones y bajas en tiempo real)</p>
       </div>
       <div class="excel-actions">
-        <span id="fileStatus" class="status-pill">Conectando con servidor local...</span>
-        <button id="btnSincronizarServidor" type="button" class="btn btn-primary" title="Guarda inmediatamente todos los registros actuales en data/study-tracker.xlsx">
+        <div class="lang-switch" id="langSwitch" title="Cambiar idioma / Switch language">
+          <button type="button" class="lang-switch-btn active" data-lang="es">ES</button>
+          <button type="button" class="lang-switch-btn" data-lang="en">EN</button>
+        </div>
+        <span id="fileStatus" class="status-pill" data-i18n="statusConnecting">Conectando con servidor local...</span>
+        <button id="btnSincronizarServidor" type="button" class="btn btn-primary" data-i18n="btnSyncExcel" data-i18n-title="btnSyncExcelTitle" title="Guarda inmediatamente todos los registros actuales en data/study-tracker.xlsx">
           🔄 Sincronizar Excel
         </button>
-        <button id="btnRecargarExcel" type="button" class="btn" title="Vuelve a leer data/study-tracker.xlsx si hiciste cambios manuales desde Microsoft Excel">
+        <button id="btnRecargarExcel" type="button" class="btn" data-i18n="btnReloadExcel" data-i18n-title="btnReloadExcelTitle" title="Vuelve a leer data/study-tracker.xlsx si hiciste cambios manuales desde Microsoft Excel">
           📂 Recargar de Excel
         </button>
-        <label class="btn" style="margin:0; cursor:pointer;" title="Importar un archivo .xlsx externo">
-          📤 Importar otro .xlsx
+        <label class="btn" style="margin:0; cursor:pointer;" data-i18n-title="btnImportExcelTitle" title="Importar un archivo .xlsx externo">
+          <span data-i18n="btnImportExcel">📤 Importar otro .xlsx</span>
           <input type="file" id="importInput" accept=".xlsx,.xls,.csv" style="display:none">
         </label>
-        <button id="btnExportarExcel" type="button" class="btn btn-success" title="Descarga una copia de respaldo de study-tracker.xlsx">
+        <button id="btnExportarExcel" type="button" class="btn btn-success" data-i18n="btnExportExcel" data-i18n-title="btnExportExcelTitle" title="Descarga una copia de respaldo de study-tracker.xlsx">
           📥 Descargar copia (.xlsx)
         </button>
       </div>
@@ -48,27 +53,27 @@
     <!-- BANNER RPG DE NIVEL Y EXPERIENCIA -->
     <div class="rpg-banner">
       <div class="level-badge">
-        <small>Nivel</small>
+        <small data-i18n="rpgLevelSmall">Nivel</small>
         <span id="uiNivel">1</span>
       </div>
       <div class="xp-progress-container">
         <div class="xp-header">
-          <span>Rango: <strong id="uiRango">Novato del Enfoque</strong></span>
-          <span><strong id="uiXpActual">0</strong> / <span id="uiXpSiguiente">500</span> XP para subir de nivel</span>
+          <span><span data-i18n="rpgRankPrefix">Rango:</span> <strong id="uiRango">Novato del Enfoque</strong></span>
+          <span><strong id="uiXpActual">0</strong> / <span id="uiXpSiguiente">500</span> <span data-i18n="rpgXpToNext">XP para subir de nivel</span></span>
         </div>
         <div class="xp-bar-bg">
           <div class="xp-bar-fill" id="uiXpBar"></div>
         </div>
       </div>
       <div class="xp-total-box">
-        <div class="xp-total-label">XP Total Acumulado</div>
+        <div class="xp-total-label" data-i18n="rpgTotalXpLabel">XP Total Acumulado</div>
         <div class="xp-total-value" id="uiXpTotalBadge">0 XP</div>
       </div>
     </div>
 
     <!-- BARRA DE FILTRO RÁPIDO POR CONTEXTO -->
     <div class="filter-bar" id="contextFilterBar">
-      <span class="filter-label">🔍 Filtrar analítica y tabla por contexto:</span>
+      <span class="filter-label" data-i18n="filterLabel">🔍 Filtrar analítica y tabla por contexto:</span>
       <div class="filter-pills">
         <button type="button" class="filter-pill active" data-filter="Todos">🌐 Todos</button>
         <button type="button" class="filter-pill" data-filter="Académico">🎓 Académico</button>
@@ -81,27 +86,27 @@
     <!-- TARJETAS KPI -->
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="label">Tiempo Total Estudiado</div>
+        <div class="label" data-i18n="kpiTotalTimeLabel">Tiempo Total Estudiado</div>
         <div class="value" id="kpiHoras">0.0 h</div>
         <div class="sub" id="kpiMinutos">0 minutos en total</div>
       </div>
       <div class="kpi-card">
-        <div class="label">Sesiones Completadas</div>
+        <div class="label" data-i18n="kpiSessionsLabel">Sesiones Completadas</div>
         <div class="value" id="kpiSesiones">0</div>
         <div class="sub" id="kpiPromedioMin">0 min promedio / sesión</div>
       </div>
       <div class="kpi-card">
-        <div class="label">Asimilación Promedio</div>
+        <div class="label" data-i18n="kpiAssimilationLabel">Asimilación Promedio</div>
         <div class="value" id="kpiCalidad">0.0 / 5</div>
         <div class="sub" id="kpiMejorHora">Mejor hora: --:--</div>
       </div>
       <div class="kpi-card">
-        <div class="label">Objetivos Cumplidos</div>
+        <div class="label" data-i18n="kpiGoalsLabel">Objetivos Cumplidos</div>
         <div class="value" id="kpiObjetivos">0%</div>
         <div class="sub" id="kpiObjetivosSub">0 sí · 0 parc. · 0 bloq.</div>
       </div>
       <div class="kpi-card">
-        <div class="label">Impacto y Uso de IA</div>
+        <div class="label" data-i18n="kpiAiImpactLabel">Impacto y Uso de IA</div>
         <div class="value" id="kpiIA">0%</div>
         <div class="sub" id="kpiIASub">0 diálogo · 0 copiloto · 0 mec.</div>
       </div>
@@ -112,18 +117,18 @@
       <!-- COLUMNA IZQUIERDA: FORMULARIO DE INGESTA Y EDICIÓN -->
       <div class="panel" id="formPanel">
         <h2>
-          <span id="formTitle">➕ Registrar Sesión</span>
+          <span id="formTitle" data-i18n="formTitleNew">➕ Registrar Sesión</span>
         </h2>
-        <div class="subtitle">Cronometra tu sesión o regístrala en 1 clic. Sincronización automática con <code>data/study-tracker.xlsx</code>.</div>
+        <div class="subtitle" data-i18n-html="formSubtitle">Cronometra tu sesión o regístrala en 1 clic. Sincronización automática con <code>data/study-tracker.xlsx</code>.</div>
 
         <!-- CRONÓMETRO Y POMODORO INTEGRADO -->
         <div class="timer-widget" id="timerWidgetCard">
           <div class="timer-header">
             <div class="timer-tabs">
-              <button type="button" class="timer-mode-tab active" data-mode="cronometro" title="Cuenta progresiva con captura de inicio y fin">
+              <button type="button" class="timer-mode-tab active" data-mode="cronometro" data-i18n="timerTabStopwatch" data-i18n-title="timerTabStopwatchTitle" title="Cuenta progresiva con captura de inicio y fin">
                 ⏱️ Cronómetro
               </button>
-              <button type="button" class="timer-mode-tab" data-mode="pomodoro" title="Temporizador por bloques de enfoque y descanso">
+              <button type="button" class="timer-mode-tab" data-mode="pomodoro" data-i18n="timerTabPomodoro" data-i18n-title="timerTabPomodoroTitle" title="Temporizador por bloques de enfoque y descanso">
                 🍅 Pomodoro
               </button>
             </div>
@@ -138,7 +143,7 @@
             <button type="button" class="pomo-preset-btn" data-minutes="50" data-phase="enfoque">🔥 50m</button>
             <button type="button" class="pomo-preset-btn pomo-break-btn" data-minutes="5" data-phase="descanso">☕ 5m</button>
             <button type="button" class="pomo-preset-btn pomo-break-btn" data-minutes="15" data-phase="descanso">🌴 15m</button>
-            <div class="pomo-custom-wrap" title="Personalizar minutos del bloque">
+            <div class="pomo-custom-wrap" data-i18n-title="timerCustomMinTitle" title="Personalizar minutos del bloque">
               <input type="number" id="pomodoroCustomMin" min="1" max="180" value="25" aria-label="Minutos personalizados">
               <span>min</span>
             </div>
@@ -146,7 +151,7 @@
 
           <div class="timer-display-box">
             <div class="timer-digits" id="timerDisplay">00:00:00</div>
-            <div class="timer-status-text" id="timerStatusText">
+            <div class="timer-status-text" id="timerStatusText" data-i18n="timerStatusReady">
               Listo para iniciar
             </div>
             <div class="timer-progress-bg">
@@ -163,10 +168,10 @@
             <button type="button" id="btnTimerStartPause" class="btn timer-btn timer-btn-start">
               ▶️ Iniciar Sesión
             </button>
-            <button type="button" id="btnTimerFinish" class="btn timer-btn timer-btn-finish" disabled title="Detiene el reloj y registra la Hora de Fin en el formulario">
+            <button type="button" id="btnTimerFinish" class="btn timer-btn timer-btn-finish" disabled data-i18n="timerBtnFinish" title="Detiene el reloj y registra la Hora de Fin en el formulario">
               ⏹️ Terminar
             </button>
-            <button type="button" id="btnTimerReset" class="btn timer-btn timer-btn-reset" disabled title="Reiniciar contador a cero">
+            <button type="button" id="btnTimerReset" class="btn timer-btn timer-btn-reset" disabled data-i18n-title="timerBtnResetTitle" title="Reiniciar contador a cero">
               🔄
             </button>
           </div>
@@ -180,7 +185,7 @@
         <form id="studyForm">
           <!-- CONTEXTO / PROPÓSITO (4 CHIPS DE 1 CLIC) -->
           <div class="form-group">
-            <label>Contexto / Propósito</label>
+            <label data-i18n="labelContext">Contexto / Propósito</label>
             <div class="chip-group" data-group="contexto">
               <button type="button" class="chip-btn active" data-value="Académico">🎓 Académico</button>
               <button type="button" class="chip-btn" data-value="Certificación">🏅 Certificación</button>
@@ -191,38 +196,38 @@
 
           <div class="row">
             <div class="form-group">
-              <label for="fecha">Fecha</label>
+              <label for="fecha" data-i18n="labelDate">Fecha</label>
               <input type="date" id="fecha" required>
             </div>
             <div class="form-group">
-              <label for="materia">Materia / Proyecto</label>
-              <input type="text" id="materia" list="listaMaterias" placeholder="Ej. Snowflake, Base de Datos" required>
+              <label for="materia" data-i18n="labelSubject">Materia / Proyecto</label>
+              <input type="text" id="materia" list="listaMaterias" data-i18n-placeholder="placeholderSubject" placeholder="Ej. Snowflake, Base de Datos" required>
               <datalist id="listaMaterias"></datalist>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="tema">Tema específico <span class="label-hint">(Subtema o módulo)</span></label>
-            <input type="text" id="tema" list="listaTemas" placeholder="Ej. Virtual Warehouses, Rutas MVC..." required>
+            <label for="tema"><span data-i18n="labelTopic">Tema específico</span> <span class="label-hint" data-i18n="labelTopicHint">(Subtema o módulo)</span></label>
+            <input type="text" id="tema" list="listaTemas" data-i18n-placeholder="placeholderTopic" placeholder="Ej. Virtual Warehouses, Rutas MVC..." required>
             <datalist id="listaTemas"></datalist>
           </div>
 
           <div class="row">
             <div class="form-group">
-              <label for="horaInicio">Hora Inicio</label>
+              <label for="horaInicio" data-i18n="labelStartTime">Hora Inicio</label>
               <input type="time" id="horaInicio" required>
-              <button type="button" id="btnHoraInicioActual" class="quick-btn">⏱️ Poner hora actual</button>
+              <button type="button" id="btnHoraInicioActual" class="quick-btn" data-i18n="btnNowStart">⏱️ Poner hora actual</button>
             </div>
             <div class="form-group">
-              <label for="horaFin">Hora Fin</label>
+              <label for="horaFin" data-i18n="labelEndTime">Hora Fin</label>
               <input type="time" id="horaFin" required>
-              <button type="button" id="btnHoraFinActual" class="quick-btn">🏁 Poner hora actual</button>
+              <button type="button" id="btnHoraFinActual" class="quick-btn" data-i18n="btnNowEnd">🏁 Poner hora actual</button>
             </div>
           </div>
 
           <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (6 CHIPS EN GRID 3x2) -->
           <div class="form-group">
-            <label>Tipo de Actividad</label>
+            <label data-i18n="labelActivity">Tipo de Actividad</label>
             <div class="chip-group chip-grid-6" data-group="tipoActividad">
               <button type="button" class="chip-btn" data-value="Teoría / Docs">📖 Teoría / Docs</button>
               <button type="button" class="chip-btn" data-value="Investigación / Diálogo">💬 Investigación / Diálogo</button>
@@ -236,7 +241,7 @@
           <!-- 2. ENERGÍA PREVIA Y COMPLEJIDAD DEL TEMA -->
           <div class="row">
             <div class="form-group">
-              <label>Energía Previa</label>
+              <label data-i18n="labelEnergy">Energía Previa</label>
               <div class="chip-group" data-group="energiaPrevia">
                 <button type="button" class="chip-btn" data-value="Alta">🔋 Alta</button>
                 <button type="button" class="chip-btn active" data-value="Media">⚡ Media</button>
@@ -244,7 +249,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label>Complejidad <span class="label-hint">(+XP)</span></label>
+              <label><span data-i18n="labelComplexity">Complejidad</span> <span class="label-hint" data-i18n="labelComplexityHint">(+XP)</span></label>
               <div class="chip-group" data-group="complejidad">
                 <button type="button" class="chip-btn" data-value="Fácil">🟢 Fácil</button>
                 <button type="button" class="chip-btn active" data-value="Desafiante">🟡 Reto</button>
@@ -255,7 +260,7 @@
 
           <!-- 3. OBJETIVO CUMPLIDO -->
           <div class="form-group">
-            <label>¿Objetivo Cumplido? <span class="label-hint">(+10% Sí · +5% Parcial)</span></label>
+            <label><span data-i18n="labelGoal">¿Objetivo Cumplido?</span> <span class="label-hint" data-i18n="labelGoalHint">(+10% Sí · +5% Parcial)</span></label>
             <div class="chip-group" data-group="objetivoCumplido">
               <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Logrado +10%)</button>
               <button type="button" class="chip-btn" data-value="Parcial">⚠️ Parcial (+5%)</button>
@@ -268,7 +273,7 @@
 
           <!-- 4. MODO DE INTERACCIÓN CON IA + PORCENTAJE -->
           <div class="form-group">
-            <label>Modo de Uso de IA <span class="label-hint">(+5% Autónomo/Diálogo · -15% Mecánico)</span></label>
+            <label><span data-i18n="labelAiMode">Modo de Uso de IA</span> <span class="label-hint" data-i18n="labelAiModeHint">(+5% Autónomo/Diálogo · -15% Mecánico)</span></label>
             <div class="chip-group chip-grid-2" data-group="modoIA">
               <button type="button" class="chip-btn" data-value="Autónomo">🧠 Autónomo (Sin IA)</button>
               <button type="button" class="chip-btn active" data-value="Diálogo / Tutoría">💬 Diálogo / Tutoría</button>
@@ -276,7 +281,7 @@
               <button type="button" class="chip-btn" data-value="Mecánico / Copy-Paste">🤖 Mecánico / Copy-Paste</button>
             </div>
             <div class="ia-slider-row">
-              <span class="ia-slider-label">Porcentaje de apoyo IA: <strong id="iaLabel">25%</strong></span>
+              <span class="ia-slider-label"><span data-i18n="labelAiSlider">Porcentaje de apoyo IA:</span> <strong id="iaLabel">25%</strong></span>
               <input type="range" id="usoIA" min="0" max="100" step="5" value="25">
             </div>
             <div id="ayudaIA" class="helper-box">
@@ -286,13 +291,13 @@
 
           <!-- 5. CALIDAD DE APRENDIZAJE / ASIMILACIÓN REAL -->
           <div class="form-group">
-            <label for="calidad">Calidad de Aprendizaje / Asimilación (1 al 5)</label>
+            <label for="calidad" data-i18n="labelQuality">Calidad de Aprendizaje / Asimilación (1 al 5)</label>
             <select id="calidad">
-              <option value="1">1 - ⭐️ Mecánico / Sin retención (Solo copié o distraído)</option>
-              <option value="2">2 - ⭐️⭐️ Superficial / Pasivo (Entendí por encima)</option>
-              <option value="3" selected>3 - ⭐️⭐️⭐️ Comprensión estándar (Entendí la lógica)</option>
-              <option value="4">4 - ⭐️⭐️⭐️⭐️ Aprendizaje sólido (Razoné y puedo replicarlo)</option>
-              <option value="5">5 - ⭐️⭐️⭐️⭐️⭐️ Asimilación profunda (Dominio total)</option>
+              <option value="1" data-i18n="qualityOpt1">1 - ⭐️ Mecánico / Sin retención (Solo copié o distraído)</option>
+              <option value="2" data-i18n="qualityOpt2">2 - ⭐️⭐️ Superficial / Pasivo (Entendí por encima)</option>
+              <option value="3" selected data-i18n="qualityOpt3">3 - ⭐️⭐️⭐️ Comprensión estándar (Entendí la lógica)</option>
+              <option value="4" data-i18n="qualityOpt4">4 - ⭐️⭐️⭐️⭐️ Aprendizaje sólido (Razoné y puedo replicarlo)</option>
+              <option value="5" data-i18n="qualityOpt5">5 - ⭐️⭐️⭐️⭐️⭐️ Asimilación profunda (Dominio total)</option>
             </select>
             <div id="ayudaCalidad" class="helper-box">
               Comprensión estándar: Entendí la lógica general de lo realizado y resolví partes por mi cuenta.
@@ -300,15 +305,15 @@
           </div>
 
           <div class="form-group">
-            <label for="notas">Notas breves</label>
-            <textarea id="notas" rows="2" placeholder="¿Qué aprendiste, qué debatiste o dónde te trabaste?"></textarea>
+            <label for="notas" data-i18n="labelNotes">Notas breves</label>
+            <textarea id="notas" rows="2" data-i18n-placeholder="placeholderNotes" placeholder="¿Qué aprendiste, qué debatiste o dónde te trabaste?"></textarea>
           </div>
 
           <div class="form-actions">
-            <button type="submit" id="btnSubmitForm" class="btn btn-primary btn-submit">
+            <button type="submit" id="btnSubmitForm" class="btn btn-primary btn-submit" data-i18n="btnSubmitNew">
               💾 Registrar Sesión y Sumar XP
             </button>
-            <button type="button" id="btnCancelEdit" class="btn btn-cancel-edit" style="display:none;">
+            <button type="button" id="btnCancelEdit" class="btn btn-cancel-edit" style="display:none;" data-i18n="btnCancelEdit">
               ✖ Cancelar edición
             </button>
           </div>
@@ -319,10 +324,10 @@
       <div class="charts-col">
         <div class="panel">
           <h2>
-            <span>🕒 Rendimiento y Asimilación por Hora del Día</span>
-            <small class="chart-hint">Descubre tus picos biológicos de enfoque</small>
+            <span data-i18n="chart1Title">🕒 Rendimiento y Asimilación por Hora del Día</span>
+            <small class="chart-hint" data-i18n="chart1Hint">Descubre tus picos biológicos de enfoque</small>
           </h2>
-          <div class="subtitle">Compara los minutos estudiados (barras) y tu calidad de asimilación promedio (línea) según la hora de inicio.</div>
+          <div class="subtitle" data-i18n="chart1Subtitle">Compara los minutos estudiados (barras) y tu calidad de asimilación promedio (línea) según la hora de inicio.</div>
           <div class="chart-box">
             <canvas id="chartPorHora"></canvas>
           </div>
@@ -330,10 +335,10 @@
 
         <div class="panel">
           <h2>
-            <span>📚 Impacto de IA y Aprendizaje por Materia</span>
-            <small class="chart-hint">Aprendizaje real vs. Copy-Paste mecánico</small>
+            <span data-i18n="chart2Title">📚 Impacto de IA y Aprendizaje por Materia</span>
+            <small class="chart-hint" data-i18n="chart2Hint">Aprendizaje real vs. Copy-Paste mecánico</small>
           </h2>
-          <div class="subtitle">Contrasta tus minutos de aprendizaje real (Autónomo, Diálogo o Copiloto) frente a las sesiones mecánicas (Copy-Paste) y tu asimilación (1-5).</div>
+          <div class="subtitle" data-i18n="chart2Subtitle">Contrasta tus minutos de aprendizaje real (Autónomo, Diálogo o Copiloto) frente a las sesiones mecánicas (Copy-Paste) y tu asimilación (1-5).</div>
           <div class="chart-box">
             <canvas id="chartPorMateria"></canvas>
           </div>
@@ -341,10 +346,10 @@
 
         <div class="panel">
           <h2>
-            <span>🧠 Patrones de Hábito: Actividad y Energía Previa</span>
-            <small class="chart-hint">Comportamiento por tipo de tarea y fatiga</small>
+            <span data-i18n="chart3Title">🧠 Patrones de Hábito: Actividad y Energía Previa</span>
+            <small class="chart-hint" data-i18n="chart3Hint">Comportamiento por tipo de tarea y fatiga</small>
           </h2>
-          <div class="subtitle">Minutos y asimilación promedio según los 6 tipos de actividad y cómo rinde tu aprendizaje según tu energía inicial.</div>
+          <div class="subtitle" data-i18n="chart3Subtitle">Minutos y asimilación promedio según los 6 tipos de actividad y cómo rinde tu aprendizaje según tu energía inicial.</div>
           <div class="chart-box">
             <canvas id="chartPorActividad"></canvas>
           </div>
@@ -356,24 +361,24 @@
     <!-- HISTORIAL DE SESIONES -->
     <div class="panel history-panel">
       <h2>
-        <span>📋 Historial de Sesiones Registradas (Clic en ✏️ para editar o ✖ para borrar)</span>
-        <button id="btnVaciarTodo" type="button" class="btn btn-clear">🗑️ Vaciar todo / Reiniciar a 0</button>
+        <span data-i18n="historyTitle">📋 Historial de Sesiones Registradas (Clic en ✏️ para editar o ✖ para borrar)</span>
+        <button id="btnVaciarTodo" type="button" class="btn btn-clear" data-i18n="btnClearAll">🗑️ Vaciar todo / Reiniciar a 0</button>
       </h2>
       <div class="table-wrapper">
         <table>
           <thead>
             <tr>
-              <th>Fecha / Franja</th>
-              <th>Horario</th>
-              <th>Materia / Tema</th>
-              <th>Actividad</th>
-              <th>Energía · Reto · Meta</th>
-              <th>Duración</th>
-              <th>Asimilación</th>
-              <th>IA (Modo · %)</th>
-              <th>XP Ganados</th>
-              <th>Notas</th>
-              <th>Acciones</th>
+              <th data-i18n="thDateSlot">Fecha / Franja</th>
+              <th data-i18n="thSchedule">Horario</th>
+              <th data-i18n="thSubjectTopic">Materia / Tema</th>
+              <th data-i18n="thActivity">Actividad</th>
+              <th data-i18n="thEnergyChallengeGoal">Energía · Reto · Meta</th>
+              <th data-i18n="thDuration">Duración</th>
+              <th data-i18n="thAssimilation">Asimilación</th>
+              <th data-i18n="thAiModePct">IA (Modo · %)</th>
+              <th data-i18n="thXpEarned">XP Ganados</th>
+              <th data-i18n="thNotes">Notas</th>
+              <th data-i18n="thActions">Acciones</th>
             </tr>
           </thead>
           <tbody id="tablaBody"></tbody>
@@ -383,43 +388,43 @@
 
     <!-- GUÍA Y ESCALAS DE REFERENCIA PARA CUALQUIER USUARIO -->
     <div class="panel">
-      <h2>📖 Guía de Referencia y Escalas del Sistema</h2>
-      <div class="subtitle">Documentación integrada para evaluar el impacto cognitivo de cada bloque y cómo se calculan las fórmulas en Excel.</div>
+      <h2 data-i18n="guideMainTitle">📖 Guía de Referencia y Escalas del Sistema</h2>
+      <div class="subtitle" data-i18n="guideMainSubtitle">Documentación integrada para evaluar el impacto cognitivo de cada bloque y cómo se calculan las fórmulas en Excel.</div>
       <div class="guide-grid">
         <div class="guide-card">
-          <h4>⭐️ Calidad de Aprendizaje / Asimilación (1 al 5)</h4>
+          <h4 data-i18n="guideCard1Title">⭐️ Calidad de Aprendizaje / Asimilación (1 al 5)</h4>
           <ul>
-            <li><strong>1 (Mecánico / Sin retención):</strong> Solo copié/pegué respuestas o estuve distraído; no asimilé el tema.</li>
-            <li><strong>2 (Superficial / Pasivo):</strong> Seguí pasos o código generado entendiendo solo por encima; poca retención.</li>
-            <li><strong>3 (Comprensión estándar):</strong> Entendí la lógica general de lo realizado y resolví partes por mi cuenta.</li>
-            <li><strong>4 (Aprendizaje sólido):</strong> Razoné activamente el problema, comprendí el porqué y puedo replicarlo.</li>
-            <li><strong>5 (Asimilación profunda):</strong> Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda.</li>
+            <li data-i18n-html="guideCard1Li1"><strong>1 (Mecánico / Sin retención):</strong> Solo copié/pegué respuestas o estuve distraído; no asimilé el tema.</li>
+            <li data-i18n-html="guideCard1Li2"><strong>2 (Superficial / Pasivo):</strong> Seguí pasos o código generado entendiendo solo por encima; poca retención.</li>
+            <li data-i18n-html="guideCard1Li3"><strong>3 (Comprensión estándar):</strong> Entendí la lógica general de lo realizado y resolví partes por mi cuenta.</li>
+            <li data-i18n-html="guideCard1Li4"><strong>4 (Aprendizaje sólido):</strong> Razoné activamente el problema, comprendí el porqué y puedo replicarlo.</li>
+            <li data-i18n-html="guideCard1Li5"><strong>5 (Asimilación profunda):</strong> Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda.</li>
           </ul>
         </div>
         <div class="guide-card">
-          <h4>🧠 Contexto y 6 Tipos de Actividad</h4>
+          <h4 data-i18n="guideCard2Title">🧠 Contexto y 6 Tipos de Actividad</h4>
           <ul>
-            <li><strong>Contexto:</strong> <code>🎓 Académico</code>, <code>🏅 Certificación</code>, <code>🚀 Proyecto Propio</code>, <code>🤝 Externo</code>.</li>
-            <li><strong>Actividades:</strong> <code>📖 Teoría / Docs</code>, <code>💬 Investigación / Diálogo</code>, <code>✍️ Diseño / Apuntes</code>, <code>💻 Desarrollo / Código</code>, <code>🧪 Práctica / Debugging</code>, <code>🔁 Repaso / Simulacro</code>.</li>
-            <li><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code>.</li>
-            <li><strong>Objetivo:</strong> <code>✅ Sí (+10% XP)</code>, <code>⚠️ Parcial (+5% XP)</code>, <code>❌ No (0% / Bloqueo)</code>.</li>
+            <li data-i18n-html="guideCard2Li1"><strong>Contexto:</strong> <code>🎓 Académico</code>, <code>🏅 Certificación</code>, <code>🚀 Proyecto Propio</code>, <code>🤝 Externo</code>.</li>
+            <li data-i18n-html="guideCard2Li2"><strong>Actividades:</strong> <code>📖 Teoría / Docs</code>, <code>💬 Investigación / Diálogo</code>, <code>✍️ Diseño / Apuntes</code>, <code>💻 Desarrollo / Código</code>, <code>🧪 Práctica / Debugging</code>, <code>🔁 Repaso / Simulacro</code>.</li>
+            <li data-i18n-html="guideCard2Li3"><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code>.</li>
+            <li data-i18n-html="guideCard2Li4"><strong>Objetivo:</strong> <code>✅ Sí (+10% XP)</code>, <code>⚠️ Parcial (+5% XP)</code>, <code>❌ No (0% / Bloqueo)</code>.</li>
           </ul>
         </div>
         <div class="guide-card">
-          <h4>🤖 Modo de Uso de IA (Impacto Cognitivo)</h4>
+          <h4 data-i18n="guideCard3Title">🤖 Modo de Uso de IA (Impacto Cognitivo)</h4>
           <ul>
-            <li><strong>🧠 Autónomo (+5% XP):</strong> 100% por tu cuenta (0% IA).</li>
-            <li><strong>💬 Diálogo / Tutoría (+5% XP):</strong> Debate conceptual, preguntas de <em>"¿por qué?"</em> y refuerzo activo con IA.</li>
-            <li><strong>🛠️ Copiloto / Apoyo (0% ajuste):</strong> Consulta puntual de sintaxis o desbloqueo de bugs entendiendo la solución.</li>
-            <li><strong>🤖 Mecánico / Copy-Paste (-15% XP):</strong> Automatización directa para entregar rápido sin leer a fondo.</li>
+            <li data-i18n-html="guideCard3Li1"><strong>🧠 Autónomo (+5% XP):</strong> 100% por tu cuenta (0% IA).</li>
+            <li data-i18n-html="guideCard3Li2"><strong>💬 Diálogo / Tutoría (+5% XP):</strong> Debate conceptual, preguntas de <em>"¿por qué?"</em> y refuerzo activo con IA.</li>
+            <li data-i18n-html="guideCard3Li3"><strong>🛠️ Copiloto / Apoyo (0% ajuste):</strong> Consulta puntual de sintaxis o desbloqueo de bugs entendiendo la solución.</li>
+            <li data-i18n-html="guideCard3Li4"><strong>🤖 Mecánico / Copy-Paste (-15% XP):</strong> Automatización directa para entregar rápido sin leer a fondo.</li>
           </ul>
         </div>
         <div class="guide-card">
-          <h4>🧮 Curva Exponencial y Fórmulas en Excel</h4>
+          <h4 data-i18n="guideCard4Title">🧮 Curva Exponencial y Fórmulas en Excel</h4>
           <ul>
-            <li><strong>Curva RPG (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code> (El XP necesario se duplica cada 7 niveles).</li>
-            <li><strong>Duración (Minutos):</strong> <code>=MOD(TIMEVALUE(Fin)-TIMEVALUE(Inicio),1)*1440</code>.</li>
-            <li><strong>XP con Bonos y Modo IA:</strong> <code>=ROUND(Duracion * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoMeta + BonoModoIA), 0)</code>.</li>
+            <li data-i18n-html="guideCard4Li1"><strong>Curva RPG (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code> (El XP necesario se duplica cada 7 niveles).</li>
+            <li data-i18n-html="guideCard4Li2"><strong>Duración (Minutos):</strong> <code>=MOD(TIMEVALUE(Fin)-TIMEVALUE(Inicio),1)*1440</code>.</li>
+            <li data-i18n-html="guideCard4Li3"><strong>XP con Bonos y Modo IA:</strong> <code>=ROUND(Duracion * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoMeta + BonoModoIA), 0)</code>.</li>
           </ul>
         </div>
       </div>
