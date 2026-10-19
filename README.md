@@ -41,6 +41,9 @@ Aplicación web **Local-First** gamificada (estilo RPG) con **micro-servidor loc
 - **Sincronización en Tiempo Real con Excel (`data/study-tracker.xlsx`):**
   - Cada alta, edición en línea (`✏️`) o eliminación (`✖`) actualiza directamente `data/study-tracker.xlsx` en tu disco duro sin descargas repetidas.
   - La carpeta `data/` y los archivos `.xlsx` están excluidos en `.gitignore` por privacidad.
+- **Interfaz Bilingüe en Tiempo Real (`ES` / `EN`):**
+  - Selector rápido `ES` | `EN` en la barra superior con persistencia en `localStorage` (`study_tracker_lang`).
+  - Traduce al instante toda la interfaz, el cronómetro/Pomodoro, las ayudas dinámicas, los gráficos de Chart.js y la tabla de historial, manteniendo intactos los valores canónicos en el `Store` y en `data/study-tracker.xlsx` para no romper fórmulas de Excel ni filtros.
 
 ---
 
@@ -51,6 +54,7 @@ flowchart TD
     subgraph UI["Capa de Presentación (Frontend)"]
         HTML["index.html"]
         CSS["css/styles.css"]
+        I18N["js/ui/i18n.js\n(Diccionario Bilingüe ES / EN)"]
         TIMER["js/ui/timer.js\n(Cronómetro + Pomodoro)"]
         DASH["js/ui/dashboard.js\n(Filtro por Contexto, CRUD UI y KPIs)"]
         CHARTS["js/ui/charts.js\n(3 Instancias Chart.js)"]
