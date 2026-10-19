@@ -1,22 +1,24 @@
 /**
  * Capa de UI (Dashboard): Renderizado seguro del DOM (prevención de XSS con textContent),
- * autocompletado dinámico de Materia/Tema, modo de edición en línea de sesiones,
- * selectores rápidos de chips (1 clic), actualización de KPIs, barra RPG y tabla.
+ * filtro rápido por Contexto, autocompletado dinámico de Materia/Tema, modo de edición en línea,
+ * selectores rápidos de chips (1 clic), actualización de KPIs, barra RPG exponencial y tabla.
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
   const {
+    CONTEXTOS,
     calcularMinutos,
     calcularXP,
     calcularProgresoRPG,
     calcularKPIs,
+    obtenerTextoAyudaObjetivo,
     obtenerTextoAyudaCalidad,
     obtenerTextoAyudaIA
   } = StudyTracker.RPG;
 
   // Estado local de los chips seleccionados en el formulario (1 clic)
   const estadoChips = {
-    contexto: "Escuela",
+    contexto: "Académico",
     tipoActividad: "Código / Práctica",
     energiaPrevia: "Media",
     complejidad: "Desafiante",
@@ -26,17 +28,21 @@
   // ID de la sesión que se está editando actualmente (null si es registro nuevo)
   let sesionEditandoId = null;
 
+  // Filtro activo en el Dashboard ("Todos" o uno de los 4 contextos)
+  let filtroContextoActual = "Todos";
+
   const ICONOS_CONTEXTO = {
-    Escuela: "🎓",
-    Personal: "🚀",
+    Académico: "🎓",
+    Certificación: "🏅",
+    "Proyecto Propio": "🚀",
     Externo: "🤝"
   };
 
   const ICONOS_ACTIVIDAD = {
     "Código / Práctica": "💻",
-    "Lectura / Teoría": "📖",
-    "Papel / A mano": "✍️",
-    Repaso: "🔁"
+    "Teoría / Docs": "📖",
+    "Papel / Diseño": "✍️",
+    "Repaso / Test": "🔁"
   };
 
   const ICONOS_ENERGIA = {
@@ -59,9 +65,10 @@
 
   const MATERIAS_BASE = [
     "Base de Datos",
+    "Snowflake",
+    "Proyecto Rails",
     "PySpark",
     "Algoritmos",
-    "Matemáticas",
     "StudyTracker"
   ];
 
@@ -80,7 +87,17 @@
   }
 
   /**
-   * Selecciona un chip dentro de su grupo y actualiza la vista previa de XP.
+   * Cambia el filtro de contexto activo del Dashboard.
+   */
+  function cambiarFiltroContexto(nuevoContexto) {
+    filtroContextoActual = nuevoContexto || "Todos";
+    document.querySelectorAll("#contextFilterBar .filter-pill").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.filter === filtroContextoActual);
+    });
+  }
+
+  /**
+   * Selecciona un chip dentro de su grupo y actualiza la vista previa de XP y ayudas.
    */
   function seleccionarChip(grupo, valor) {
     if (!(grupo in estadoChips)) return;
@@ -91,6 +108,10 @@
       contenedor.querySelectorAll(".chip-btn").forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.value === valor);
       });
+    }
+
+    if (grupo === "objetivoCumplido") {
+      actualizarAyudaObjetivo();
     }
 
     actualizarPreview();
@@ -146,12 +167,13 @@
     document.getElementById("usoIA").value = String(sesion.usoIA);
     document.getElementById("notas").value = sesion.notas || "";
 
-    seleccionarChip("contexto", sesion.contexto || "Escuela");
+    seleccionarChip("contexto", sesion.contexto || "Académico");
     seleccionarChip("tipoActividad", sesion.tipoActividad || "Código / Práctica");
     seleccionarChip("energiaPrevia", sesion.energiaPrevia || "Media");
     seleccionarChip("complejidad", sesion.complejidad || "Desafiante");
     seleccionarChip("objetivoCumplido", sesion.objetivoCumplido || "Sí");
 
+    actualizarAyudaObjetivo();
     actualizarAyudaCalidad();
     actualizarAyudaIA();
     actualizarPreview();
@@ -227,6 +249,7 @@
       seleccionarChip(grupo, estadoChips[grupo]);
     });
 
+    actualizarAyudaObjetivo();
     actualizarPreview();
     actualizarAyudaCalidad();
     actualizarAyudaIA();
@@ -240,6 +263,15 @@
     if (!el) return;
     el.value = new Date().toTimeString().slice(0, 5);
     actualizarPreview();
+  }
+
+  /**
+   * Actualiza la caja de ayuda según el estado de Objetivo Cumplido seleccionado.
+   */
+  function actualizarAyudaObjetivo() {
+    const boxAyuda = document.getElementById("ayudaObjetivo");
+    if (!boxAyuda) return;
+    boxAyuda.textContent = obtenerTextoAyudaObjetivo(estadoChips.objetivoCumplido);
   }
 
   /**
@@ -281,6 +313,7 @@
     if (estadoChips.complejidad === "Desafiante") bonosActivos.push("+10% reto");
     if (estadoChips.complejidad === "Muy difícil") bonosActivos.push("+20% difícil");
     if (estadoChips.objetivoCumplido === "Sí") bonosActivos.push("+10% meta");
+    if (estadoChips.objetivoCumplido === "Parcial") bonosActivos.push("+5% avance");
 
     const elDuracion = document.getElementById("previewDuracion");
     const elXP = document.getElementById("previewXP");
@@ -307,6 +340,27 @@
     } else if (tipoEstado === "warning") {
       status.classList.add("warning");
     }
+  }
+
+  /**
+   * Actualiza los contadores de sesiones en la barra de filtro rápido por Contexto.
+   */
+  function actualizarContadoresFiltro(todasLasSesiones) {
+    const lista = Array.isArray(todasLasSesiones) ? todasLasSesiones : [];
+    const btnTodos = document.querySelector('#contextFilterBar .filter-pill[data-filter="Todos"]');
+    if (btnTodos) {
+      btnTodos.textContent = `🌐 Todos (${lista.length})`;
+    }
+
+    CONTEXTOS.forEach((ctx) => {
+      const btn = document.querySelector(
+        `#contextFilterBar .filter-pill[data-filter="${ctx.valor}"]`
+      );
+      if (btn) {
+        const conteo = lista.filter((s) => (s.contexto || "Académico") === ctx.valor).length;
+        btn.textContent = `${ctx.icono} ${ctx.etiqueta} (${conteo})`;
+      }
+    });
   }
 
   /**
@@ -365,7 +419,7 @@
     const subTema = document.createElement("small");
     subTema.className = "cell-sub";
     const icCtx = ICONOS_CONTEXTO[sesion.contexto] || "🎓";
-    subTema.textContent = `${icCtx} ${sesion.contexto || "Escuela"} · ${sesion.tema || "General"}`;
+    subTema.textContent = `${icCtx} ${sesion.contexto || "Académico"} · ${sesion.tema || "General"}`;
     tdMateriaTema.append(strongMateria, subTema);
 
     // Actividad
@@ -446,24 +500,37 @@
   }
 
   /**
-   * Renderiza toda la interfaz (Barra RPG, KPIs, Autocompletado, Tabla y Gráficos) a partir de las sesiones.
+   * Renderiza toda la interfaz (Barra RPG Global, Filtro por Contexto, KPIs, Tabla y Gráficos).
    */
-  function renderizarDashboard(sesiones, { onEditarSesion, onEliminarSesion } = {}) {
-    const kpis = calcularKPIs(sesiones);
-    const progreso = calcularProgresoRPG(kpis.totalXP);
+  function renderizarDashboard(todasLasSesiones, { onEditarSesion, onEliminarSesion } = {}) {
+    const listaGlobal = Array.isArray(todasLasSesiones) ? todasLasSesiones : [];
 
-    // Actualizar sugerencias de autocompletado de Materia y Tema
-    actualizarAutocompletado(sesiones);
+    // Actualizar autocompletado y contadores de pestañas de filtro
+    actualizarAutocompletado(listaGlobal);
+    actualizarContadoresFiltro(listaGlobal);
 
-    // 1. Barra RPG
+    // 1. Barra RPG Exponencial (siempre refleja el XP y Nivel total del personaje)
+    const kpisGlobales = calcularKPIs(listaGlobal);
+    const progreso = calcularProgresoRPG(kpisGlobales.totalXP);
+
     document.getElementById("uiNivel").textContent = progreso.nivel;
     document.getElementById("uiRango").textContent = progreso.rango;
     document.getElementById("uiXpActual").textContent = progreso.xpEnNivelActual;
-    document.getElementById("uiXpSiguiente").textContent = progreso.xpSiguienteNivel;
+    document.getElementById("uiXpSiguiente").textContent = progreso.esNivelMaximo
+      ? "MÁX"
+      : progreso.xpSiguienteNivel;
     document.getElementById("uiXpBar").style.width = `${progreso.porcentajeBarra}%`;
     document.getElementById("uiXpTotalBadge").textContent = `${progreso.totalXP} XP`;
 
-    // 2. Tarjetas KPI
+    // Aplicar filtro de Contexto para KPIs, Gráficos y Tabla
+    const sesionesFiltradas =
+      filtroContextoActual === "Todos"
+        ? listaGlobal
+        : listaGlobal.filter((s) => (s.contexto || "Académico") === filtroContextoActual);
+
+    const kpis = calcularKPIs(sesionesFiltradas);
+
+    // 2. Tarjetas KPI (filtradas por el contexto seleccionado)
     document.getElementById("kpiHoras").textContent = `${kpis.totalHoras} h`;
     document.getElementById("kpiMinutos").textContent = `${kpis.totalMinutos} minutos en total`;
     document.getElementById("kpiSesiones").textContent = kpis.totalSesiones;
@@ -477,7 +544,7 @@
     const elKpiObjetivosSub = document.getElementById("kpiObjetivosSub");
     if (elKpiObjetivos) elKpiObjetivos.textContent = `${kpis.tasaObjetivos}%`;
     if (elKpiObjetivosSub) {
-      elKpiObjetivosSub.textContent = `${kpis.cumplidosSi} cumplidos · ${kpis.cumplidosParcial} parciales`;
+      elKpiObjetivosSub.textContent = `${kpis.cumplidosSi} sí · ${kpis.cumplidosParcial} parc. · ${kpis.bloqueosNo} bloq.`;
     }
 
     // 3. Tabla de Historial (usando nodos seguros e IDs únicos)
@@ -485,7 +552,7 @@
     if (tbody) {
       tbody.replaceChildren();
       const fragment = document.createDocumentFragment();
-      sesiones.forEach((s) => {
+      sesionesFiltradas.forEach((s) => {
         fragment.appendChild(
           crearFilaSesion(s, {
             onEditar: (sesionSeleccionada) => {
@@ -505,7 +572,7 @@
     }
 
     // 4. Gráficos, resumen de hábitos y mejor hora de enfoque
-    const { datosHora, datosHabitos } = StudyTracker.Charts.renderizarGraficos(sesiones);
+    const { datosHora, datosHabitos } = StudyTracker.Charts.renderizarGraficos(sesionesFiltradas);
     renderizarResumenHabitos(datosHabitos);
 
     const elMejorHora = document.getElementById("kpiMejorHora");
@@ -521,11 +588,13 @@
   StudyTracker.UI = {
     obtenerValoresChips,
     obtenerIdSesionEditando,
+    cambiarFiltroContexto,
     seleccionarChip,
     cargarSesionEnFormulario,
     salirModoEdicion,
     inicializarFormulario,
     ponerHoraActual,
+    actualizarAyudaObjetivo,
     actualizarAyudaCalidad,
     actualizarAyudaIA,
     actualizarPreview,
@@ -533,3 +602,4 @@
     renderizarDashboard
   };
 })(window);
+

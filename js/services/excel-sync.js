@@ -15,7 +15,7 @@
 
   /**
    * Construye el objeto Workbook de SheetJS con pestaña de sesiones enriquecida (17 columnas),
-   * fórmulas nativas de Excel (incluyendo bonos por complejidad y objetivo) y pestaña de guía.
+   * fórmulas nativas de Excel (incluyendo bonos por complejidad, objetivo y nivel exponencial) y pestaña de guía.
    */
   function construirLibroExcel(sesiones) {
     const wb = XLSX.utils.book_new();
@@ -54,7 +54,7 @@
         s.horaInicio,
         s.horaFin,
         s.franjaHoraria || calcularFranjaHoraria(s.horaInicio),
-        s.contexto || "Escuela",
+        s.contexto || "Académico",
         s.materia,
         s.tema || "General",
         s.tipoActividad || "Código / Práctica",
@@ -82,10 +82,10 @@
       };
       // O: Formato de porcentaje
       if (ws[`O${r}`]) ws[`O${r}`].z = "0%";
-      // P: Fórmula de XP Ganados con bonos por Complejidad (Col K) y Objetivo_Cumplido (Col L)
+      // P: Fórmula de XP Ganados con bonos por Complejidad (Col K) y Objetivo_Cumplido (Col L: Sí +10%, Parcial +5%)
       ws[`P${r}`] = {
         t: "n",
-        f: `IF(M${r}="","",ROUND(M${r}*(1+(N${r}*0.2)+IF(K${r}="Muy difícil",0.2,IF(K${r}="Desafiante",0.1,0))+IF(L${r}="Sí",0.1,0)),0))`,
+        f: `IF(M${r}="","",ROUND(M${r}*(1+(N${r}*0.2)+IF(K${r}="Muy difícil",0.2,IF(K${r}="Desafiante",0.1,0))+IF(L${r}="Sí",0.1,IF(L${r}="Parcial",0.05,0))),0))`,
         v: Number(s.xp)
       };
     });
@@ -96,7 +96,7 @@
       { wch: 12 }, // C: Hora_Inicio
       { wch: 12 }, // D: Hora_Fin
       { wch: 15 }, // E: Franja_Horaria
-      { wch: 13 }, // F: Contexto
+      { wch: 16 }, // F: Contexto
       { wch: 20 }, // G: Materia
       { wch: 26 }, // H: Tema
       { wch: 19 }, // I: Tipo_Actividad
@@ -130,19 +130,29 @@
           z: "0%"
         }
       ],
+      [
+        "Sesiones con Bloqueo (No)",
+        { t: "n", f: 'COUNTIF(Registro_Estudio!L2:L1000,"No")' }
+      ],
       ["Total XP Acumulados", { t: "n", f: "SUM(Registro_Estudio!P2:P1000)" }],
-      ["Nivel Actual del Estudiante", { t: "n", f: "INT(SUM(Registro_Estudio!P2:P1000)/500)+1" }],
+      [
+        "Nivel Actual (Curva Exponencial 1-99)",
+        { t: "n", f: "MIN(99,INT(1+7*(LN(1+SUM(Registro_Estudio!P2:P1000)/250)/LN(2))))" }
+      ],
       [],
       ["GUÍA DE REFERENCIA RÁPIDA Y REGLAS DE NEGOCIO", ""],
       ["Variable", "Opciones y Regla Analítica"],
-      ["Contexto / Propósito", "Escuela (🎓) | Personal (🚀) | Externo (🤝)"],
+      [
+        "Contexto / Propósito",
+        "Académico (🎓) | Certificación (🏅) | Proyecto Propio (🚀) | Externo (🤝)"
+      ],
       [
         "Materia vs. Tema",
-        "Materia agrupa a nivel macro (ej. Base de Datos) y Tema detalla el contenido (ej. Normalización 3FN)"
+        "Materia agrupa a nivel macro (ej. Snowflake, Base de Datos) y Tema detalla el contenido específico"
       ],
       [
         "Tipo de Actividad",
-        "Código / Práctica | Lectura / Teoría | Papel / A mano | Repaso"
+        "Código / Práctica (💻) | Teoría / Docs (📖) | Papel / Diseño (✍️) | Repaso / Test (🔁)"
       ],
       ["Energía Previa", "Alta (🔋) | Media (⚡) | Baja (🪫) — Permite medir fatiga vs. retención"],
       [
@@ -151,7 +161,11 @@
       ],
       [
         "Objetivo Cumplido",
-        "Sí (+10% XP) | Parcial (+0% XP) | No (+0% XP) — Mide efectividad de planeación"
+        "Sí (+10% XP: meta lograda) | Parcial (+5% XP: avance en progreso) | No (0% XP: bloqueo o distracción)"
+      ],
+      [
+        "Curva de Nivel Exponencial",
+        "XP(Nivel L) = REDONDEAR(250 * (2^((L-1)/7) - 1)). El XP requerido se duplica cada 7 niveles (el Nivel 92 es exactamente el 50% del Nivel 99)."
       ],
       [],
       ["Escala de Calidad (1 al 5)", "Significado"],
@@ -159,24 +173,10 @@
       ["2 - Bajo", "Costó mucho mantener el foco, interrupciones frecuentes."],
       ["3 - Normal / Neutro", "Sesión estándar, se avanzó lo planeado con distracciones menores."],
       ["4 - Bueno", "Buen ritmo de trabajo, comprensión sólida y pocas distracciones."],
-      ["5 - Flujo total", "Concentración profunda, el tiempo pasó volando y retención al máximo."],
-      [],
-      ["Escala de Uso de IA (0% a 100%)", "Significado"],
-      [
-        "0% (Autónomo)",
-        "Estudio 100% autónomo (lectura, código o ejercicios resueltos sin asistencia)."
-      ],
-      [
-        "25% - 50% (Híbrido)",
-        "Estudio propio usando IA para aclarar dudas puntuales, explicar conceptos o depurar errores."
-      ],
-      [
-        "75% - 100% (Dependencia)",
-        "La IA resolvió la mayor parte del ejercicio o generó la respuesta directamente."
-      ]
+      ["5 - Flujo total", "Concentración profunda, el tiempo pasó volando y retención al máximo."]
     ];
     const wsGuia = XLSX.utils.aoa_to_sheet(guiaDatos);
-    wsGuia["!cols"] = [{ wch: 34 }, { wch: 80 }];
+    wsGuia["!cols"] = [{ wch: 36 }, { wch: 88 }];
     XLSX.utils.book_append_sheet(wb, wsGuia, "Guia_y_Resumen");
 
     return wb;
@@ -206,7 +206,7 @@
       const materia = r.Materia || r.materia || "";
       if (!fecha && !materia) return;
 
-      const contexto = r.Contexto || r.contexto || "Escuela";
+      const contexto = r.Contexto || r.contexto || "Académico";
       const tema = r.Tema || r.tema || "General";
       const tipoActividad = r.Tipo_Actividad || r.tipoActividad || "Código / Práctica";
       const energiaPrevia = r.Energia_Previa || r.energiaPrevia || "Media";
@@ -404,3 +404,4 @@
     estaServidorConectado
   };
 })(window);
+

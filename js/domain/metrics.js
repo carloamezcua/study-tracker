@@ -1,31 +1,41 @@
 /**
- * Capa de Dominio: Reglas de negocio puras del sistema RPG y analítica de estudio.
+ * Capa de Dominio: Reglas de negocio puras del sistema RPG (curva exponencial de niveles
+ * donde el Nivel 92 es la mitad del 99) y analítica de hábitos de estudio.
  * No tiene dependencias del DOM ni de almacenamiento externo.
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
 
-  const XP_POR_NIVEL = 500;
+  // Curva exponencial estilo RuneScape: el XP requerido se duplica cada 7 niveles (2^((L-1)/7)).
+  // Con ello, el Nivel 92 (2^13 - 1) es exactamente el 50% del XP del Nivel 99 (2^14 - 1).
+  const XP_BASE_CURVA = 250;
+  const NIVEL_MAXIMO = 99;
 
-  const RANGOS = [
-    "Novato del Enfoque",
-    "Explorador de Datos",
-    "Guerrero Pomodoro",
-    "Maestro de la Concentración",
-    "Señor del Flujo Profundo"
+  const TRAMOS_RANGO = [
+    { minNivel: 99, titulo: "Capa de Maestría (Nivel 99)" },
+    { minNivel: 92, titulo: "Leyenda de la Mitad (Nv. 92+)" },
+    { minNivel: 75, titulo: "Gran Maestro Cognitivo" },
+    { minNivel: 60, titulo: "Sabio del Flujo Profundo" },
+    { minNivel: 45, titulo: "Maestro de la Concentración" },
+    { minNivel: 30, titulo: "Arquitecto del Estudio" },
+    { minNivel: 20, titulo: "Guerrero Pomodoro" },
+    { minNivel: 10, titulo: "Explorador de Datos" },
+    { minNivel: 5, titulo: "Aprendiz Constante" },
+    { minNivel: 1, titulo: "Novato del Enfoque" }
   ];
 
   const CONTEXTOS = [
-    { valor: "Escuela", icono: "🎓", etiqueta: "Escuela" },
-    { valor: "Personal", icono: "🚀", etiqueta: "Personal" },
+    { valor: "Académico", icono: "🎓", etiqueta: "Académico" },
+    { valor: "Certificación", icono: "🏅", etiqueta: "Certificación" },
+    { valor: "Proyecto Propio", icono: "🚀", etiqueta: "Proyecto Propio" },
     { valor: "Externo", icono: "🤝", etiqueta: "Externo" }
   ];
 
   const TIPOS_ACTIVIDAD = [
     { valor: "Código / Práctica", icono: "💻", etiqueta: "Código / Práctica" },
-    { valor: "Lectura / Teoría", icono: "📖", etiqueta: "Lectura / Teoría" },
-    { valor: "Papel / A mano", icono: "✍️", etiqueta: "Papel / A mano" },
-    { valor: "Repaso", icono: "🔁", etiqueta: "Repaso" }
+    { valor: "Teoría / Docs", icono: "📖", etiqueta: "Teoría / Docs" },
+    { valor: "Papel / Diseño", icono: "✍️", etiqueta: "Papel / Diseño" },
+    { valor: "Repaso / Test", icono: "🔁", etiqueta: "Repaso / Test" }
   ];
 
   const NIVELES_ENERGIA = [
@@ -41,9 +51,29 @@
   ];
 
   const ESTADOS_OBJETIVO = [
-    { valor: "Sí", icono: "✅", etiqueta: "Sí", bonoXP: 0.1 },
-    { valor: "Parcial", icono: "⚠️", etiqueta: "Parcial", bonoXP: 0 },
-    { valor: "No", icono: "❌", etiqueta: "No", bonoXP: 0 }
+    {
+      valor: "Sí",
+      icono: "✅",
+      etiqueta: "Sí (+10%)",
+      bonoXP: 0.1,
+      ayuda: "Meta lograda: completaste lo planeado para este bloque (+10% XP)."
+    },
+    {
+      valor: "Parcial",
+      icono: "⚠️",
+      etiqueta: "Parcial (+5%)",
+      bonoXP: 0.05,
+      ayuda:
+        "En progreso: hubo avance real y aprendizaje, pero continuará en otra sesión (+5% XP)."
+    },
+    {
+      valor: "No",
+      icono: "❌",
+      etiqueta: "No (Bloqueo)",
+      bonoXP: 0,
+      ayuda:
+        "Bloqueo o sin avance: te trabaste en un error, hubo distracción total o interrupción (0% bono, alerta de bloqueo)."
+    }
   ];
 
   const DIAS_SEMANA = [
@@ -117,7 +147,7 @@
   }
 
   /**
-   * Devuelve el bono multiplicador por cumplimiento de objetivo (0.10 si es "Sí", 0 en otro caso).
+   * Devuelve el bono multiplicador por cumplimiento de objetivo (+10% Sí, +5% Parcial, 0% No).
    */
   function obtenerBonoObjetivo(objetivoCumplido) {
     const item = ESTADOS_OBJETIVO.find((o) => o.valor === objetivoCumplido);
@@ -126,7 +156,7 @@
 
   /**
    * Calcula los puntos de experiencia (XP) en función de duración, calidad (1-5),
-   * complejidad percibida (+10% desafiante, +20% muy difícil) y objetivo cumplido (+10%).
+   * complejidad percibida (+10% desafiante, +20% muy difícil) y objetivo (+10% Sí, +5% Parcial).
    */
   function calcularXP(minutos, calidad, complejidad = "Fácil", objetivoCumplido = "No") {
     const min = Math.max(0, Number(minutos) || 0);
@@ -138,22 +168,58 @@
   }
 
   /**
-   * Calcula el estado de progreso RPG a partir del XP total acumulado.
+   * Devuelve el XP total acumulado requerido para alcanzar un nivel determinado (1 a 99).
+   * Sigue la ley exponencial de duplicación cada 7 niveles: XP(L) = round(250 * (2^((L-1)/7) - 1)).
+   */
+  function calcularXpRequeridoParaNivel(nivel) {
+    const n = Math.max(1, Math.floor(Number(nivel) || 1));
+    if (n <= 1) return 0;
+    return Math.round(XP_BASE_CURVA * (Math.pow(2, (n - 1) / 7) - 1));
+  }
+
+  /**
+   * Obtiene el título del rango RPG correspondiente al nivel actual.
+   */
+  function obtenerRangoPorNivel(nivel) {
+    const tramo = TRAMOS_RANGO.find((t) => nivel >= t.minNivel);
+    return tramo ? tramo.titulo : TRAMOS_RANGO[TRAMOS_RANGO.length - 1].titulo;
+  }
+
+  /**
+   * Calcula el estado de progreso RPG exponencial a partir del XP total acumulado.
    */
   function calcularProgresoRPG(totalXP) {
-    const xpSeguro = Math.max(0, Number(totalXP) || 0);
-    const nivel = Math.floor(xpSeguro / XP_POR_NIVEL) + 1;
-    const xpEnNivelActual = xpSeguro % XP_POR_NIVEL;
-    const porcentajeBarra = Math.min(100, (xpEnNivelActual / XP_POR_NIVEL) * 100);
-    const rango = RANGOS[Math.min(nivel - 1, RANGOS.length - 1)];
+    const xpSeguro = Math.max(0, Math.round(Number(totalXP) || 0));
+
+    let nivel = 1;
+    while (nivel < NIVEL_MAXIMO && xpSeguro >= calcularXpRequeridoParaNivel(nivel + 1)) {
+      nivel += 1;
+    }
+
+    const xpInicioNivelActual = calcularXpRequeridoParaNivel(nivel);
+    const xpMetaSiguienteNivel =
+      nivel < NIVEL_MAXIMO ? calcularXpRequeridoParaNivel(nivel + 1) : xpInicioNivelActual;
+
+    const xpEnNivelActual = xpSeguro - xpInicioNivelActual;
+    const xpRequeridoTramoActual =
+      nivel < NIVEL_MAXIMO ? Math.max(1, xpMetaSiguienteNivel - xpInicioNivelActual) : 1;
+
+    const porcentajeBarra =
+      nivel >= NIVEL_MAXIMO
+        ? 100
+        : Math.min(100, +((xpEnNivelActual / xpRequeridoTramoActual) * 100).toFixed(1));
+
+    const rango = obtenerRangoPorNivel(nivel);
 
     return {
       nivel,
       rango,
       xpEnNivelActual,
-      xpSiguienteNivel: XP_POR_NIVEL,
+      xpSiguienteNivel: nivel < NIVEL_MAXIMO ? xpRequeridoTramoActual : 0,
+      xpMetaTotalSiguiente: xpMetaSiguienteNivel,
       porcentajeBarra,
-      totalXP: xpSeguro
+      totalXP: xpSeguro,
+      esNivelMaximo: nivel >= NIVEL_MAXIMO
     };
   }
 
@@ -176,6 +242,7 @@
 
     const cumplidosSi = lista.filter((s) => s.objetivoCumplido === "Sí").length;
     const cumplidosParcial = lista.filter((s) => s.objetivoCumplido === "Parcial").length;
+    const bloqueosNo = lista.filter((s) => s.objetivoCumplido === "No").length;
     const tasaObjetivos = totalSesiones ? Math.round((cumplidosSi / totalSesiones) * 100) : 0;
 
     return {
@@ -188,6 +255,7 @@
       promedioIA,
       cumplidosSi,
       cumplidosParcial,
+      bloqueosNo,
       tasaObjetivos
     };
   }
@@ -300,9 +368,9 @@
       };
     });
 
-    // 3. Resumen por Contexto (Escuela, Personal, Externo)
+    // 3. Resumen por Contexto (Académico, Certificación, Proyecto Propio, Externo)
     const resumenContextos = CONTEXTOS.map((ctx) => {
-      const filtradas = lista.filter((s) => (s.contexto || "Escuela") === ctx.valor);
+      const filtradas = lista.filter((s) => (s.contexto || "Académico") === ctx.valor);
       const conteo = filtradas.length;
       const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
       return {
@@ -332,6 +400,14 @@
   }
 
   /**
+   * Devuelve el texto explicativo para un estado de Objetivo Cumplido (Sí, Parcial, No).
+   */
+  function obtenerTextoAyudaObjetivo(objetivoCumplido) {
+    const item = ESTADOS_OBJETIVO.find((o) => o.valor === objetivoCumplido);
+    return item ? item.ayuda : ESTADOS_OBJETIVO[0].ayuda;
+  }
+
+  /**
    * Devuelve el texto explicativo para un nivel de calidad (1 al 5).
    */
   function obtenerTextoAyudaCalidad(calidad) {
@@ -353,8 +429,9 @@
   }
 
   StudyTracker.RPG = {
-    XP_POR_NIVEL,
-    RANGOS,
+    XP_BASE_CURVA,
+    NIVEL_MAXIMO,
+    TRAMOS_RANGO,
     CONTEXTOS,
     TIPOS_ACTIVIDAD,
     NIVELES_ENERGIA,
@@ -366,12 +443,15 @@
     obtenerBonoComplejidad,
     obtenerBonoObjetivo,
     calcularXP,
+    calcularXpRequeridoParaNivel,
     calcularProgresoRPG,
     calcularKPIs,
     analizarPorHora,
     analizarPorMateria,
     analizarHabitos,
+    obtenerTextoAyudaObjetivo,
     obtenerTextoAyudaCalidad,
     obtenerTextoAyudaIA
   };
 })(window);
+

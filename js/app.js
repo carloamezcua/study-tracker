@@ -42,7 +42,21 @@
   }
 
   function vincularEventosDOM() {
-    // Selectores de chips de 1 clic (Actividad, Energía, Complejidad y Objetivo)
+    // Barra de filtro rápido por Contexto en el Dashboard
+    const filterBar = document.getElementById("contextFilterBar");
+    if (filterBar) {
+      filterBar.addEventListener("click", (e) => {
+        const pill = e.target.closest(".filter-pill");
+        if (!pill) return;
+        UI.cambiarFiltroContexto(pill.dataset.filter);
+        UI.renderizarDashboard(store.getSesiones(), {
+          onEditarSesion: manejarEditarSesion,
+          onEliminarSesion: manejarEliminarSesion
+        });
+      });
+    }
+
+    // Selectores de chips de 1 clic (Contexto, Actividad, Energía, Complejidad y Objetivo)
     document.querySelectorAll(".chip-group").forEach((grupoEl) => {
       const nombreGrupo = grupoEl.dataset.group;
       grupoEl.addEventListener("click", (e) => {

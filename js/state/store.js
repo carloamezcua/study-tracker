@@ -1,6 +1,6 @@
 /**
  * Capa de Estado (Store): Gestión centralizada de sesiones (CRUD completo),
- * IDs únicos, validación de esquema, enriquecimiento automático,
+ * IDs únicos, validación y migración de esquema, enriquecimiento automático,
  * persistencia en LocalStorage y patrón Pub/Sub.
  */
 (function (global) {
@@ -25,16 +25,28 @@
   const VALORES_COMPLEJIDAD = new Set(NIVELES_COMPLEJIDAD.map((c) => c.valor));
   const VALORES_OBJETIVO = new Set(ESTADOS_OBJETIVO.map((o) => o.valor));
 
+  const MAPA_MIGRACION_CONTEXTO = {
+    Escuela: "Académico",
+    Personal: "Proyecto Propio"
+  };
+
+  const MAPA_MIGRACION_ACTIVIDAD = {
+    "Lectura / Teoría": "Teoría / Docs",
+    "Papel / A mano": "Papel / Diseño",
+    Repaso: "Repaso / Test",
+    "Tarea / Entrega": "Código / Práctica"
+  };
+
   // Datos iniciales de ejemplo cuando no existe historial previo en LocalStorage ni en Excel
   const DATOS_INICIALES = [
     {
       fecha: "2026-10-18",
       horaInicio: "10:00",
       horaFin: "11:30",
-      contexto: "Escuela",
+      contexto: "Académico",
       materia: "Base de Datos",
       tema: "Normalización 3FN y Modelo ER",
-      tipoActividad: "Papel / A mano",
+      tipoActividad: "Papel / Diseño",
       energiaPrevia: "Alta",
       complejidad: "Desafiante",
       objetivoCumplido: "Sí",
@@ -47,33 +59,33 @@
       fecha: "2026-10-18",
       horaInicio: "14:00",
       horaFin: "16:15",
-      contexto: "Personal",
-      materia: "PySpark",
-      tema: "Optimización de DataFrames y Joins",
-      tipoActividad: "Código / Práctica",
+      contexto: "Certificación",
+      materia: "Snowflake",
+      tema: "Arquitectura de Virtual Warehouses",
+      tipoActividad: "Teoría / Docs",
       energiaPrevia: "Media",
       complejidad: "Muy difícil",
       objetivoCumplido: "Sí",
       duracion: 135,
       calidad: 5,
-      usoIA: 50,
-      notas: "Práctica de particionamiento y broadcast joins"
+      usoIA: 20,
+      notas: "Estudio para certificación SnowPro Core y notas de arquitectura"
     },
     {
       fecha: "2026-10-18",
       horaInicio: "18:00",
       horaFin: "18:45",
-      contexto: "Escuela",
-      materia: "Algoritmos",
-      tema: "Árboles Binarios de Búsqueda",
-      tipoActividad: "Repaso",
+      contexto: "Externo",
+      materia: "Proyecto Rails",
+      tema: "Rutas y Controladores MVC",
+      tipoActividad: "Código / Práctica",
       energiaPrevia: "Baja",
-      complejidad: "Fácil",
+      complejidad: "Desafiante",
       objetivoCumplido: "Parcial",
       duracion: 45,
       calidad: 3,
-      usoIA: 0,
-      notas: "Lectura de apuntes de la semana"
+      usoIA: 50,
+      notas: "Configuración inicial de endpoints para proyecto en equipo"
     }
   ];
 
@@ -89,7 +101,7 @@
 
   /**
    * Normaliza y garantiza la integridad de una sesión de estudio,
-   * inyectando campos automáticos (diaSemana y franjaHoraria).
+   * migrando nombres antiguos e inyectando campos automáticos (diaSemana y franjaHoraria).
    */
   function normalizarSesion(raw) {
     const fecha = String(raw.fecha || "").slice(0, 10);
@@ -99,10 +111,12 @@
     const tema = String(raw.tema || "General").trim() || "General";
     const calidad = Math.min(5, Math.max(1, Number(raw.calidad) || 3));
 
-    const contexto = VALORES_CONTEXTO.has(raw.contexto) ? raw.contexto : "Escuela";
+    const ctxCandidato = MAPA_MIGRACION_CONTEXTO[raw.contexto] || raw.contexto;
+    const contexto = VALORES_CONTEXTO.has(ctxCandidato) ? ctxCandidato : "Académico";
 
-    const tipoActividad = VALORES_ACTIVIDAD.has(raw.tipoActividad)
-      ? raw.tipoActividad
+    const actCandidata = MAPA_MIGRACION_ACTIVIDAD[raw.tipoActividad] || raw.tipoActividad;
+    const tipoActividad = VALORES_ACTIVIDAD.has(actCandidata)
+      ? actCandidata
       : "Código / Práctica";
 
     const energiaPrevia = VALORES_ENERGIA.has(raw.energiaPrevia)
@@ -290,3 +304,4 @@
   StudyTracker.store = new StudyStore();
   StudyTracker.normalizarSesion = normalizarSesion;
 })(window);
+

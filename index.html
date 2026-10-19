@@ -65,6 +65,18 @@
       </div>
     </div>
 
+    <!-- BARRA DE FILTRO RÁPIDO POR CONTEXTO -->
+    <div class="filter-bar" id="contextFilterBar">
+      <span class="filter-label">🔍 Filtrar analítica y tabla por contexto:</span>
+      <div class="filter-pills">
+        <button type="button" class="filter-pill active" data-filter="Todos">🌐 Todos</button>
+        <button type="button" class="filter-pill" data-filter="Académico">🎓 Académico</button>
+        <button type="button" class="filter-pill" data-filter="Certificación">🏅 Certificación</button>
+        <button type="button" class="filter-pill" data-filter="Proyecto Propio">🚀 Proyecto Propio</button>
+        <button type="button" class="filter-pill" data-filter="Externo">🤝 Externo</button>
+      </div>
+    </div>
+
     <!-- TARJETAS KPI -->
     <div class="kpi-grid">
       <div class="kpi-card">
@@ -85,7 +97,7 @@
       <div class="kpi-card">
         <div class="label">Objetivos Cumplidos</div>
         <div class="value" id="kpiObjetivos">0%</div>
-        <div class="sub" id="kpiObjetivosSub">0 cumplidos · 0 parciales</div>
+        <div class="sub" id="kpiObjetivosSub">0 sí · 0 parc. · 0 bloq.</div>
       </div>
       <div class="kpi-card">
         <div class="label">Uso Promedio de IA</div>
@@ -109,12 +121,13 @@
         </div>
 
         <form id="studyForm">
-          <!-- CONTEXTO / PROPÓSITO (3 CHIPS DE 1 CLIC) -->
+          <!-- CONTEXTO / PROPÓSITO (4 CHIPS DE 1 CLIC) -->
           <div class="form-group">
             <label>Contexto / Propósito</label>
             <div class="chip-group" data-group="contexto">
-              <button type="button" class="chip-btn active" data-value="Escuela">🎓 Escuela</button>
-              <button type="button" class="chip-btn" data-value="Personal">🚀 Personal</button>
+              <button type="button" class="chip-btn active" data-value="Académico">🎓 Académico</button>
+              <button type="button" class="chip-btn" data-value="Certificación">🏅 Certificación</button>
+              <button type="button" class="chip-btn" data-value="Proyecto Propio">🚀 Proyecto Propio</button>
               <button type="button" class="chip-btn" data-value="Externo">🤝 Externo</button>
             </div>
           </div>
@@ -126,14 +139,14 @@
             </div>
             <div class="form-group">
               <label for="materia">Materia / Proyecto</label>
-              <input type="text" id="materia" list="listaMaterias" placeholder="Ej. Base de Datos" required>
+              <input type="text" id="materia" list="listaMaterias" placeholder="Ej. Snowflake, Base de Datos" required>
               <datalist id="listaMaterias"></datalist>
             </div>
           </div>
 
           <div class="form-group">
             <label for="tema">Tema específico <span class="label-hint">(Subtema o módulo)</span></label>
-            <input type="text" id="tema" list="listaTemas" placeholder="Ej. Normalización 3FN, Índices B-Tree..." required>
+            <input type="text" id="tema" list="listaTemas" placeholder="Ej. Virtual Warehouses, Rutas MVC..." required>
             <datalist id="listaTemas"></datalist>
           </div>
 
@@ -155,9 +168,9 @@
             <label>Tipo de Actividad</label>
             <div class="chip-group" data-group="tipoActividad">
               <button type="button" class="chip-btn active" data-value="Código / Práctica">💻 Código / Práctica</button>
-              <button type="button" class="chip-btn" data-value="Lectura / Teoría">📖 Lectura / Teoría</button>
-              <button type="button" class="chip-btn" data-value="Papel / A mano">✍️ Papel / A mano</button>
-              <button type="button" class="chip-btn" data-value="Repaso">🔁 Repaso</button>
+              <button type="button" class="chip-btn" data-value="Teoría / Docs">📖 Teoría / Docs</button>
+              <button type="button" class="chip-btn" data-value="Papel / Diseño">✍️ Papel / Diseño</button>
+              <button type="button" class="chip-btn" data-value="Repaso / Test">🔁 Repaso / Test</button>
             </div>
           </div>
 
@@ -183,11 +196,14 @@
 
           <!-- 3. OBJETIVO CUMPLIDO -->
           <div class="form-group">
-            <label>¿Objetivo Cumplido? <span class="label-hint">(+10% XP al completar)</span></label>
+            <label>¿Objetivo Cumplido? <span class="label-hint">(+10% Sí · +5% Parcial)</span></label>
             <div class="chip-group" data-group="objetivoCumplido">
-              <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Completado)</button>
-              <button type="button" class="chip-btn" data-value="Parcial">⚠️ Parcial</button>
-              <button type="button" class="chip-btn" data-value="No">❌ No</button>
+              <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Logrado +10%)</button>
+              <button type="button" class="chip-btn" data-value="Parcial">⚠️ Parcial (+5%)</button>
+              <button type="button" class="chip-btn" data-value="No">❌ No (Bloqueo)</button>
+            </div>
+            <div id="ayudaObjetivo" class="helper-box">
+              Meta lograda: completaste lo planeado para este bloque (+10% XP).
             </div>
           </div>
 
@@ -313,10 +329,10 @@
         <div class="guide-card">
           <h4>🧠 Variables de Comportamiento (1 Clic)</h4>
           <ul>
-            <li><strong>Contexto:</strong> <code>🎓 Escuela</code>, <code>🚀 Personal</code> (propio o en pareja), <code>🤝 Externo</code> (encargos/otros).</li>
-            <li><strong>Tipo de Actividad:</strong> <code>💻 Código</code>, <code>📖 Lectura</code>, <code>✍️ Papel / A mano</code>, <code>🔁 Repaso</code>.</li>
+            <li><strong>Contexto:</strong> <code>🎓 Académico</code>, <code>🏅 Certificación</code> (ej. Snowflake), <code>🚀 Proyecto Propio</code>, <code>🤝 Externo</code>.</li>
+            <li><strong>Tipo de Actividad:</strong> <code>💻 Código / Práctica</code>, <code>📖 Teoría / Docs</code>, <code>✍️ Papel / Diseño</code>, <code>🔁 Repaso / Test</code>.</li>
             <li><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code> (mide impacto del cansancio).</li>
-            <li><strong>Complejidad y Meta:</strong> <code>🟢 Fácil</code>, <code>🟡 Reto (+10% XP)</code>, <code>🔴 Difícil (+20% XP)</code> · <code>✅ Meta (+10% XP)</code>.</li>
+            <li><strong>Objetivo:</strong> <code>✅ Sí (+10% XP)</code>, <code>⚠️ Parcial (+5% XP)</code>, <code>❌ No (0% / Bloqueo)</code>.</li>
           </ul>
         </div>
         <div class="guide-card">
@@ -328,11 +344,11 @@
           </ul>
         </div>
         <div class="guide-card">
-          <h4>🧮 Fórmulas Automáticas en tu Excel</h4>
+          <h4>🧮 Curva Exponencial y Fórmulas en Excel</h4>
           <ul>
-            <li><strong>Sincronización en vivo:</strong> Se guarda en <code>data/study-tracker.xlsx</code> automáticamente al crear, editar o borrar filas.</li>
+            <li><strong>Curva RPG (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code> (El XP necesario se duplica cada 7 niveles).</li>
             <li><strong>Duración (Minutos):</strong> <code>=MOD(TIMEVALUE(Fin)-TIMEVALUE(Inicio),1)*1440</code>.</li>
-            <li><strong>XP con Bonos:</strong> <code>=ROUND(Duracion * (1 + Calidad*0.2 + BonoComplejidad + BonoObjetivo), 0)</code>.</li>
+            <li><strong>XP con Bonos:</strong> <code>=ROUND(Duracion * (1 + Calidad*0.2 + BonoReto + BonoObjetivo), 0)</code>.</li>
           </ul>
         </div>
       </div>
