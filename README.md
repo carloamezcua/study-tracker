@@ -6,19 +6,29 @@ Aplicación web **Local-First** gamificada (estilo RPG) con **micro-servidor loc
 
 ## ✨ Características Principales
 
+- **Curva Exponencial de Nivel RPG (*"Level 92 is half of 99"*):**
+  - Inspirada en *Old School RuneScape*, la experiencia requerida **se duplica cada 7 niveles**:
+    $$\text{XP}(\text{Nivel } L) = \text{REDONDEAR}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
+  - Subida rápida en los primeros niveles para motivar la constancia, progresión creciente (+10.4% por nivel) y propiedad matemática exacta donde el **Nivel 92 representa el 50% del XP total hacia el Nivel 99**.
+- **Taxonomía Ortogonal de 1 Clic (`Contexto` × `Actividad`):**
+  - **Contexto / Propósito (4 chips):**
+    - `🎓 Académico`: Materias universitarias/escolares, tareas y exámenes de carrera.
+    - `🏅 Certificación`: Certificaciones profesionales (ej. *Snowflake*) y cursos técnicos estructurados.
+    - `🚀 Proyecto Propio`: Desarrollo de software personal, portafolio o proyectos en pareja.
+    - `🤝 Externo`: Proyectos de amigos/terceros (ej. *Ruby on Rails*), incluyendo el estudio requerido para ellos.
+  - **Tipo de Actividad (4 chips universales):**
+    - `💻 Código / Práctica` · `📖 Teoría / Docs` · `✍️ Papel / Diseño` · `🔁 Repaso / Test`.
+- **Filtro Rápido por Contexto en el Dashboard:**
+  - Barra de pestañas interactiva (`🌐 Todos`, `🎓 Académico`, `🏅 Certificación`, `🚀 Proyecto Propio`, `🤝 Externo`) que filtra al instante las tarjetas KPI, los 3 gráficos y la tabla de historial manteniendo tu nivel global de personaje en la barra superior.
+- **Detector de Bloqueos y Bonos de Esfuerzo:**
+  - **Complejidad:** `🟢 Fácil (+0% XP)` · `🟡 Desafiante (+10% XP)` · `🔴 Muy difícil (+20% XP)`.
+  - **¿Objetivo Cumplido? (con guía dinámica en vivo):**
+    - `✅ Sí (Logrado +10% XP)`: Completaste la meta planeada para el bloque.
+    - `⚠️ Parcial (Avance +5% XP)`: Hubo avance real y aprendizaje, pero continuará en otra sesión.
+    - `❌ No (Bloqueo / 0% XP)`: Bloqueo técnico, distracción total o interrupción sin lograr avance (contabilizado en el indicador de bloqueos).
 - **Sincronización en Tiempo Real con Excel (`data/study-tracker.xlsx`):**
-  - **Cero descargas repetidas:** Cada vez que agregas, editas (`✏️`) o eliminas (`✖`) una sesión en el navegador, el servidor local actualiza directamente `data/study-tracker.xlsx` en tu disco duro.
-  - **Privacidad de datos:** La carpeta `data/` y los archivos `.xlsx` están excluidos en `.gitignore` para no subir tus registros personales al repositorio público; si la carpeta no existe al clonar el proyecto, `server.js` la crea automáticamente.
-  - **Detección de bloqueo de Windows:** Si tienes `data/study-tracker.xlsx` abierto en Microsoft Excel al mismo tiempo, el dashboard te avisa en pantalla y te permite sincronizar en cuanto lo cierres.
-  - **Sincronización bidireccional:** Si editas filas directamente dentro de Microsoft Excel y guardas el archivo, el botón **📂 Recargar de Excel** importa tus cambios de vuelta al dashboard con un clic.
-- **Modelado Jerárquico y Autocompletado Inteligente:**
-  - Separación entre **Materia / Proyecto** (nivel macro para gráficas) y **Tema específico** (subtema o módulo).
-  - Ambos campos alimentan automáticamente sus listas de sugerencias (`<datalist>`) con base en tu propio historial.
-- **Captura de Hábitos de Baja Fricción (1 Clic + Campos Automáticos):**
-  - **Contexto / Propósito:** `🎓 Escuela`, `🚀 Personal` (proyectos propios o en pareja) y `🤝 Externo` (encargos o apoyo a terceros).
-  - **Tipo de Actividad:** `💻 Código / Práctica`, `📖 Lectura / Teoría`, `✍️ Papel / A mano` y `🔁 Repaso`.
-  - **Estado y Esfuerzo:** *Energía Previa* (`🔋 Alta`, `⚡ Media`, `🪫 Baja`), *Complejidad* (`🟢 Fácil`, `🟡 Desafiante`, `🔴 Muy difícil`) y *Objetivo Cumplido* (`✅ Sí`, `⚠️ Parcial`, `❌ No`).
-  - **Enriquecimiento automático (0 fricción):** Cálculo transparente de `Dia_Semana` y `Franja_Horaria` (*Madrugada*, *Mañana*, *Tarde*, *Noche*).
+  - Cada alta, edición en línea (`✏️`) o eliminación (`✖`) actualiza directamente `data/study-tracker.xlsx` en tu disco duro sin descargas repetidas.
+  - La carpeta `data/` y los archivos `.xlsx` están excluidos en `.gitignore` por privacidad.
 
 ---
 
@@ -29,7 +39,7 @@ flowchart TD
     subgraph UI["Capa de Presentación (Frontend)"]
         HTML["index.html"]
         CSS["css/styles.css"]
-        DASH["js/ui/dashboard.js\n(CRUD UI, Autocompletado, Chips y KPIs)"]
+        DASH["js/ui/dashboard.js\n(Filtro por Contexto, CRUD UI y KPIs)"]
         CHARTS["js/ui/charts.js\n(3 Instancias Chart.js)"]
     end
 
@@ -43,7 +53,7 @@ flowchart TD
     end
 
     subgraph Domain["Capa de Dominio"]
-        METRICS["js/domain/metrics.js\n(Métricas RPG, Bonos XP y Hábitos)"]
+        METRICS["js/domain/metrics.js\n(Curva Exponencial Nv.1-99, Bonos XP y Hábitos)"]
     end
 
     subgraph Sync["Capa de Sincronización y Backend Local"]
@@ -56,7 +66,7 @@ flowchart TD
     APP -->|Crear / Editar / Borrar| STORE
     STORE -->|Respaldo rápido| LS
     STORE -->|Notifica cambios| APP
-    APP -->|Renderiza| DASH
+    APP -->|Renderiza y Filtra| DASH
     DASH --> CHARTS
     APP -->|Sincroniza binario .xlsx| SYNC
     SYNC <-->|GET / PUT /api/excel| SERVER
@@ -65,33 +75,6 @@ flowchart TD
     DASH --> METRICS
     CHARTS --> METRICS
     SYNC --> METRICS
-```
-
-### 📂 Estructura de Directorios
-
-```text
-study-tracker/
-├── index.html                   # Punto de entrada principal de la aplicación
-├── server.js                    # Micro-servidor local Node.js (cero dependencias externas)
-├── package.json                 # Configuración del proyecto y script npm start
-├── start.bat                    # Lanzador de 1 clic para Windows
-├── .gitignore                   # Excluye data/, archivos .xlsx y temporales de Excel
-├── README.md                    # Documentación técnica y de arquitectura
-├── data/                        # Generada automáticamente (ignorada en Git)
-│   └── study-tracker.xlsx       # Base de datos Excel local sincronizada en vivo (17 columnas)
-├── css/
-│   └── styles.css               # Estilos, variables de diseño y modo edición
-└── js/
-    ├── domain/
-    │   └── metrics.js           # Reglas de negocio puras (minutos, XP, bonos, contextos y hábitos)
-    ├── state/
-    │   └── store.js             # Store reactivo (Pub/Sub) con soporte CRUD por ID único
-    ├── services/
-    │   └── excel-sync.js        # Construcción de .xlsx (17 columnas + fórmulas) y cliente API
-    ├── ui/
-    │   ├── charts.js            # Gestión y actualización eficiente de los 3 gráficos Chart.js
-    │   └── dashboard.js         # Renderizado seguro del DOM, autocompletado, edición y chips
-    └── app.js                   # Inicializador y enlace de eventos DOM
 ```
 
 ---
@@ -105,9 +88,10 @@ El archivo Excel generado contiene dos hojas (`Registro_Estudio` y `Guia_y_Resum
 | Métrica | Regla / Fórmula en la App | Fórmula Inyectada en Excel (`.xlsx`) |
 | :--- | :--- | :--- |
 | **Duración (min)** | Diferencia entre `Hora_Fin` y `Hora_Inicio` (soporta cruce de medianoche sumando `1440` min). | `=IF(OR(C2="",D2=""),"",MOD(TIMEVALUE(D2)-TIMEVALUE(C2),1)*1440)` |
-| **XP Ganados** | $\text{REDONDEAR}\Big(\text{Duración} \times (1 + \text{Calidad}\times 0.2 + \text{BonoReto} + \text{BonoMeta})\Big)$ | `=IF(M2="","",ROUND(M2*(1+(N2*0.2)+IF(K2="Muy difícil",0.2,IF(K2="Desafiante",0.1,0))+IF(L2="Sí",0.1,0)),0))` |
-| **Nivel Actual** | Cada **500 XP** acumulados subes 1 nivel. | `=INT(SUM(Registro_Estudio!P2:P1000)/500)+1` |
-| **Tasa Objetivos** | Porcentaje de sesiones donde `Objetivo_Cumplido = "Sí"`. | `=IFERROR(COUNTIF(Registro_Estudio!L2:L1000,"Sí")/COUNTA(Registro_Estudio!G2:G1000),0)` |
+| **XP Ganados** | $\text{REDONDEAR}\Big(\text{Duración} \times (1 + \text{Calidad}\times 0.2 + \text{BonoReto} + \text{BonoMeta})\Big)$ | `=IF(M2="","",ROUND(M2*(1+(N2*0.2)+IF(K2="Muy difícil",0.2,IF(K2="Desafiante",0.1,0))+IF(L2="Sí",0.1,IF(L2="Parcial",0.05,0))),0))` |
+| **Nivel Exponencial (1-99)** | $\text{XP}(L) = \text{REDONDEAR}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Nivel 92 = 50% de 99)* | `=MIN(99,INT(1+7*(LN(1+SUM(Registro_Estudio!P2:P1000)/250)/LN(2))))` |
+| **Tasa Objetivos (Sí)** | Porcentaje de sesiones donde `Objetivo_Cumplido = "Sí"`. | `=IFERROR(COUNTIF(Registro_Estudio!L2:L1000,"Sí")/COUNTA(Registro_Estudio!G2:G1000),0)` |
+| **Bloqueos (No)** | Total de sesiones con bloqueo o sin avance (`Objetivo_Cumplido = "No"`). | `=COUNTIF(Registro_Estudio!L2:L1000,"No")` |
 
 ---
 
@@ -120,6 +104,3 @@ No requiere instalar paquetes externos (`node_modules`), ya que `server.js` util
 2. Se abrirá automáticamente `http://localhost:3000`.
 3. El indicador superior mostrará **`🟢 Sincronizado en vivo: data/study-tracker.xlsx`**.
 4. Cada sesión que registres, edites (`✏️`) o elimines (`✖`) actualizará instantáneamente el archivo `data/study-tracker.xlsx`.
-
-### Opción Alternativa: Modo Solo Navegador (`index.html`)
-También puedes abrir `index.html` directamente sin servidor; funcionará con la memoria del navegador (`localStorage`) y podrás usar los botones **📤 Importar otro .xlsx** y **📥 Descargar copia (.xlsx)** manualmente.
