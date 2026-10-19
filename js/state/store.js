@@ -8,6 +8,7 @@
   const {
     CONTEXTOS,
     TIPOS_ACTIVIDAD,
+    MODOS_IA,
     NIVELES_ENERGIA,
     NIVELES_COMPLEJIDAD,
     ESTADOS_OBJETIVO,
@@ -21,6 +22,7 @@
 
   const VALORES_CONTEXTO = new Set(CONTEXTOS.map((c) => c.valor));
   const VALORES_ACTIVIDAD = new Set(TIPOS_ACTIVIDAD.map((t) => t.valor));
+  const VALORES_MODO_IA = new Set(MODOS_IA.map((m) => m.valor));
   const VALORES_ENERGIA = new Set(NIVELES_ENERGIA.map((e) => e.valor));
   const VALORES_COMPLEJIDAD = new Set(NIVELES_COMPLEJIDAD.map((c) => c.valor));
   const VALORES_OBJETIVO = new Set(ESTADOS_OBJETIVO.map((o) => o.valor));
@@ -32,9 +34,12 @@
 
   const MAPA_MIGRACION_ACTIVIDAD = {
     "Lectura / Teoría": "Teoría / Docs",
-    "Papel / A mano": "Papel / Diseño",
-    Repaso: "Repaso / Test",
-    "Tarea / Entrega": "Código / Práctica"
+    "Papel / A mano": "Diseño / Apuntes",
+    "Papel / Diseño": "Diseño / Apuntes",
+    Repaso: "Repaso / Simulacro",
+    "Repaso / Test": "Repaso / Simulacro",
+    "Tarea / Entrega": "Desarrollo / Código",
+    "Código / Práctica": "Desarrollo / Código"
   };
 
   // Datos iniciales de ejemplo cuando no existe historial previo en LocalStorage ni en Excel
@@ -46,14 +51,15 @@
       contexto: "Académico",
       materia: "Base de Datos",
       tema: "Normalización 3FN y Modelo ER",
-      tipoActividad: "Papel / Diseño",
+      tipoActividad: "Diseño / Apuntes",
       energiaPrevia: "Alta",
       complejidad: "Desafiante",
       objetivoCumplido: "Sí",
       duracion: 90,
       calidad: 4,
+      modoIA: "Diálogo / Tutoría",
       usoIA: 25,
-      notas: "Diseño de modelo entidad-relación y normalización en libreta"
+      notas: "Diseño de modelo entidad-relación y debate de reglas 3FN"
     },
     {
       fecha: "2026-10-18",
@@ -68,8 +74,9 @@
       objetivoCumplido: "Sí",
       duracion: 135,
       calidad: 5,
-      usoIA: 20,
-      notas: "Estudio para certificación SnowPro Core y notas de arquitectura"
+      modoIA: "Diálogo / Tutoría",
+      usoIA: 30,
+      notas: "Estudio para certificación SnowPro Core reforzando conceptos con preguntas"
     },
     {
       fecha: "2026-10-18",
@@ -78,12 +85,13 @@
       contexto: "Externo",
       materia: "Proyecto Rails",
       tema: "Rutas y Controladores MVC",
-      tipoActividad: "Código / Práctica",
+      tipoActividad: "Desarrollo / Código",
       energiaPrevia: "Baja",
       complejidad: "Desafiante",
       objetivoCumplido: "Parcial",
       duracion: 45,
       calidad: 3,
+      modoIA: "Copiloto / Apoyo",
       usoIA: 50,
       notas: "Configuración inicial de endpoints para proyecto en equipo"
     }
@@ -97,6 +105,19 @@
       return global.crypto.randomUUID();
     }
     return "ses_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 9);
+  }
+
+  /**
+   * Infiere el Modo de IA cuando una sesión antigua no tiene el campo definido.
+   */
+  function inferirModoIA(rawModoIA, usoIA, calidad) {
+    if (VALORES_MODO_IA.has(rawModoIA)) {
+      return rawModoIA;
+    }
+    if (usoIA === 0) return "Autónomo";
+    if (calidad <= 2 && usoIA >= 60) return "Mecánico / Copy-Paste";
+    if (calidad >= 4 && usoIA > 0) return "Diálogo / Tutoría";
+    return "Copiloto / Apoyo";
   }
 
   /**
@@ -117,7 +138,7 @@
     const actCandidata = MAPA_MIGRACION_ACTIVIDAD[raw.tipoActividad] || raw.tipoActividad;
     const tipoActividad = VALORES_ACTIVIDAD.has(actCandidata)
       ? actCandidata
-      : "Código / Práctica";
+      : "Desarrollo / Código";
 
     const energiaPrevia = VALORES_ENERGIA.has(raw.energiaPrevia)
       ? raw.energiaPrevia
@@ -135,13 +156,18 @@
     if (Number.isNaN(usoIA)) usoIA = 0;
     usoIA = Math.min(100, Math.max(0, Math.round(usoIA)));
 
+    const modoIA = inferirModoIA(raw.modoIA, usoIA, calidad);
+    if (modoIA === "Autónomo") {
+      usoIA = 0;
+    }
+
     const duracionCalculada = calcularMinutos(horaInicio, horaFin);
     const duracion =
       raw.duracion !== undefined && Number(raw.duracion) > 0 && !raw.recalcularDuracion
         ? Number(raw.duracion)
         : duracionCalculada;
 
-    const xp = calcularXP(duracion, calidad, complejidad, objetivoCumplido);
+    const xp = calcularXP(duracion, calidad, complejidad, objetivoCumplido, modoIA);
 
     return {
       id: raw.id ? String(raw.id) : generarId(),
@@ -159,6 +185,7 @@
       objetivoCumplido,
       duracion,
       calidad,
+      modoIA,
       usoIA,
       xp,
       notas: String(raw.notas || "").trim()

@@ -14,18 +14,18 @@
   let servidorLocalActivo = false;
 
   /**
-   * Construye el objeto Workbook de SheetJS con pestaña de sesiones enriquecida (17 columnas),
-   * fórmulas nativas de Excel (incluyendo bonos por complejidad, objetivo y nivel exponencial) y pestaña de guía.
+   * Construye el objeto Workbook de SheetJS con pestaña de sesiones enriquecida (18 columnas),
+   * fórmulas nativas de Excel (incluyendo bonos por complejidad, objetivo, modo de IA y nivel exponencial) y pestaña de guía.
    */
   function construirLibroExcel(sesiones) {
     const wb = XLSX.utils.book_new();
     const lista = Array.isArray(sesiones) ? sesiones : [];
 
-    // Pestaña 1: Registro_Estudio (17 columnas analíticas)
+    // Pestaña 1: Registro_Estudio (18 columnas analíticas)
     // A: Fecha | B: Dia_Semana | C: Hora_Inicio | D: Hora_Fin | E: Franja_Horaria
     // F: Contexto | G: Materia | H: Tema | I: Tipo_Actividad | J: Energia_Previa
     // K: Complejidad | L: Objetivo_Cumplido | M: Duracion_Minutos | N: Calidad
-    // O: Uso_IA_Porcentaje | P: XP_Ganados | Q: Notas
+    // O: Modo_IA | P: Uso_IA_Porcentaje | Q: XP_Ganados | R: Notas
     const encabezados = [
       "Fecha",
       "Dia_Semana",
@@ -41,6 +41,7 @@
       "Objetivo_Cumplido",
       "Duracion_Minutos",
       "Calidad",
+      "Modo_IA",
       "Uso_IA_Porcentaje",
       "XP_Ganados",
       "Notas"
@@ -57,12 +58,13 @@
         s.contexto || "Académico",
         s.materia,
         s.tema || "General",
-        s.tipoActividad || "Código / Práctica",
+        s.tipoActividad || "Desarrollo / Código",
         s.energiaPrevia || "Media",
         s.complejidad || "Desafiante",
         s.objetivoCumplido || "Sí",
         Number(s.duracion),
         Number(s.calidad),
+        s.modoIA || (Number(s.usoIA) === 0 ? "Autónomo" : "Copiloto / Apoyo"),
         Number(s.usoIA) / 100, // Formato decimal para porcentaje en Excel
         Number(s.xp),
         s.notas || ""
@@ -71,7 +73,7 @@
 
     const ws = XLSX.utils.aoa_to_sheet(filas);
 
-    // Inyectar las fórmulas reales de Excel en Duracion_Minutos (Col M) y XP_Ganados (Col P)
+    // Inyectar las fórmulas reales de Excel en Duracion_Minutos (Col M) y XP_Ganados (Col Q)
     lista.forEach((s, idx) => {
       const r = idx + 2; // Fila 2 en adelante en Excel
       // M: Diferencia entre Hora_Fin (D) y Hora_Inicio (C) en minutos
@@ -80,12 +82,12 @@
         f: `IF(OR(C${r}="",D${r}=""),"",MOD(TIMEVALUE(D${r})-TIMEVALUE(C${r}),1)*1440)`,
         v: Number(s.duracion)
       };
-      // O: Formato de porcentaje
-      if (ws[`O${r}`]) ws[`O${r}`].z = "0%";
-      // P: Fórmula de XP Ganados con bonos por Complejidad (Col K) y Objetivo_Cumplido (Col L: Sí +10%, Parcial +5%)
-      ws[`P${r}`] = {
+      // P: Formato de porcentaje
+      if (ws[`P${r}`]) ws[`P${r}`].z = "0%";
+      // Q: Fórmula de XP Ganados con bonos por Complejidad (Col K), Objetivo_Cumplido (Col L) y Modo_IA (Col O)
+      ws[`Q${r}`] = {
         t: "n",
-        f: `IF(M${r}="","",ROUND(M${r}*(1+(N${r}*0.2)+IF(K${r}="Muy difícil",0.2,IF(K${r}="Desafiante",0.1,0))+IF(L${r}="Sí",0.1,IF(L${r}="Parcial",0.05,0))),0))`,
+        f: `IF(M${r}="","",ROUND(M${r}*MAX(0.5,1+(N${r}*0.2)+IF(K${r}="Muy difícil",0.2,IF(K${r}="Desafiante",0.1,0))+IF(L${r}="Sí",0.1,IF(L${r}="Parcial",0.05,0))+IF(OR(O${r}="Autónomo",O${r}="Diálogo / Tutoría"),0.05,IF(O${r}="Mecánico / Copy-Paste",-0.15,0))),0))`,
         v: Number(s.xp)
       };
     });
@@ -99,15 +101,16 @@
       { wch: 16 }, // F: Contexto
       { wch: 20 }, // G: Materia
       { wch: 26 }, // H: Tema
-      { wch: 19 }, // I: Tipo_Actividad
+      { wch: 22 }, // I: Tipo_Actividad
       { wch: 15 }, // J: Energia_Previa
       { wch: 15 }, // K: Complejidad
       { wch: 18 }, // L: Objetivo_Cumplido
       { wch: 18 }, // M: Duracion_Minutos
       { wch: 10 }, // N: Calidad
-      { wch: 18 }, // O: Uso_IA_Porcentaje
-      { wch: 14 }, // P: XP_Ganados
-      { wch: 34 }  // Q: Notas
+      { wch: 22 }, // O: Modo_IA
+      { wch: 18 }, // P: Uso_IA_Porcentaje
+      { wch: 14 }, // Q: XP_Ganados
+      { wch: 34 }  // R: Notas
     ];
     XLSX.utils.book_append_sheet(wb, ws, "Registro_Estudio");
 
@@ -117,10 +120,18 @@
       ["Total de Sesiones", { t: "n", f: "COUNTA(Registro_Estudio!G2:G1000)" }],
       ["Tiempo Total (Minutos)", { t: "n", f: "SUM(Registro_Estudio!M2:M1000)" }],
       ["Tiempo Total (Horas)", { t: "n", f: "SUM(Registro_Estudio!M2:M1000)/60" }],
-      ["Promedio de Calidad (1-5)", { t: "n", f: "IFERROR(AVERAGE(Registro_Estudio!N2:N1000),0)" }],
+      ["Promedio de Asimilación / Calidad (1-5)", { t: "n", f: "IFERROR(AVERAGE(Registro_Estudio!N2:N1000),0)" }],
       [
         "Promedio Uso de IA",
-        { t: "n", f: "IFERROR(AVERAGE(Registro_Estudio!O2:O1000),0)", z: "0%" }
+        { t: "n", f: "IFERROR(AVERAGE(Registro_Estudio!P2:P1000),0)", z: "0%" }
+      ],
+      [
+        "Sesiones en Diálogo / Tutoría IA",
+        { t: "n", f: 'COUNTIF(Registro_Estudio!O2:O1000,"Diálogo / Tutoría")' }
+      ],
+      [
+        "Sesiones Mecánicas / Copy-Paste IA",
+        { t: "n", f: 'COUNTIF(Registro_Estudio!O2:O1000,"Mecánico / Copy-Paste")' }
       ],
       [
         "Tasa de Objetivos Cumplidos (Sí)",
@@ -134,10 +145,10 @@
         "Sesiones con Bloqueo (No)",
         { t: "n", f: 'COUNTIF(Registro_Estudio!L2:L1000,"No")' }
       ],
-      ["Total XP Acumulados", { t: "n", f: "SUM(Registro_Estudio!P2:P1000)" }],
+      ["Total XP Acumulados", { t: "n", f: "SUM(Registro_Estudio!Q2:Q1000)" }],
       [
         "Nivel Actual (Curva Exponencial 1-99)",
-        { t: "n", f: "MIN(99,INT(1+7*(LN(1+SUM(Registro_Estudio!P2:P1000)/250)/LN(2))))" }
+        { t: "n", f: "MIN(99,INT(1+7*(LN(1+SUM(Registro_Estudio!Q2:Q1000)/250)/LN(2))))" }
       ],
       [],
       ["GUÍA DE REFERENCIA RÁPIDA Y REGLAS DE NEGOCIO", ""],
@@ -151,8 +162,12 @@
         "Materia agrupa a nivel macro (ej. Snowflake, Base de Datos) y Tema detalla el contenido específico"
       ],
       [
-        "Tipo de Actividad",
-        "Código / Práctica (💻) | Teoría / Docs (📖) | Papel / Diseño (✍️) | Repaso / Test (🔁)"
+        "Tipo de Actividad (6 opciones)",
+        "Teoría / Docs (📖) | Investigación / Diálogo (💬) | Diseño / Apuntes (✍️) | Desarrollo / Código (💻) | Práctica / Debugging (🧪) | Repaso / Simulacro (🔁)"
+      ],
+      [
+        "Modo de Uso de IA (4 opciones)",
+        "Autónomo (+5% XP) | Diálogo / Tutoría (+5% XP: aprendizaje activo) | Copiloto / Apoyo (0% ajuste) | Mecánico / Copy-Paste (-15% XP: delegación sin lectura)"
       ],
       ["Energía Previa", "Alta (🔋) | Media (⚡) | Baja (🪫) — Permite medir fatiga vs. retención"],
       [
@@ -168,15 +183,15 @@
         "XP(Nivel L) = REDONDEAR(250 * (2^((L-1)/7) - 1)). El XP requerido se duplica cada 7 niveles (el Nivel 92 es exactamente el 50% del Nivel 99)."
       ],
       [],
-      ["Escala de Calidad (1 al 5)", "Significado"],
-      ["1 - Muy bajo", "Distraído todo el tiempo, procrastinación constante, baja retención."],
-      ["2 - Bajo", "Costó mucho mantener el foco, interrupciones frecuentes."],
-      ["3 - Normal / Neutro", "Sesión estándar, se avanzó lo planeado con distracciones menores."],
-      ["4 - Bueno", "Buen ritmo de trabajo, comprensión sólida y pocas distracciones."],
-      ["5 - Flujo total", "Concentración profunda, el tiempo pasó volando y retención al máximo."]
+      ["Escala de Asimilación / Calidad (1 al 5)", "Significado Cognitivo"],
+      ["1 - Mecánico / Sin retención", "Solo copié/pegué respuestas o estuve distraído; no asimilé el tema."],
+      ["2 - Superficial / Pasivo", "Seguí pasos o código generado entendiendo solo por encima; poca retención."],
+      ["3 - Comprensión estándar", "Entendí la lógica general de lo realizado y resolví partes por mi cuenta."],
+      ["4 - Aprendizaje sólido", "Razoné activamente el problema, comprendí el porqué y puedo replicarlo."],
+      ["5 - Asimilación profunda", "Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda."]
     ];
     const wsGuia = XLSX.utils.aoa_to_sheet(guiaDatos);
-    wsGuia["!cols"] = [{ wch: 36 }, { wch: 88 }];
+    wsGuia["!cols"] = [{ wch: 36 }, { wch: 94 }];
     XLSX.utils.book_append_sheet(wb, wsGuia, "Guia_y_Resumen");
 
     return wb;
@@ -208,10 +223,11 @@
 
       const contexto = r.Contexto || r.contexto || "Académico";
       const tema = r.Tema || r.tema || "General";
-      const tipoActividad = r.Tipo_Actividad || r.tipoActividad || "Código / Práctica";
+      const tipoActividad = r.Tipo_Actividad || r.tipoActividad || "Desarrollo / Código";
       const energiaPrevia = r.Energia_Previa || r.energiaPrevia || "Media";
       const complejidad = r.Complejidad || r.complejidad || "Desafiante";
       const objetivoCumplido = r.Objetivo_Cumplido || r.objetivoCumplido || "Sí";
+      const modoIA = r.Modo_IA || r.modoIA || "";
 
       const duracion = Number(
         r.Duracion_Minutos || calcularMinutos(String(horaInicio), String(horaFin))
@@ -225,7 +241,8 @@
       }
 
       const xp = Number(
-        r.XP_Ganados || calcularXP(duracion, calidad, complejidad, objetivoCumplido)
+        r.XP_Ganados ||
+          calcularXP(duracion, calidad, complejidad, objetivoCumplido, modoIA || undefined)
       );
       const notas = r.Notas || "";
 
@@ -242,6 +259,7 @@
         objetivoCumplido: String(objetivoCumplido),
         duracion,
         calidad,
+        modoIA: modoIA ? String(modoIA) : undefined,
         usoIA: rawIA,
         xp,
         notas: String(notas)

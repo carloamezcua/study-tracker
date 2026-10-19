@@ -91,7 +91,7 @@
         <div class="sub" id="kpiPromedioMin">0 min promedio / sesión</div>
       </div>
       <div class="kpi-card">
-        <div class="label">Calidad Promedio</div>
+        <div class="label">Asimilación Promedio</div>
         <div class="value" id="kpiCalidad">0.0 / 5</div>
         <div class="sub" id="kpiMejorHora">Mejor hora: --:--</div>
       </div>
@@ -101,9 +101,9 @@
         <div class="sub" id="kpiObjetivosSub">0 sí · 0 parc. · 0 bloq.</div>
       </div>
       <div class="kpi-card">
-        <div class="label">Uso Promedio de IA</div>
+        <div class="label">Impacto y Uso de IA</div>
         <div class="value" id="kpiIA">0%</div>
-        <div class="sub">Equilibrio autonomía vs. copiloto</div>
+        <div class="sub" id="kpiIASub">0 diálogo · 0 copiloto · 0 mec.</div>
       </div>
     </div>
 
@@ -114,16 +114,16 @@
         <h2>
           <span id="formTitle">➕ Registrar Sesión</span>
         </h2>
-        <div class="subtitle">Mide tu sesión en vivo o regístrala en 1 clic. Sin anuncios y sincronizado con <code>data/study-tracker.xlsx</code>.</div>
+        <div class="subtitle">Cronometra tu sesión o regístrala en 1 clic. Sincronización automática con <code>data/study-tracker.xlsx</code>.</div>
 
-        <!-- CRONÓMETRO Y POMODORO INTEGRADO (SIN ANUNCIOS) -->
+        <!-- CRONÓMETRO Y POMODORO INTEGRADO -->
         <div class="timer-widget" id="timerWidgetCard">
           <div class="timer-header">
             <div class="timer-tabs">
-              <button type="button" class="timer-mode-tab active" data-mode="cronometro" title="Cuenta hacia adelante y captura inicio y fin">
+              <button type="button" class="timer-mode-tab active" data-mode="cronometro" title="Cuenta progresiva con captura de inicio y fin">
                 ⏱️ Cronómetro
               </button>
-              <button type="button" class="timer-mode-tab" data-mode="pomodoro" title="Temporizador por bloques 100% libre de anuncios">
+              <button type="button" class="timer-mode-tab" data-mode="pomodoro" title="Temporizador por bloques de enfoque y descanso">
                 🍅 Pomodoro
               </button>
             </div>
@@ -147,7 +147,7 @@
           <div class="timer-display-box">
             <div class="timer-digits" id="timerDisplay">00:00:00</div>
             <div class="timer-status-text" id="timerStatusText">
-              Pulsa Iniciar para capturar la Hora de Inicio automáticamente
+              Listo para iniciar
             </div>
             <div class="timer-progress-bg">
               <div class="timer-progress-fill" id="timerProgressFill"></div>
@@ -220,14 +220,16 @@
             </div>
           </div>
 
-          <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (4 CHIPS DE 1 CLIC) -->
+          <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (6 CHIPS EN GRID 3x2) -->
           <div class="form-group">
             <label>Tipo de Actividad</label>
-            <div class="chip-group" data-group="tipoActividad">
-              <button type="button" class="chip-btn active" data-value="Código / Práctica">💻 Código / Práctica</button>
+            <div class="chip-group chip-grid-6" data-group="tipoActividad">
               <button type="button" class="chip-btn" data-value="Teoría / Docs">📖 Teoría / Docs</button>
-              <button type="button" class="chip-btn" data-value="Papel / Diseño">✍️ Papel / Diseño</button>
-              <button type="button" class="chip-btn" data-value="Repaso / Test">🔁 Repaso / Test</button>
+              <button type="button" class="chip-btn" data-value="Investigación / Diálogo">💬 Investigación / Diálogo</button>
+              <button type="button" class="chip-btn" data-value="Diseño / Apuntes">✍️ Diseño / Apuntes</button>
+              <button type="button" class="chip-btn active" data-value="Desarrollo / Código">💻 Desarrollo / Código</button>
+              <button type="button" class="chip-btn" data-value="Práctica / Debugging">🧪 Práctica / Debugging</button>
+              <button type="button" class="chip-btn" data-value="Repaso / Simulacro">🔁 Repaso / Simulacro</button>
             </div>
           </div>
 
@@ -264,31 +266,42 @@
             </div>
           </div>
 
+          <!-- 4. MODO DE INTERACCIÓN CON IA + PORCENTAJE -->
           <div class="form-group">
-            <label for="calidad">Calidad del Estudio (1 al 5)</label>
-            <select id="calidad">
-              <option value="1">1 - ⭐️ Muy bajo (Distraído)</option>
-              <option value="2">2 - ⭐️⭐️ Bajo (Costó enfocar)</option>
-              <option value="3" selected>3 - ⭐️⭐️⭐️ Normal / Neutro</option>
-              <option value="4">4 - ⭐️⭐️⭐️⭐️ Bueno (Sólido)</option>
-              <option value="5">5 - ⭐️⭐️⭐️⭐️⭐️ Flujo total</option>
-            </select>
-            <div id="ayudaCalidad" class="helper-box">
-              Sesión estándar: se avanzó lo planeado con distracciones menores.
+            <label>Modo de Uso de IA <span class="label-hint">(+5% Autónomo/Diálogo · -15% Mecánico)</span></label>
+            <div class="chip-group chip-grid-2" data-group="modoIA">
+              <button type="button" class="chip-btn" data-value="Autónomo">🧠 Autónomo (Sin IA)</button>
+              <button type="button" class="chip-btn active" data-value="Diálogo / Tutoría">💬 Diálogo / Tutoría</button>
+              <button type="button" class="chip-btn" data-value="Copiloto / Apoyo">🛠️ Copiloto / Apoyo</button>
+              <button type="button" class="chip-btn" data-value="Mecánico / Copy-Paste">🤖 Mecánico / Copy-Paste</button>
+            </div>
+            <div class="ia-slider-row">
+              <span class="ia-slider-label">Porcentaje de apoyo IA: <strong id="iaLabel">25%</strong></span>
+              <input type="range" id="usoIA" min="0" max="100" step="5" value="25">
+            </div>
+            <div id="ayudaIA" class="helper-box">
+              Alto valor cognitivo: debate de conceptos, preguntas de '¿por qué?' y refuerzo activo con IA (+5% XP).
             </div>
           </div>
 
+          <!-- 5. CALIDAD DE APRENDIZAJE / ASIMILACIÓN REAL -->
           <div class="form-group">
-            <label for="usoIA">Porcentaje de Uso de IA: <strong id="iaLabel">25%</strong></label>
-            <input type="range" id="usoIA" min="0" max="100" step="5" value="25">
-            <div id="ayudaIA" class="helper-box">
-              Modo híbrido: estudio propio usando IA para aclarar dudas puntuales o depurar errores.
+            <label for="calidad">Calidad de Aprendizaje / Asimilación (1 al 5)</label>
+            <select id="calidad">
+              <option value="1">1 - ⭐️ Mecánico / Sin retención (Solo copié o distraído)</option>
+              <option value="2">2 - ⭐️⭐️ Superficial / Pasivo (Entendí por encima)</option>
+              <option value="3" selected>3 - ⭐️⭐️⭐️ Comprensión estándar (Entendí la lógica)</option>
+              <option value="4">4 - ⭐️⭐️⭐️⭐️ Aprendizaje sólido (Razoné y puedo replicarlo)</option>
+              <option value="5">5 - ⭐️⭐️⭐️⭐️⭐️ Asimilación profunda (Dominio total)</option>
+            </select>
+            <div id="ayudaCalidad" class="helper-box">
+              Comprensión estándar: Entendí la lógica general de lo realizado y resolví partes por mi cuenta.
             </div>
           </div>
 
           <div class="form-group">
             <label for="notas">Notas breves</label>
-            <textarea id="notas" rows="2" placeholder="¿Qué aprendiste, qué te costó o qué te distrajo?"></textarea>
+            <textarea id="notas" rows="2" placeholder="¿Qué aprendiste, qué debatiste o dónde te trabaste?"></textarea>
           </div>
 
           <div class="form-actions">
@@ -306,10 +319,10 @@
       <div class="charts-col">
         <div class="panel">
           <h2>
-            <span>🕒 Rendimiento y Concentración por Hora del Día</span>
+            <span>🕒 Rendimiento y Asimilación por Hora del Día</span>
             <small class="chart-hint">Descubre tus picos biológicos de enfoque</small>
           </h2>
-          <div class="subtitle">Compara los minutos estudiados (barras) y tu calidad de concentración promedio (línea) según la hora de inicio.</div>
+          <div class="subtitle">Compara los minutos estudiados (barras) y tu calidad de asimilación promedio (línea) según la hora de inicio.</div>
           <div class="chart-box">
             <canvas id="chartPorHora"></canvas>
           </div>
@@ -317,10 +330,10 @@
 
         <div class="panel">
           <h2>
-            <span>📚 Tiempo vs. % Uso de IA por Materia</span>
-            <small class="chart-hint">Autonomía por asignatura</small>
+            <span>📚 Impacto de IA y Aprendizaje por Materia</span>
+            <small class="chart-hint">Aprendizaje real vs. Copy-Paste mecánico</small>
           </h2>
-          <div class="subtitle">Minutos acumulados por materia y qué porcentaje dependiste de la IA en cada una.</div>
+          <div class="subtitle">Contrasta tus minutos de aprendizaje real (Autónomo, Diálogo o Copiloto) frente a las sesiones mecánicas (Copy-Paste) y tu asimilación (1-5).</div>
           <div class="chart-box">
             <canvas id="chartPorMateria"></canvas>
           </div>
@@ -331,7 +344,7 @@
             <span>🧠 Patrones de Hábito: Actividad y Energía Previa</span>
             <small class="chart-hint">Comportamiento por tipo de tarea y fatiga</small>
           </h2>
-          <div class="subtitle">Minutos y calidad promedio según el tipo de actividad (Código, Lectura, Papel, Tarea, Repaso) y cómo rinde tu foco según tu energía inicial.</div>
+          <div class="subtitle">Minutos y asimilación promedio según los 6 tipos de actividad y cómo rinde tu aprendizaje según tu energía inicial.</div>
           <div class="chart-box">
             <canvas id="chartPorActividad"></canvas>
           </div>
@@ -356,8 +369,8 @@
               <th>Actividad</th>
               <th>Energía · Reto · Meta</th>
               <th>Duración</th>
-              <th>Calidad</th>
-              <th>% IA</th>
+              <th>Asimilación</th>
+              <th>IA (Modo · %)</th>
               <th>XP Ganados</th>
               <th>Notas</th>
               <th>Acciones</th>
@@ -371,33 +384,34 @@
     <!-- GUÍA Y ESCALAS DE REFERENCIA PARA CUALQUIER USUARIO -->
     <div class="panel">
       <h2>📖 Guía de Referencia y Escalas del Sistema</h2>
-      <div class="subtitle">Documentación integrada para entender cómo medir cada bloque y cómo se calculan las fórmulas en Excel.</div>
+      <div class="subtitle">Documentación integrada para evaluar el impacto cognitivo de cada bloque y cómo se calculan las fórmulas en Excel.</div>
       <div class="guide-grid">
         <div class="guide-card">
-          <h4>⭐️ Escala de Calidad (1 al 5)</h4>
+          <h4>⭐️ Calidad de Aprendizaje / Asimilación (1 al 5)</h4>
           <ul>
-            <li><strong>1 (Muy bajo):</strong> Distraído todo el tiempo, procrastinación constante, baja retención.</li>
-            <li><strong>2 (Bajo):</strong> Costó mucho mantener el foco, interrupciones frecuentes.</li>
-            <li><strong>3 (Normal / Neutro):</strong> Sesión estándar, se avanzó lo planeado con distracciones menores.</li>
-            <li><strong>4 (Bueno):</strong> Buen ritmo de trabajo, comprensión sólida y pocas distracciones.</li>
-            <li><strong>5 (Flujo total):</strong> Concentración profunda, el tiempo pasó volando y retención al máximo.</li>
+            <li><strong>1 (Mecánico / Sin retención):</strong> Solo copié/pegué respuestas o estuve distraído; no asimilé el tema.</li>
+            <li><strong>2 (Superficial / Pasivo):</strong> Seguí pasos o código generado entendiendo solo por encima; poca retención.</li>
+            <li><strong>3 (Comprensión estándar):</strong> Entendí la lógica general de lo realizado y resolví partes por mi cuenta.</li>
+            <li><strong>4 (Aprendizaje sólido):</strong> Razoné activamente el problema, comprendí el porqué y puedo replicarlo.</li>
+            <li><strong>5 (Asimilación profunda):</strong> Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda.</li>
           </ul>
         </div>
         <div class="guide-card">
-          <h4>🧠 Variables de Comportamiento (1 Clic)</h4>
+          <h4>🧠 Contexto y 6 Tipos de Actividad</h4>
           <ul>
-            <li><strong>Contexto:</strong> <code>🎓 Académico</code>, <code>🏅 Certificación</code> (ej. Snowflake), <code>🚀 Proyecto Propio</code>, <code>🤝 Externo</code>.</li>
-            <li><strong>Tipo de Actividad:</strong> <code>💻 Código / Práctica</code>, <code>📖 Teoría / Docs</code>, <code>✍️ Papel / Diseño</code>, <code>🔁 Repaso / Test</code>.</li>
-            <li><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code> (mide impacto del cansancio).</li>
+            <li><strong>Contexto:</strong> <code>🎓 Académico</code>, <code>🏅 Certificación</code>, <code>🚀 Proyecto Propio</code>, <code>🤝 Externo</code>.</li>
+            <li><strong>Actividades:</strong> <code>📖 Teoría / Docs</code>, <code>💬 Investigación / Diálogo</code>, <code>✍️ Diseño / Apuntes</code>, <code>💻 Desarrollo / Código</code>, <code>🧪 Práctica / Debugging</code>, <code>🔁 Repaso / Simulacro</code>.</li>
+            <li><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code>.</li>
             <li><strong>Objetivo:</strong> <code>✅ Sí (+10% XP)</code>, <code>⚠️ Parcial (+5% XP)</code>, <code>❌ No (0% / Bloqueo)</code>.</li>
           </ul>
         </div>
         <div class="guide-card">
-          <h4>🤖 Escala de Uso de IA (0% a 100%)</h4>
+          <h4>🤖 Modo de Uso de IA (Impacto Cognitivo)</h4>
           <ul>
-            <li><strong>0% (Autónomo):</strong> Lectura, código o ejercicios resueltos 100% sin asistencia.</li>
-            <li><strong>25% - 50% (Modo Híbrido):</strong> Estudio propio usando IA como copiloto para aclarar dudas puntuales o explicar conceptos.</li>
-            <li><strong>75% - 100% (Dependencia Alta):</strong> La IA resolvió la mayor parte del ejercicio o generó la respuesta directamente.</li>
+            <li><strong>🧠 Autónomo (+5% XP):</strong> 100% por tu cuenta (0% IA).</li>
+            <li><strong>💬 Diálogo / Tutoría (+5% XP):</strong> Debate conceptual, preguntas de <em>"¿por qué?"</em> y refuerzo activo con IA.</li>
+            <li><strong>🛠️ Copiloto / Apoyo (0% ajuste):</strong> Consulta puntual de sintaxis o desbloqueo de bugs entendiendo la solución.</li>
+            <li><strong>🤖 Mecánico / Copy-Paste (-15% XP):</strong> Automatización directa para entregar rápido sin leer a fondo.</li>
           </ul>
         </div>
         <div class="guide-card">
@@ -405,7 +419,7 @@
           <ul>
             <li><strong>Curva RPG (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code> (El XP necesario se duplica cada 7 niveles).</li>
             <li><strong>Duración (Minutos):</strong> <code>=MOD(TIMEVALUE(Fin)-TIMEVALUE(Inicio),1)*1440</code>.</li>
-            <li><strong>XP con Bonos:</strong> <code>=ROUND(Duracion * (1 + Calidad*0.2 + BonoReto + BonoObjetivo), 0)</code>.</li>
+            <li><strong>XP con Bonos y Modo IA:</strong> <code>=ROUND(Duracion * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoMeta + BonoModoIA), 0)</code>.</li>
           </ul>
         </div>
       </div>

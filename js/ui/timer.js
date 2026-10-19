@@ -281,31 +281,29 @@
 
       if (statusTextEl) {
         if (estado.modo === "cronometro") {
-          statusTextEl.textContent = "🟢 Midiendo sesión en vivo...";
+          statusTextEl.textContent = "En curso...";
         } else if (estado.fasePomodoro === "descanso") {
-          statusTextEl.textContent = "☕ Descanso en curso (no altera tus horas de estudio)";
+          statusTextEl.textContent = `Descanso en curso (${estado.minutosPomodoro} min)`;
         } else {
-          statusTextEl.textContent = `🍅 Enfoque Pomodoro (${estado.minutosPomodoro} min) en curso...`;
+          statusTextEl.textContent = `Enfoque en curso (${estado.minutosPomodoro} min)`;
         }
       }
     } else if (estado.enPausa) {
       document.title = `(Pausado ${textoReloj}) StudyTracker`;
       if (statusTextEl) {
-        statusTextEl.textContent = "⏸️ Sesión en pausa — Pulsa Reanudar o Terminar";
+        statusTextEl.textContent = "En pausa";
       }
     } else {
       document.title = TITULO_ORIGINAL;
       if (statusTextEl) {
         if (estado.horaInicioCapturada && estado.horaFinCapturada) {
-          statusTextEl.textContent =
-            "✅ Horario capturado en el formulario — Listo para registrar sesión";
+          statusTextEl.textContent = "Horario aplicado al formulario";
         } else if (estado.modo === "cronometro") {
-          statusTextEl.textContent =
-            "Pulsa Iniciar para capturar la Hora de Inicio automáticamente";
+          statusTextEl.textContent = "Listo para iniciar";
         } else if (estado.fasePomodoro === "descanso") {
-          statusTextEl.textContent = `Descanso sin anuncios (${estado.minutosPomodoro} min) listo`;
+          statusTextEl.textContent = `Descanso · ${estado.minutosPomodoro} min`;
         } else {
-          statusTextEl.textContent = `Pomodoro sin anuncios (${estado.minutosPomodoro} min) — Captura inicio y fin automático`;
+          statusTextEl.textContent = `Enfoque · ${estado.minutosPomodoro} min`;
         }
       }
     }

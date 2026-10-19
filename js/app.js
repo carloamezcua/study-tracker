@@ -89,6 +89,7 @@
           complejidad: chips.complejidad,
           objetivoCumplido: chips.objetivoCumplido,
           calidad: Number(document.getElementById("calidad").value),
+          modoIA: chips.modoIA,
           usoIA: Number(document.getElementById("usoIA").value),
           notas: document.getElementById("notas").value.trim()
         };
@@ -131,7 +132,7 @@
       });
     }
     if (inputUsoIA) {
-      inputUsoIA.addEventListener("input", UI.actualizarAyudaIA);
+      inputUsoIA.addEventListener("input", () => UI.actualizarAyudaIA());
     }
 
     // Botones rápidos de hora actual

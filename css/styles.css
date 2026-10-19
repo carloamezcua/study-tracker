@@ -420,6 +420,24 @@ textarea:focus {
   box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.35);
 }
 
+.chip-group.chip-grid-6,
+.chip-group.chip-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.ia-slider-row {
+  margin-top: 8px;
+}
+
+.ia-slider-label {
+  display: block;
+  font-size: 0.77rem;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
 .quick-btn {
   margin-top: 5px;
   background: transparent;
@@ -453,7 +471,7 @@ input[type="range"] {
   cursor: pointer;
 }
 
-/* Cronómetro y Pomodoro Integrado (Sin Anuncios) */
+/* Cronómetro y Pomodoro Integrado */
 .timer-widget {
   background: linear-gradient(145deg, #131c31 0%, #1a2540 100%);
   border: 1px solid var(--border);
@@ -923,6 +941,22 @@ tr.row-editing td {
 .badge-q2,
 .badge-q1 {
   background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.ia-mode-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+.ia-mode-aprendizaje {
+  color: #6ee7b7;
+}
+
+.ia-mode-mecanico {
   color: #fca5a5;
 }
 

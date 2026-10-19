@@ -32,10 +32,46 @@
   ];
 
   const TIPOS_ACTIVIDAD = [
-    { valor: "Código / Práctica", icono: "💻", etiqueta: "Código / Práctica" },
     { valor: "Teoría / Docs", icono: "📖", etiqueta: "Teoría / Docs" },
-    { valor: "Papel / Diseño", icono: "✍️", etiqueta: "Papel / Diseño" },
-    { valor: "Repaso / Test", icono: "🔁", etiqueta: "Repaso / Test" }
+    { valor: "Investigación / Diálogo", icono: "💬", etiqueta: "Investigación / Diálogo" },
+    { valor: "Diseño / Apuntes", icono: "✍️", etiqueta: "Diseño / Apuntes" },
+    { valor: "Desarrollo / Código", icono: "💻", etiqueta: "Desarrollo / Código" },
+    { valor: "Práctica / Debugging", icono: "🧪", etiqueta: "Práctica / Debugging" },
+    { valor: "Repaso / Simulacro", icono: "🔁", etiqueta: "Repaso / Simulacro" }
+  ];
+
+  const MODOS_IA = [
+    {
+      valor: "Autónomo",
+      icono: "🧠",
+      etiqueta: "Autónomo (Sin IA)",
+      bonoXP: 0.05,
+      ayuda: "100% por tu cuenta sin asistencia de IA (+5% XP por autonomía cognitiva)."
+    },
+    {
+      valor: "Diálogo / Tutoría",
+      icono: "💬",
+      etiqueta: "Diálogo / Tutoría",
+      bonoXP: 0.05,
+      ayuda:
+        "Alto valor cognitivo: debate de conceptos, preguntas de '¿por qué?' y refuerzo activo con IA (+5% XP)."
+    },
+    {
+      valor: "Copiloto / Apoyo",
+      icono: "🛠️",
+      etiqueta: "Copiloto / Apoyo",
+      bonoXP: 0,
+      ayuda:
+        "Apoyo puntual: consulta de sintaxis, documentación o desbloqueo de bugs entendiendo la solución (XP estándar)."
+    },
+    {
+      valor: "Mecánico / Copy-Paste",
+      icono: "🤖",
+      etiqueta: "Mecánico / Copy-Paste",
+      bonoXP: -0.15,
+      ayuda:
+        "Delegación mecánica: automatización directa o copiar/pegar para entregar rápido sin profundizar (-15% XP)."
+    }
   ];
 
   const NIVELES_ENERGIA = [
@@ -87,11 +123,11 @@
   ];
 
   const TEXTOS_CALIDAD = {
-    1: "Distraído todo el tiempo, procrastinación constante, baja retención.",
-    2: "Costó mucho mantener el foco, interrupciones frecuentes.",
-    3: "Sesión estándar: se avanzó lo planeado con distracciones menores.",
-    4: "Buen ritmo de trabajo, comprensión sólida y pocas distracciones.",
-    5: "Concentración profunda (flujo total), el tiempo pasó volando."
+    1: "Mecánico / Sin retención: Solo copié/pegué respuestas o estuve distraído; no asimilé el tema.",
+    2: "Superficial / Pasivo: Seguí pasos o código generado entendiendo solo por encima; poca retención.",
+    3: "Comprensión estándar: Entendí la lógica general de lo realizado y resolví partes por mi cuenta.",
+    4: "Aprendizaje sólido: Razoné activamente el problema, comprendí el porqué y puedo replicarlo.",
+    5: "Asimilación profunda: Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda."
   };
 
   /**
@@ -155,15 +191,30 @@
   }
 
   /**
-   * Calcula los puntos de experiencia (XP) en función de duración, calidad (1-5),
-   * complejidad percibida (+10% desafiante, +20% muy difícil) y objetivo (+10% Sí, +5% Parcial).
+   * Devuelve el bono/ajuste multiplicador según el Modo de Uso de IA (+5% Autónomo/Diálogo, 0% Copiloto, -15% Mecánico).
    */
-  function calcularXP(minutos, calidad, complejidad = "Fácil", objetivoCumplido = "No") {
+  function obtenerBonoModoIA(modoIA) {
+    const item = MODOS_IA.find((m) => m.valor === modoIA);
+    return item ? item.bonoXP : 0;
+  }
+
+  /**
+   * Calcula los puntos de experiencia (XP) en función de duración, calidad de asimilación (1-5),
+   * complejidad (+10% desafiante, +20% muy difícil), objetivo (+10% Sí, +5% Parcial) y modo de IA.
+   */
+  function calcularXP(
+    minutos,
+    calidad,
+    complejidad = "Fácil",
+    objetivoCumplido = "No",
+    modoIA = "Copiloto / Apoyo"
+  ) {
     const min = Math.max(0, Number(minutos) || 0);
     const cal = Math.min(5, Math.max(1, Number(calidad) || 3));
     const bonoComp = obtenerBonoComplejidad(complejidad);
     const bonoObj = obtenerBonoObjetivo(objetivoCumplido);
-    const multiplicador = 1 + cal * 0.2 + bonoComp + bonoObj;
+    const bonoIA = obtenerBonoModoIA(modoIA);
+    const multiplicador = Math.max(0.5, 1 + cal * 0.2 + bonoComp + bonoObj + bonoIA);
     return Math.round(min * multiplicador);
   }
 
@@ -245,6 +296,12 @@
     const bloqueosNo = lista.filter((s) => s.objetivoCumplido === "No").length;
     const tasaObjetivos = totalSesiones ? Math.round((cumplidosSi / totalSesiones) * 100) : 0;
 
+    // Desglose por Modo de Uso de IA
+    const iaAutonomo = lista.filter((s) => s.modoIA === "Autónomo").length;
+    const iaDialogo = lista.filter((s) => s.modoIA === "Diálogo / Tutoría").length;
+    const iaCopiloto = lista.filter((s) => s.modoIA === "Copiloto / Apoyo").length;
+    const iaMecanico = lista.filter((s) => s.modoIA === "Mecánico / Copy-Paste").length;
+
     return {
       totalSesiones,
       totalMinutos,
@@ -256,12 +313,16 @@
       cumplidosSi,
       cumplidosParcial,
       bloqueosNo,
-      tasaObjetivos
+      tasaObjetivos,
+      iaAutonomo,
+      iaDialogo,
+      iaCopiloto,
+      iaMecanico
     };
   }
 
   /**
-   * Agrupa las sesiones por hora de inicio (HH:00) y determina la hora pico de concentración.
+   * Agrupa las sesiones por hora de inicio (HH:00) y determina la hora pico de asimilación.
    */
   function analizarPorHora(sesiones) {
     const mapaHoras = {};
@@ -302,30 +363,55 @@
   }
 
   /**
-   * Agrupa las sesiones por materia/proyecto calculando minutos acumulados y % promedio de uso de IA.
+   * Agrupa las sesiones por materia/proyecto contrastando:
+   * - Minutos de Aprendizaje Real (Autónomo, Diálogo / Tutoría y Copiloto)
+   * - Minutos de Uso Mecánico / Copy-Paste
+   * - Calidad de Asimilación promedio (1-5)
    */
   function analizarPorMateria(sesiones) {
     const mapaMaterias = {};
     (Array.isArray(sesiones) ? sesiones : []).forEach((s) => {
       const mat = (s.materia || "General").trim() || "General";
       if (!mapaMaterias[mat]) {
-        mapaMaterias[mat] = { minutos: 0, sumaIA: 0, conteo: 0 };
+        mapaMaterias[mat] = {
+          minutos: 0,
+          minutosAprendizaje: 0,
+          minutosMecanicos: 0,
+          sumaIA: 0,
+          sumaCalidad: 0,
+          conteo: 0
+        };
       }
-      mapaMaterias[mat].minutos += Number(s.duracion) || 0;
+      const dur = Number(s.duracion) || 0;
+      mapaMaterias[mat].minutos += dur;
+      if (s.modoIA === "Mecánico / Copy-Paste") {
+        mapaMaterias[mat].minutosMecanicos += dur;
+      } else {
+        mapaMaterias[mat].minutosAprendizaje += dur;
+      }
       mapaMaterias[mat].sumaIA += Number(s.usoIA) || 0;
+      mapaMaterias[mat].sumaCalidad += Number(s.calidad) || 0;
       mapaMaterias[mat].conteo += 1;
     });
 
     const materiasLabels = Object.keys(mapaMaterias);
     const minutosMateria = materiasLabels.map((m) => mapaMaterias[m].minutos);
+    const minutosAprendizaje = materiasLabels.map((m) => mapaMaterias[m].minutosAprendizaje);
+    const minutosMecanicos = materiasLabels.map((m) => mapaMaterias[m].minutosMecanicos);
     const iaMateria = materiasLabels.map((m) =>
       Math.round(mapaMaterias[m].sumaIA / mapaMaterias[m].conteo)
+    );
+    const calidadMateria = materiasLabels.map(
+      (m) => +(mapaMaterias[m].sumaCalidad / mapaMaterias[m].conteo).toFixed(2)
     );
 
     return {
       materiasLabels,
       minutosMateria,
-      iaMateria
+      minutosAprendizaje,
+      minutosMecanicos,
+      iaMateria,
+      calidadMateria
     };
   }
 
@@ -338,7 +424,7 @@
     // 1. Por Tipo de Actividad
     const mapaActividades = {};
     lista.forEach((s) => {
-      const act = s.tipoActividad || "Código / Práctica";
+      const act = s.tipoActividad || "Desarrollo / Código";
       if (!mapaActividades[act]) {
         mapaActividades[act] = { minutos: 0, sumaCalidad: 0, sumaIA: 0, conteo: 0 };
       }
@@ -408,24 +494,37 @@
   }
 
   /**
-   * Devuelve el texto explicativo para un nivel de calidad (1 al 5).
+   * Devuelve el texto explicativo para un nivel de calidad de asimilación (1 al 5),
+   * advirtiendo si se combina modo mecánico con calidad alta.
    */
-  function obtenerTextoAyudaCalidad(calidad) {
-    return TEXTOS_CALIDAD[Number(calidad)] || TEXTOS_CALIDAD[3];
+  function obtenerTextoAyudaCalidad(calidad, modoIA = "", usoIA = 0) {
+    const numCal = Number(calidad) || 3;
+    const base = TEXTOS_CALIDAD[numCal] || TEXTOS_CALIDAD[3];
+    if (modoIA === "Mecánico / Copy-Paste" && numCal >= 4) {
+      return `${base} ⚠️ Nota: seleccionaste modo 'Mecánico / Copy-Paste'; si solo copiaste sin profundizar, considera nivel 1 o 2 (o cambia a 'Diálogo / Tutoría' si aprendiste debatiendo con la IA).`;
+    }
+    if (Number(usoIA) >= 75 && modoIA !== "Diálogo / Tutoría" && numCal >= 4) {
+      return `${base} 💡 Con ${usoIA}% de IA, califica con 4-5 solo si hubo diálogo y comprensión profunda, no solo fluidez mecánica.`;
+    }
+    return base;
   }
 
   /**
-   * Devuelve el texto explicativo según el porcentaje de uso de IA (0 a 100).
+   * Devuelve el texto explicativo según el Modo de Uso de IA y el porcentaje.
    */
-  function obtenerTextoAyudaIA(usoIA) {
+  function obtenerTextoAyudaIA(usoIA, modoIA = "Copiloto / Apoyo") {
+    const itemModo = MODOS_IA.find((m) => m.valor === modoIA);
+    if (itemModo) {
+      return itemModo.ayuda;
+    }
     const val = Number(usoIA) || 0;
     if (val === 0) {
       return "Estudio 100% autónomo: lectura, código o ejercicios sin asistencia.";
     }
     if (val <= 50) {
-      return "Modo híbrido: estudio propio usando IA para aclarar dudas puntuales o depurar errores.";
+      return "Apoyo puntual: estudio propio usando IA para aclarar dudas o depurar errores.";
     }
-    return "Dependencia alta: la IA resolvió la mayor parte del ejercicio o generó la respuesta.";
+    return "Uso intensivo de IA: distingue arriba si fue por 'Diálogo / Tutoría' (aprendizaje) o 'Mecánico / Copy-Paste'.";
   }
 
   StudyTracker.RPG = {
@@ -434,6 +533,7 @@
     TRAMOS_RANGO,
     CONTEXTOS,
     TIPOS_ACTIVIDAD,
+    MODOS_IA,
     NIVELES_ENERGIA,
     NIVELES_COMPLEJIDAD,
     ESTADOS_OBJETIVO,
@@ -442,6 +542,7 @@
     calcularFranjaHoraria,
     obtenerBonoComplejidad,
     obtenerBonoObjetivo,
+    obtenerBonoModoIA,
     calcularXP,
     calcularXpRequeridoParaNivel,
     calcularProgresoRPG,

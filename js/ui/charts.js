@@ -84,20 +84,28 @@
   }
 
   /**
-   * Actualiza o inicializa el gráfico de tiempo vs. % uso de IA por materia.
+   * Actualiza o inicializa el gráfico de Impacto de IA y Aprendizaje por Materia:
+   * Contrasta Minutos de Aprendizaje (Autónomo / Diálogo / Copiloto) vs. Minutos Mecánicos (Copy-Paste)
+   * junto con la línea de Calidad de Asimilación Promedio (1-5).
    */
   function actualizarGraficoPorMateria(datosMateria) {
     const canvas = document.getElementById("chartPorMateria");
     if (!canvas) return;
 
     const labels = datosMateria.materiasLabels.length ? datosMateria.materiasLabels : ["Sin datos"];
-    const dataMinutos = datosMateria.minutosMateria.length ? datosMateria.minutosMateria : [0];
-    const dataIA = datosMateria.iaMateria.length ? datosMateria.iaMateria : [0];
+    const dataAprendizaje = datosMateria.minutosAprendizaje.length
+      ? datosMateria.minutosAprendizaje
+      : [0];
+    const dataMecanico = datosMateria.minutosMecanicos.length
+      ? datosMateria.minutosMecanicos
+      : [0];
+    const dataCalidad = datosMateria.calidadMateria.length ? datosMateria.calidadMateria : [0];
 
     if (chartMateriaInstance) {
       chartMateriaInstance.data.labels = labels;
-      chartMateriaInstance.data.datasets[0].data = dataMinutos;
-      chartMateriaInstance.data.datasets[1].data = dataIA;
+      chartMateriaInstance.data.datasets[0].data = dataCalidad;
+      chartMateriaInstance.data.datasets[1].data = dataAprendizaje;
+      chartMateriaInstance.data.datasets[2].data = dataMecanico;
       chartMateriaInstance.update();
       return;
     }
@@ -109,18 +117,30 @@
         labels,
         datasets: [
           {
-            label: "Minutos Totales",
-            data: dataMinutos,
-            backgroundColor: "rgba(59, 130, 246, 0.7)",
+            type: "line",
+            label: "Asimilación (1-5)",
+            data: dataCalidad,
+            borderColor: "#10b981",
+            backgroundColor: "#10b981",
+            borderWidth: 3,
+            tension: 0.3,
+            yAxisID: "yCalMat"
+          },
+          {
+            type: "bar",
+            label: "Min. Aprendizaje (Autónomo / Diálogo / Copiloto)",
+            data: dataAprendizaje,
+            backgroundColor: "rgba(59, 130, 246, 0.72)",
             borderRadius: 6,
             yAxisID: "yMin"
           },
           {
-            label: "% Uso IA Promedio",
-            data: dataIA,
-            backgroundColor: "rgba(245, 158, 11, 0.75)",
+            type: "bar",
+            label: "Min. Mecánico (Copy-Paste IA)",
+            data: dataMecanico,
+            backgroundColor: "rgba(239, 68, 68, 0.75)",
             borderRadius: 6,
-            yAxisID: "yIA"
+            yAxisID: "yMin"
           }
         ]
       },
@@ -138,13 +158,13 @@
             ticks: { color: "#94a3b8" },
             grid: { color: "rgba(51,65,85,0.4)" }
           },
-          yIA: {
+          yCalMat: {
             type: "linear",
             position: "right",
             min: 0,
-            max: 100,
-            title: { display: true, text: "% Uso IA", color: "#f59e0b" },
-            ticks: { color: "#f59e0b" },
+            max: 5,
+            title: { display: true, text: "Asimilación (1-5)", color: "#10b981" },
+            ticks: { color: "#10b981", stepSize: 1 },
             grid: { drawOnChartArea: false }
           }
         }

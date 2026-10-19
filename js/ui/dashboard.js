@@ -19,10 +19,11 @@
   // Estado local de los chips seleccionados en el formulario (1 clic)
   const estadoChips = {
     contexto: "Académico",
-    tipoActividad: "Código / Práctica",
+    tipoActividad: "Desarrollo / Código",
     energiaPrevia: "Media",
     complejidad: "Desafiante",
-    objetivoCumplido: "Sí"
+    objetivoCumplido: "Sí",
+    modoIA: "Diálogo / Tutoría"
   };
 
   // ID de la sesión que se está editando actualmente (null si es registro nuevo)
@@ -39,10 +40,19 @@
   };
 
   const ICONOS_ACTIVIDAD = {
-    "Código / Práctica": "💻",
     "Teoría / Docs": "📖",
-    "Papel / Diseño": "✍️",
-    "Repaso / Test": "🔁"
+    "Investigación / Diálogo": "💬",
+    "Diseño / Apuntes": "✍️",
+    "Desarrollo / Código": "💻",
+    "Práctica / Debugging": "🧪",
+    "Repaso / Simulacro": "🔁"
+  };
+
+  const ICONOS_MODO_IA = {
+    Autónomo: "🧠",
+    "Diálogo / Tutoría": "💬",
+    "Copiloto / Apoyo": "🛠️",
+    "Mecánico / Copy-Paste": "🤖"
   };
 
   const ICONOS_ENERGIA = {
@@ -97,21 +107,40 @@
   }
 
   /**
-   * Selecciona un chip dentro de su grupo y actualiza la vista previa de XP y ayudas.
+   * Actualiza visualmente los botones de un grupo de chips sin disparar efectos colaterales.
    */
-  function seleccionarChip(grupo, valor) {
-    if (!(grupo in estadoChips)) return;
-    estadoChips[grupo] = valor;
-
+  function pintarGrupoChip(grupo, valor) {
     const contenedor = document.querySelector(`.chip-group[data-group="${grupo}"]`);
     if (contenedor) {
       contenedor.querySelectorAll(".chip-btn").forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.value === valor);
       });
     }
+  }
+
+  /**
+   * Selecciona un chip dentro de su grupo y actualiza la vista previa de XP y ayudas.
+   */
+  function seleccionarChip(grupo, valor) {
+    if (!(grupo in estadoChips)) return;
+    estadoChips[grupo] = valor;
+    pintarGrupoChip(grupo, valor);
 
     if (grupo === "objetivoCumplido") {
       actualizarAyudaObjetivo();
+    }
+
+    if (grupo === "modoIA") {
+      const inputIA = document.getElementById("usoIA");
+      if (inputIA) {
+        if (valor === "Autónomo") {
+          inputIA.value = "0";
+        } else if (Number(inputIA.value) === 0) {
+          inputIA.value = valor === "Mecánico / Copy-Paste" ? "75" : "25";
+        }
+      }
+      actualizarAyudaIA({ desdeChip: true });
+      actualizarAyudaCalidad();
     }
 
     actualizarPreview();
@@ -168,14 +197,19 @@
     document.getElementById("notas").value = sesion.notas || "";
 
     seleccionarChip("contexto", sesion.contexto || "Académico");
-    seleccionarChip("tipoActividad", sesion.tipoActividad || "Código / Práctica");
+    seleccionarChip("tipoActividad", sesion.tipoActividad || "Desarrollo / Código");
     seleccionarChip("energiaPrevia", sesion.energiaPrevia || "Media");
     seleccionarChip("complejidad", sesion.complejidad || "Desafiante");
     seleccionarChip("objetivoCumplido", sesion.objetivoCumplido || "Sí");
+    seleccionarChip(
+      "modoIA",
+      sesion.modoIA || (Number(sesion.usoIA) === 0 ? "Autónomo" : "Copiloto / Apoyo")
+    );
+    document.getElementById("usoIA").value = String(sesion.usoIA);
 
     actualizarAyudaObjetivo();
+    actualizarAyudaIA({ desdeChip: true });
     actualizarAyudaCalidad();
-    actualizarAyudaIA();
     actualizarPreview();
 
     const formPanel = document.getElementById("formPanel");
@@ -249,13 +283,13 @@
 
     // Sincronizar estado visual de los chips
     Object.keys(estadoChips).forEach((grupo) => {
-      seleccionarChip(grupo, estadoChips[grupo]);
+      pintarGrupoChip(grupo, estadoChips[grupo]);
     });
 
     actualizarAyudaObjetivo();
-    actualizarPreview();
+    actualizarAyudaIA({ desdeChip: true });
     actualizarAyudaCalidad();
-    actualizarAyudaIA();
+    actualizarPreview();
   }
 
   /**
@@ -278,31 +312,50 @@
   }
 
   /**
-   * Actualiza la caja de ayuda según la calidad seleccionada.
+   * Actualiza la caja de ayuda según la calidad de asimilación seleccionada y el modo de IA.
    */
   function actualizarAyudaCalidad() {
     const selectCalidad = document.getElementById("calidad");
     const boxAyuda = document.getElementById("ayudaCalidad");
+    const inputIA = document.getElementById("usoIA");
     if (!selectCalidad || !boxAyuda) return;
-    boxAyuda.textContent = obtenerTextoAyudaCalidad(selectCalidad.value);
+    const valIA = inputIA ? Number(inputIA.value) : 0;
+    boxAyuda.textContent = obtenerTextoAyudaCalidad(
+      selectCalidad.value,
+      estadoChips.modoIA,
+      valIA
+    );
   }
 
   /**
-   * Actualiza la etiqueta y descripción de ayuda del deslizador de uso de IA.
+   * Actualiza la etiqueta y descripción de ayuda del deslizador de uso de IA,
+   * manteniendo coherencia con el chip de Modo de IA.
    */
-  function actualizarAyudaIA() {
+  function actualizarAyudaIA({ desdeChip = false } = {}) {
     const inputIA = document.getElementById("usoIA");
     const labelIA = document.getElementById("iaLabel");
     const boxAyuda = document.getElementById("ayudaIA");
     if (!inputIA) return;
 
     const val = Number(inputIA.value);
+    if (!desdeChip) {
+      if (val === 0 && estadoChips.modoIA !== "Autónomo") {
+        estadoChips.modoIA = "Autónomo";
+        pintarGrupoChip("modoIA", "Autónomo");
+      } else if (val > 0 && estadoChips.modoIA === "Autónomo") {
+        estadoChips.modoIA = "Diálogo / Tutoría";
+        pintarGrupoChip("modoIA", "Diálogo / Tutoría");
+      }
+      actualizarAyudaCalidad();
+      actualizarPreview();
+    }
+
     if (labelIA) labelIA.textContent = `${val}%`;
-    if (boxAyuda) boxAyuda.textContent = obtenerTextoAyudaIA(val);
+    if (boxAyuda) boxAyuda.textContent = obtenerTextoAyudaIA(val, estadoChips.modoIA);
   }
 
   /**
-   * Calcula y muestra la vista previa de minutos y XP (incluyendo bonos por complejidad y objetivo).
+   * Calcula y muestra la vista previa de minutos y XP (incluyendo bonos por complejidad, objetivo y modo de IA).
    */
   function actualizarPreview() {
     const horaInicio = document.getElementById("horaInicio")?.value;
@@ -310,13 +363,22 @@
     const calidad = Number(document.getElementById("calidad")?.value || 3);
 
     const min = calcularMinutos(horaInicio, horaFin);
-    const xp = calcularXP(min, calidad, estadoChips.complejidad, estadoChips.objetivoCumplido);
+    const xp = calcularXP(
+      min,
+      calidad,
+      estadoChips.complejidad,
+      estadoChips.objetivoCumplido,
+      estadoChips.modoIA
+    );
 
     const bonosActivos = [];
     if (estadoChips.complejidad === "Desafiante") bonosActivos.push("+10% reto");
     if (estadoChips.complejidad === "Muy difícil") bonosActivos.push("+20% difícil");
     if (estadoChips.objetivoCumplido === "Sí") bonosActivos.push("+10% meta");
     if (estadoChips.objetivoCumplido === "Parcial") bonosActivos.push("+5% avance");
+    if (estadoChips.modoIA === "Autónomo") bonosActivos.push("+5% autónomo");
+    if (estadoChips.modoIA === "Diálogo / Tutoría") bonosActivos.push("+5% diálogo IA");
+    if (estadoChips.modoIA === "Mecánico / Copy-Paste") bonosActivos.push("-15% mecánico");
 
     const elDuracion = document.getElementById("previewDuracion");
     const elXP = document.getElementById("previewXP");
@@ -393,7 +455,7 @@
   }
 
   /**
-   * Crea una fila <tr> segura para la tabla de historial con Materia, Tema, Contexto y acciones CRUD.
+   * Crea una fila <tr> segura para la tabla de historial con Materia, Tema, Contexto, Modo de IA y acciones CRUD.
    */
   function crearFilaSesion(sesion, { onEditar, onEliminar }) {
     const tr = document.createElement("tr");
@@ -428,7 +490,7 @@
     // Actividad
     const tdActividad = document.createElement("td");
     const iconoAct = ICONOS_ACTIVIDAD[sesion.tipoActividad] || "💻";
-    tdActividad.textContent = `${iconoAct} ${sesion.tipoActividad || "Código / Práctica"}`;
+    tdActividad.textContent = `${iconoAct} ${sesion.tipoActividad || "Desarrollo / Código"}`;
 
     // Contexto Operativo (Energía + Complejidad + Objetivo)
     const tdContexto = document.createElement("td");
@@ -444,7 +506,7 @@
     const tdDuracion = document.createElement("td");
     tdDuracion.textContent = `${sesion.duracion} min`;
 
-    // Calidad
+    // Asimilación / Calidad
     const tdCalidad = document.createElement("td");
     const badgeCalidad = document.createElement("span");
     const calSegura = Math.min(5, Math.max(1, Number(sesion.calidad) || 3));
@@ -452,9 +514,23 @@
     badgeCalidad.textContent = `⭐️ ${calSegura} / 5`;
     tdCalidad.appendChild(badgeCalidad);
 
-    // % Uso IA
+    // Modo de IA + % Uso IA
     const tdIA = document.createElement("td");
-    tdIA.textContent = `${sesion.usoIA}%`;
+    const modoActual =
+      sesion.modoIA || (Number(sesion.usoIA) === 0 ? "Autónomo" : "Copiloto / Apoyo");
+    const icModoIA = ICONOS_MODO_IA[modoActual] || "🛠️";
+    const divModoIA = document.createElement("div");
+    divModoIA.className =
+      modoActual === "Mecánico / Copy-Paste"
+        ? "ia-mode-tag ia-mode-mecanico"
+        : modoActual === "Diálogo / Tutoría" || modoActual === "Autónomo"
+        ? "ia-mode-tag ia-mode-aprendizaje"
+        : "ia-mode-tag";
+    divModoIA.textContent = `${icModoIA} ${modoActual}`;
+    const subPorcentajeIA = document.createElement("small");
+    subPorcentajeIA.className = "cell-sub";
+    subPorcentajeIA.textContent = `${sesion.usoIA}% apoyo IA`;
+    tdIA.append(divModoIA, subPorcentajeIA);
 
     // XP Ganados
     const tdXP = document.createElement("td");
@@ -542,6 +618,11 @@
       : "0 min promedio";
     document.getElementById("kpiCalidad").textContent = `${kpis.promedioCalidad} / 5`;
     document.getElementById("kpiIA").textContent = `${kpis.promedioIA}%`;
+
+    const elKpiIASub = document.getElementById("kpiIASub");
+    if (elKpiIASub) {
+      elKpiIASub.textContent = `💬 ${kpis.iaDialogo} diálogo · 🧠 ${kpis.iaAutonomo} autón. · 🤖 ${kpis.iaMecanico} mec.`;
+    }
 
     const elKpiObjetivos = document.getElementById("kpiObjetivos");
     const elKpiObjetivosSub = document.getElementById("kpiObjetivosSub");
