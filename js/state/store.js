@@ -1,6 +1,6 @@
 /**
- * Capa de Estado (Store): Gestión centralizada de sesiones, IDs únicos,
- * validación de esquema, enriquecimiento automático (día y franja horaria),
+ * Capa de Estado (Store): Gestión centralizada de sesiones (CRUD completo),
+ * IDs únicos, validación de esquema, enriquecimiento automático,
  * persistencia en LocalStorage y patrón Pub/Sub.
  */
 (function (global) {
@@ -23,7 +23,7 @@
   const VALORES_COMPLEJIDAD = new Set(NIVELES_COMPLEJIDAD.map((c) => c.valor));
   const VALORES_OBJETIVO = new Set(ESTADOS_OBJETIVO.map((o) => o.valor));
 
-  // Datos iniciales de ejemplo cuando no existe historial previo en LocalStorage
+  // Datos iniciales de ejemplo cuando no existe historial previo en LocalStorage ni en Excel
   const DATOS_INICIALES = [
     {
       fecha: "2026-10-18",
@@ -70,7 +70,7 @@
   ];
 
   /**
-   * Genera un identificador único para cada sesión (compatible con contextos file:// y https://).
+   * Genera un identificador único para cada sesión (compatible con contextos file:// y http://).
    */
   function generarId() {
     if (global.crypto && typeof global.crypto.randomUUID === "function") {
@@ -112,7 +112,7 @@
 
     const duracionCalculada = calcularMinutos(horaInicio, horaFin);
     const duracion =
-      raw.duracion !== undefined && Number(raw.duracion) > 0
+      raw.duracion !== undefined && Number(raw.duracion) > 0 && !raw.recalcularDuracion
         ? Number(raw.duracion)
         : duracionCalculada;
 
@@ -176,6 +176,14 @@
     }
 
     /**
+     * Busca y devuelve una sesión por su ID único.
+     */
+    obtenerSesionPorId(id) {
+      const encontrada = this._sesiones.find((s) => s.id === id);
+      return encontrada ? { ...encontrada } : null;
+    }
+
+    /**
      * Registra un oyente que se ejecutará cada vez que cambie el estado.
      */
     subscribe(listener) {
@@ -189,7 +197,7 @@
      * Agrega una nueva sesión calculando automáticamente su duración, día, franja, XP e ID único.
      */
     agregarSesion(datosFormulario) {
-      const nueva = normalizarSesion(datosFormulario);
+      const nueva = normalizarSesion({ ...datosFormulario, recalcularDuracion: true });
       this._sesiones.push(nueva);
       this._persistir();
       this._notificar({ origen: "agregar", sesion: nueva });
@@ -197,7 +205,27 @@
     }
 
     /**
-     * Elimina una sesión de forma segura usando su ID único (evita errores al filtrar/ordenar).
+     * Actualiza una sesión existente por su ID único y recalcula su duración, día, franja y XP.
+     */
+    actualizarSesionPorId(id, datosActualizados) {
+      const idx = this._sesiones.findIndex((s) => s.id === id);
+      if (idx === -1) return null;
+
+      const actualizada = normalizarSesion({
+        ...this._sesiones[idx],
+        ...datosActualizados,
+        id,
+        recalcularDuracion: true
+      });
+
+      this._sesiones[idx] = actualizada;
+      this._persistir();
+      this._notificar({ origen: "editar", sesion: actualizada, id });
+      return actualizada;
+    }
+
+    /**
+     * Elimina una sesión de forma segura usando su ID único.
      */
     eliminarSesionPorId(id) {
       const longitudAnterior = this._sesiones.length;
@@ -209,7 +237,7 @@
     }
 
     /**
-     * Reemplaza toda la colección de sesiones (por ejemplo, al importar desde un Excel).
+     * Reemplaza toda la colección de sesiones (por ejemplo, al cargar desde el servidor o importar Excel).
      */
     reemplazarSesiones(nuevasSesiones, origen = "importar") {
       this._sesiones = (Array.isArray(nuevasSesiones) ? nuevasSesiones : []).map(normalizarSesion);
