@@ -4,23 +4,38 @@
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
-  const { calcularMinutos, calcularXP } = StudyTracker.RPG;
+  const {
+    calcularMinutos,
+    calcularDiaSemana,
+    calcularFranjaHoraria,
+    calcularXP
+  } = StudyTracker.RPG;
 
   let archivoExcelHandle = null;
 
   /**
-   * Construye el objeto Workbook de SheetJS con pestaña de sesiones, fórmulas de Excel y guía.
+   * Construye el objeto Workbook de SheetJS con pestaña de sesiones enriquecida,
+   * fórmulas nativas de Excel (incluyendo bonos por complejidad y objetivo) y guía.
    */
   function construirLibroExcel(sesiones) {
     const wb = XLSX.utils.book_new();
     const lista = Array.isArray(sesiones) ? sesiones : [];
 
-    // Pestaña 1: Registro_Estudio (Sin columna Timestamp)
+    // Pestaña 1: Registro_Estudio (15 columnas analíticas)
+    // A: Fecha | B: Dia_Semana | C: Hora_Inicio | D: Hora_Fin | E: Franja_Horaria
+    // F: Materia | G: Tipo_Actividad | H: Energia_Previa | I: Complejidad | J: Objetivo_Cumplido
+    // K: Duracion_Minutos | L: Calidad | M: Uso_IA_Porcentaje | N: XP_Ganados | O: Notas
     const encabezados = [
       "Fecha",
+      "Dia_Semana",
       "Hora_Inicio",
       "Hora_Fin",
+      "Franja_Horaria",
       "Materia",
+      "Tipo_Actividad",
+      "Energia_Previa",
+      "Complejidad",
+      "Objetivo_Cumplido",
       "Duracion_Minutos",
       "Calidad",
       "Uso_IA_Porcentaje",
@@ -32,9 +47,15 @@
     lista.forEach((s) => {
       filas.push([
         s.fecha,
+        s.diaSemana || calcularDiaSemana(s.fecha),
         s.horaInicio,
         s.horaFin,
+        s.franjaHoraria || calcularFranjaHoraria(s.horaInicio),
         s.materia,
+        s.tipoActividad || "Código / Práctica",
+        s.energiaPrevia || "Media",
+        s.complejidad || "Desafiante",
+        s.objetivoCumplido || "Sí",
         Number(s.duracion),
         Number(s.calidad),
         Number(s.usoIA) / 100, // Formato decimal para porcentaje en Excel
@@ -45,53 +66,82 @@
 
     const ws = XLSX.utils.aoa_to_sheet(filas);
 
-    // Inyectar las fórmulas reales de Excel en Duracion_Minutos (Col E) y XP_Ganados (Col H)
+    // Inyectar las fórmulas reales de Excel en Duracion_Minutos (Col K) y XP_Ganados (Col N)
     lista.forEach((s, idx) => {
       const r = idx + 2; // Fila 2 en adelante en Excel
-      // E: Diferencia entre Hora_Fin (C) y Hora_Inicio (B) en minutos
-      ws[`E${r}`] = {
+      // K: Diferencia entre Hora_Fin (D) y Hora_Inicio (C) en minutos
+      ws[`K${r}`] = {
         t: "n",
-        f: `IF(OR(B${r}="",C${r}=""),"",MOD(TIMEVALUE(C${r})-TIMEVALUE(B${r}),1)*1440)`,
+        f: `IF(OR(C${r}="",D${r}=""),"",MOD(TIMEVALUE(D${r})-TIMEVALUE(C${r}),1)*1440)`,
         v: Number(s.duracion)
       };
-      // G: Formato de porcentaje
-      if (ws[`G${r}`]) ws[`G${r}`].z = "0%";
-      // H: Fórmula de XP Ganados
-      ws[`H${r}`] = {
+      // M: Formato de porcentaje
+      if (ws[`M${r}`]) ws[`M${r}`].z = "0%";
+      // N: Fórmula de XP Ganados con bonos por Complejidad (Col I) y Objetivo_Cumplido (Col J)
+      ws[`N${r}`] = {
         t: "n",
-        f: `IF(E${r}="","",ROUND(E${r}*(1+(F${r}*0.2)),0))`,
+        f: `IF(K${r}="","",ROUND(K${r}*(1+(L${r}*0.2)+IF(I${r}="Muy difícil",0.2,IF(I${r}="Desafiante",0.1,0))+IF(J${r}="Sí",0.1,0)),0))`,
         v: Number(s.xp)
       };
     });
 
     ws["!cols"] = [
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 20 },
-      { wch: 18 },
-      { wch: 10 },
-      { wch: 18 },
-      { wch: 14 },
-      { wch: 32 }
+      { wch: 12 }, // A: Fecha
+      { wch: 13 }, // B: Dia_Semana
+      { wch: 12 }, // C: Hora_Inicio
+      { wch: 12 }, // D: Hora_Fin
+      { wch: 15 }, // E: Franja_Horaria
+      { wch: 20 }, // F: Materia
+      { wch: 19 }, // G: Tipo_Actividad
+      { wch: 15 }, // H: Energia_Previa
+      { wch: 15 }, // I: Complejidad
+      { wch: 18 }, // J: Objetivo_Cumplido
+      { wch: 18 }, // K: Duracion_Minutos
+      { wch: 10 }, // L: Calidad
+      { wch: 18 }, // M: Uso_IA_Porcentaje
+      { wch: 14 }, // N: XP_Ganados
+      { wch: 34 }  // O: Notas
     ];
     XLSX.utils.book_append_sheet(wb, ws, "Registro_Estudio");
 
-    // Pestaña 2: Guia_y_Resumen (Con conteos automáticos y explicación de escalas)
+    // Pestaña 2: Guia_y_Resumen (Con conteos automáticos y explicación de todas las escalas)
     const guiaDatos = [
       ["RESUMEN DE RENDIMIENTO", "VALOR"],
-      ["Total de Sesiones", { t: "n", f: "COUNTA(Registro_Estudio!D2:D1000)" }],
-      ["Tiempo Total (Minutos)", { t: "n", f: "SUM(Registro_Estudio!E2:E1000)" }],
-      ["Tiempo Total (Horas)", { t: "n", f: "SUM(Registro_Estudio!E2:E1000)/60" }],
-      ["Promedio de Calidad (1-5)", { t: "n", f: "IFERROR(AVERAGE(Registro_Estudio!F2:F1000),0)" }],
+      ["Total de Sesiones", { t: "n", f: "COUNTA(Registro_Estudio!F2:F1000)" }],
+      ["Tiempo Total (Minutos)", { t: "n", f: "SUM(Registro_Estudio!K2:K1000)" }],
+      ["Tiempo Total (Horas)", { t: "n", f: "SUM(Registro_Estudio!K2:K1000)/60" }],
+      ["Promedio de Calidad (1-5)", { t: "n", f: "IFERROR(AVERAGE(Registro_Estudio!L2:L1000),0)" }],
       [
         "Promedio Uso de IA",
-        { t: "n", f: "IFERROR(AVERAGE(Registro_Estudio!G2:G1000),0)", z: "0%" }
+        { t: "n", f: "IFERROR(AVERAGE(Registro_Estudio!M2:M1000),0)", z: "0%" }
       ],
-      ["Total XP Acumulados", { t: "n", f: "SUM(Registro_Estudio!H2:H1000)" }],
-      ["Nivel Actual del Estudiante", { t: "n", f: "INT(SUM(Registro_Estudio!H2:H1000)/500)+1" }],
+      [
+        "Tasa de Objetivos Cumplidos (Sí)",
+        {
+          t: "n",
+          f: 'IFERROR(COUNTIF(Registro_Estudio!J2:J1000,"Sí")/COUNTA(Registro_Estudio!F2:F1000),0)',
+          z: "0%"
+        }
+      ],
+      ["Total XP Acumulados", { t: "n", f: "SUM(Registro_Estudio!N2:N1000)" }],
+      ["Nivel Actual del Estudiante", { t: "n", f: "INT(SUM(Registro_Estudio!N2:N1000)/500)+1" }],
       [],
-      ["GUÍA DE REFERENCIA RÁPIDA PARA NUEVOS USUARIOS", ""],
+      ["GUÍA DE REFERENCIA RÁPIDA Y REGLAS DE NEGOCIO", ""],
+      ["Variable", "Opciones y Regla Analítica"],
+      [
+        "Tipo de Actividad",
+        "Código / Práctica | Lectura / Teoría | Papel / A mano | Tarea / Entrega | Repaso"
+      ],
+      ["Energía Previa", "Alta (🔋) | Media (⚡) | Baja (🪫) — Permite medir fatiga vs. retención"],
+      [
+        "Complejidad del Tema",
+        "Fácil (+0% XP) | Desafiante (+10% XP) | Muy difícil (+20% XP)"
+      ],
+      [
+        "Objetivo Cumplido",
+        "Sí (+10% XP) | Parcial (+0% XP) | No (+0% XP) — Mide efectividad de planeación"
+      ],
+      [],
       ["Escala de Calidad (1 al 5)", "Significado"],
       ["1 - Muy bajo", "Distraído todo el tiempo, procrastinación constante, baja retención."],
       ["2 - Bajo", "Costó mucho mantener el foco, interrupciones frecuentes."],
@@ -114,14 +164,14 @@
       ]
     ];
     const wsGuia = XLSX.utils.aoa_to_sheet(guiaDatos);
-    wsGuia["!cols"] = [{ wch: 34 }, { wch: 75 }];
+    wsGuia["!cols"] = [{ wch: 34 }, { wch: 78 }];
     XLSX.utils.book_append_sheet(wb, wsGuia, "Guia_y_Resumen");
 
     return wb;
   }
 
   /**
-   * Extrae y normaliza las filas de un Workbook de SheetJS.
+   * Extrae y normaliza las filas de un Workbook de SheetJS (compatible con versión anterior y nueva).
    */
   function extraerSesionesDesdeWorkbook(wb) {
     const sheetName = wb.SheetNames[0];
@@ -136,6 +186,11 @@
       const materia = r.Materia || r.materia || "";
       if (!fecha && !materia) return;
 
+      const tipoActividad = r.Tipo_Actividad || r.tipoActividad || "Código / Práctica";
+      const energiaPrevia = r.Energia_Previa || r.energiaPrevia || "Media";
+      const complejidad = r.Complejidad || r.complejidad || "Desafiante";
+      const objetivoCumplido = r.Objetivo_Cumplido || r.objetivoCumplido || "Sí";
+
       const duracion = Number(
         r.Duracion_Minutos || calcularMinutos(String(horaInicio), String(horaFin))
       );
@@ -147,7 +202,9 @@
         rawIA = Math.round(rawIA * 100);
       }
 
-      const xp = Number(r.XP_Ganados || calcularXP(duracion, calidad));
+      const xp = Number(
+        r.XP_Ganados || calcularXP(duracion, calidad, complejidad, objetivoCumplido)
+      );
       const notas = r.Notas || "";
 
       nuevas.push({
@@ -155,6 +212,10 @@
         horaInicio: String(horaInicio).slice(0, 5),
         horaFin: String(horaFin).slice(0, 5),
         materia: String(materia),
+        tipoActividad: String(tipoActividad),
+        energiaPrevia: String(energiaPrevia),
+        complejidad: String(complejidad),
+        objetivoCumplido: String(objetivoCumplido),
         duracion,
         calidad,
         usoIA: rawIA,
@@ -262,4 +323,3 @@
     tieneArchivoVinculado
   };
 })(window);
-
