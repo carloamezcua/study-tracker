@@ -1,12 +1,27 @@
 /**
  * Capa de Estado (Store): Gestión centralizada de sesiones, IDs únicos,
- * validación de esquema, persistencia en LocalStorage y patrón Pub/Sub.
+ * validación de esquema, enriquecimiento automático (día y franja horaria),
+ * persistencia en LocalStorage y patrón Pub/Sub.
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
-  const { calcularMinutos, calcularXP } = StudyTracker.RPG;
+  const {
+    TIPOS_ACTIVIDAD,
+    NIVELES_ENERGIA,
+    NIVELES_COMPLEJIDAD,
+    ESTADOS_OBJETIVO,
+    calcularMinutos,
+    calcularDiaSemana,
+    calcularFranjaHoraria,
+    calcularXP
+  } = StudyTracker.RPG;
 
   const STORAGE_KEY = "study_tracker_sesiones";
+
+  const VALORES_ACTIVIDAD = new Set(TIPOS_ACTIVIDAD.map((t) => t.valor));
+  const VALORES_ENERGIA = new Set(NIVELES_ENERGIA.map((e) => e.valor));
+  const VALORES_COMPLEJIDAD = new Set(NIVELES_COMPLEJIDAD.map((c) => c.valor));
+  const VALORES_OBJETIVO = new Set(ESTADOS_OBJETIVO.map((o) => o.valor));
 
   // Datos iniciales de ejemplo cuando no existe historial previo en LocalStorage
   const DATOS_INICIALES = [
@@ -15,33 +30,42 @@
       horaInicio: "10:00",
       horaFin: "11:30",
       materia: "Base de Datos",
+      tipoActividad: "Papel / A mano",
+      energiaPrevia: "Alta",
+      complejidad: "Desafiante",
+      objetivoCumplido: "Sí",
       duracion: 90,
       calidad: 4,
       usoIA: 25,
-      xp: 162,
-      notas: "Repaso de normalización"
+      notas: "Diseño de modelo entidad-relación y normalización en libreta"
     },
     {
       fecha: "2026-10-18",
       horaInicio: "14:00",
       horaFin: "16:15",
       materia: "PySpark",
+      tipoActividad: "Código / Práctica",
+      energiaPrevia: "Media",
+      complejidad: "Muy difícil",
+      objetivoCumplido: "Sí",
       duracion: 135,
       calidad: 5,
       usoIA: 50,
-      xp: 270,
-      notas: "Práctica de DataFrames"
+      notas: "Práctica de DataFrames y optimización de joins"
     },
     {
       fecha: "2026-10-18",
       horaInicio: "18:00",
       horaFin: "18:45",
-      materia: "Repaso general",
+      materia: "Repaso General",
+      tipoActividad: "Repaso",
+      energiaPrevia: "Baja",
+      complejidad: "Fácil",
+      objetivoCumplido: "Parcial",
       duracion: 45,
       calidad: 3,
       usoIA: 0,
-      xp: 72,
-      notas: "Lectura de apuntes"
+      notas: "Lectura de apuntes de la semana"
     }
   ];
 
@@ -56,7 +80,8 @@
   }
 
   /**
-   * Normaliza y garantiza la integridad de una sesión de estudio.
+   * Normaliza y garantiza la integridad de una sesión de estudio,
+   * inyectando campos automáticos (diaSemana y franjaHoraria).
    */
   function normalizarSesion(raw) {
     const fecha = String(raw.fecha || "").slice(0, 10);
@@ -64,6 +89,22 @@
     const horaFin = String(raw.horaFin || "").slice(0, 5);
     const materia = String(raw.materia || "General").trim() || "General";
     const calidad = Math.min(5, Math.max(1, Number(raw.calidad) || 3));
+
+    const tipoActividad = VALORES_ACTIVIDAD.has(raw.tipoActividad)
+      ? raw.tipoActividad
+      : "Código / Práctica";
+
+    const energiaPrevia = VALORES_ENERGIA.has(raw.energiaPrevia)
+      ? raw.energiaPrevia
+      : "Media";
+
+    const complejidad = VALORES_COMPLEJIDAD.has(raw.complejidad)
+      ? raw.complejidad
+      : "Desafiante";
+
+    const objetivoCumplido = VALORES_OBJETIVO.has(raw.objetivoCumplido)
+      ? raw.objetivoCumplido
+      : "Sí";
 
     let usoIA = raw.usoIA !== undefined ? Number(raw.usoIA) : 0;
     if (Number.isNaN(usoIA)) usoIA = 0;
@@ -75,17 +116,20 @@
         ? Number(raw.duracion)
         : duracionCalculada;
 
-    const xp =
-      raw.xp !== undefined && Number(raw.xp) > 0
-        ? Number(raw.xp)
-        : calcularXP(duracion, calidad);
+    const xp = calcularXP(duracion, calidad, complejidad, objetivoCumplido);
 
     return {
       id: raw.id ? String(raw.id) : generarId(),
       fecha,
+      diaSemana: calcularDiaSemana(fecha),
       horaInicio,
       horaFin,
+      franjaHoraria: calcularFranjaHoraria(horaInicio),
       materia,
+      tipoActividad,
+      energiaPrevia,
+      complejidad,
+      objetivoCumplido,
       duracion,
       calidad,
       usoIA,
@@ -142,20 +186,10 @@
     }
 
     /**
-     * Agrega una nueva sesión calculando automáticamente su duración, XP e ID único.
+     * Agrega una nueva sesión calculando automáticamente su duración, día, franja, XP e ID único.
      */
     agregarSesion(datosFormulario) {
-      const duracion = calcularMinutos(datosFormulario.horaInicio, datosFormulario.horaFin);
-      const calidad = Number(datosFormulario.calidad) || 3;
-      const xp = calcularXP(duracion, calidad);
-
-      const nueva = normalizarSesion({
-        ...datosFormulario,
-        duracion,
-        calidad,
-        xp
-      });
-
+      const nueva = normalizarSesion(datosFormulario);
       this._sesiones.push(nueva);
       this._persistir();
       this._notificar({ origen: "agregar", sesion: nueva });
@@ -215,4 +249,3 @@
   StudyTracker.store = new StudyStore();
   StudyTracker.normalizarSesion = normalizarSesion;
 })(window);
-
