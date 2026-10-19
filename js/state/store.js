@@ -6,6 +6,7 @@
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
   const {
+    CONTEXTOS,
     TIPOS_ACTIVIDAD,
     NIVELES_ENERGIA,
     NIVELES_COMPLEJIDAD,
@@ -18,6 +19,7 @@
 
   const STORAGE_KEY = "study_tracker_sesiones";
 
+  const VALORES_CONTEXTO = new Set(CONTEXTOS.map((c) => c.valor));
   const VALORES_ACTIVIDAD = new Set(TIPOS_ACTIVIDAD.map((t) => t.valor));
   const VALORES_ENERGIA = new Set(NIVELES_ENERGIA.map((e) => e.valor));
   const VALORES_COMPLEJIDAD = new Set(NIVELES_COMPLEJIDAD.map((c) => c.valor));
@@ -29,7 +31,9 @@
       fecha: "2026-10-18",
       horaInicio: "10:00",
       horaFin: "11:30",
+      contexto: "Escuela",
       materia: "Base de Datos",
+      tema: "Normalización 3FN y Modelo ER",
       tipoActividad: "Papel / A mano",
       energiaPrevia: "Alta",
       complejidad: "Desafiante",
@@ -43,7 +47,9 @@
       fecha: "2026-10-18",
       horaInicio: "14:00",
       horaFin: "16:15",
+      contexto: "Personal",
       materia: "PySpark",
+      tema: "Optimización de DataFrames y Joins",
       tipoActividad: "Código / Práctica",
       energiaPrevia: "Media",
       complejidad: "Muy difícil",
@@ -51,13 +57,15 @@
       duracion: 135,
       calidad: 5,
       usoIA: 50,
-      notas: "Práctica de DataFrames y optimización de joins"
+      notas: "Práctica de particionamiento y broadcast joins"
     },
     {
       fecha: "2026-10-18",
       horaInicio: "18:00",
       horaFin: "18:45",
-      materia: "Repaso General",
+      contexto: "Escuela",
+      materia: "Algoritmos",
+      tema: "Árboles Binarios de Búsqueda",
       tipoActividad: "Repaso",
       energiaPrevia: "Baja",
       complejidad: "Fácil",
@@ -88,7 +96,10 @@
     const horaInicio = String(raw.horaInicio || "").slice(0, 5);
     const horaFin = String(raw.horaFin || "").slice(0, 5);
     const materia = String(raw.materia || "General").trim() || "General";
+    const tema = String(raw.tema || "General").trim() || "General";
     const calidad = Math.min(5, Math.max(1, Number(raw.calidad) || 3));
+
+    const contexto = VALORES_CONTEXTO.has(raw.contexto) ? raw.contexto : "Escuela";
 
     const tipoActividad = VALORES_ACTIVIDAD.has(raw.tipoActividad)
       ? raw.tipoActividad
@@ -125,7 +136,9 @@
       horaInicio,
       horaFin,
       franjaHoraria: calcularFranjaHoraria(horaInicio),
+      contexto,
       materia,
+      tema,
       tipoActividad,
       energiaPrevia,
       complejidad,

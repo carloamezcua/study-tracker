@@ -15,11 +15,16 @@
     "Señor del Flujo Profundo"
   ];
 
+  const CONTEXTOS = [
+    { valor: "Escuela", icono: "🎓", etiqueta: "Escuela" },
+    { valor: "Personal", icono: "🚀", etiqueta: "Personal" },
+    { valor: "Externo", icono: "🤝", etiqueta: "Externo" }
+  ];
+
   const TIPOS_ACTIVIDAD = [
     { valor: "Código / Práctica", icono: "💻", etiqueta: "Código / Práctica" },
     { valor: "Lectura / Teoría", icono: "📖", etiqueta: "Lectura / Teoría" },
     { valor: "Papel / A mano", icono: "✍️", etiqueta: "Papel / A mano" },
-    { valor: "Tarea / Entrega", icono: "📝", etiqueta: "Tarea / Entrega" },
     { valor: "Repaso", icono: "🔁", etiqueta: "Repaso" }
   ];
 
@@ -229,7 +234,7 @@
   }
 
   /**
-   * Agrupa las sesiones por materia calculando minutos acumulados y % promedio de uso de IA.
+   * Agrupa las sesiones por materia/proyecto calculando minutos acumulados y % promedio de uso de IA.
    */
   function analizarPorMateria(sesiones) {
     const mapaMaterias = {};
@@ -257,7 +262,7 @@
   }
 
   /**
-   * Analiza los patrones de comportamiento por Tipo de Actividad, Energía Previa y Complejidad.
+   * Analiza los patrones de comportamiento por Tipo de Actividad, Contexto, Energía Previa y Objetivos.
    */
   function analizarHabitos(sesiones) {
     const lista = Array.isArray(sesiones) ? sesiones : [];
@@ -295,7 +300,19 @@
       };
     });
 
-    // 3. Resumen de Objetivos Cumplidos
+    // 3. Resumen por Contexto (Escuela, Personal, Externo)
+    const resumenContextos = CONTEXTOS.map((ctx) => {
+      const filtradas = lista.filter((s) => (s.contexto || "Escuela") === ctx.valor);
+      const conteo = filtradas.length;
+      const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
+      return {
+        ...ctx,
+        conteo,
+        minutos
+      };
+    });
+
+    // 4. Resumen de Objetivos Cumplidos
     const resumenObjetivos = ESTADOS_OBJETIVO.map((est) => {
       const conteo = lista.filter((s) => s.objetivoCumplido === est.valor).length;
       return {
@@ -309,6 +326,7 @@
       minutosPorActividad,
       calidadPorActividad,
       resumenEnergia,
+      resumenContextos,
       resumenObjetivos
     };
   }
@@ -337,6 +355,7 @@
   StudyTracker.RPG = {
     XP_POR_NIVEL,
     RANGOS,
+    CONTEXTOS,
     TIPOS_ACTIVIDAD,
     NIVELES_ENERGIA,
     NIVELES_COMPLEJIDAD,
