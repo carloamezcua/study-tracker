@@ -206,7 +206,7 @@ body {
 /* Tarjetas KPI */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -240,7 +240,7 @@ body {
 /* Layout Principal: Formulario (Izquierda) + Gráficos (Derecha) */
 .main-grid {
   display: grid;
-  grid-template-columns: 390px 1fr;
+  grid-template-columns: 420px 1fr;
   gap: 20px;
   margin-bottom: 20px;
 }
@@ -284,15 +284,21 @@ body {
 
 /* Estilos del Formulario */
 .form-group {
-  margin-bottom: 14px;
+  margin-bottom: 13px;
 }
 
 label {
   display: block;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   margin-bottom: 5px;
   color: #cbd5e1;
+}
+
+.label-hint {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.74rem;
 }
 
 input[type="text"],
@@ -301,12 +307,12 @@ input[type="time"],
 select,
 textarea {
   width: 100%;
-  padding: 9px 11px;
+  padding: 8px 11px;
   background-color: var(--bg);
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }
 
 input:focus,
@@ -323,6 +329,40 @@ textarea:focus {
 
 .row .form-group {
   flex: 1;
+}
+
+/* Selectores rápidos por Chips (1 clic) */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip-btn {
+  flex: 1 1 auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 6px 9px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.chip-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.chip-btn.active {
+  background: rgba(99, 102, 241, 0.22);
+  border-color: var(--accent);
+  color: #e0e7ff;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.35);
 }
 
 .quick-btn {
@@ -344,11 +384,11 @@ textarea:focus {
 
 .helper-box {
   margin-top: 6px;
-  padding: 8px 10px;
+  padding: 7px 10px;
   background: rgba(15, 23, 42, 0.65);
   border-left: 3px solid var(--accent);
   border-radius: 4px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--muted);
 }
 
@@ -382,7 +422,7 @@ input[type="range"] {
   font-size: 0.95rem;
 }
 
-/* Gráficos */
+/* Gráficos y Resumen de Hábitos */
 .charts-col {
   display: flex;
   flex-direction: column;
@@ -391,7 +431,7 @@ input[type="range"] {
 
 .chart-box {
   position: relative;
-  height: 250px;
+  height: 220px;
   width: 100%;
 }
 
@@ -399,6 +439,30 @@ input[type="range"] {
   font-size: 0.75rem;
   color: var(--muted);
   font-weight: normal;
+}
+
+.habit-summary-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.habit-stat-pill {
+  background: var(--card-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.habit-stat-title {
+  color: var(--muted);
 }
 
 /* Tabla de Historial */
@@ -419,12 +483,12 @@ input[type="range"] {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
 }
 
 th,
 td {
-  padding: 10px 12px;
+  padding: 10px 11px;
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
@@ -433,7 +497,7 @@ th {
   background: var(--card-alt);
   color: var(--muted);
   font-weight: 600;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   text-transform: uppercase;
 }
 
@@ -441,11 +505,24 @@ tr:hover td {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.cell-sub {
+  display: block;
+  font-size: 0.73rem;
+  color: var(--muted);
+}
+
+.context-badges {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
 .badge {
   padding: 3px 8px;
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .badge-q5,
@@ -468,6 +545,7 @@ tr:hover td {
 .xp-cell {
   color: #34d399;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .notes-cell {
@@ -489,7 +567,7 @@ tr:hover td {
 /* Guía y Escalas inferior */
 .guide-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 16px;
   margin-top: 12px;
 }
@@ -521,4 +599,3 @@ tr:hover td {
 .guide-card li strong {
   color: var(--text);
 }
-

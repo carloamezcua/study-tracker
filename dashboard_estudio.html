@@ -24,7 +24,7 @@
     <div class="top-bar">
       <div class="brand">
         <h1>⚔️ StudyTracker RPG &mdash; Dashboard Local</h1>
-        <p>Registra tus bloques de estudio, descubre tus horas de mayor foco y sincroniza con Excel (.xlsx)</p>
+        <p>Registra tus bloques de estudio, descubre tus patrones de hábito y sincroniza con Excel (.xlsx)</p>
       </div>
       <div class="excel-actions">
         <span id="fileStatus" class="status-pill">Modo: Memoria del Navegador</span>
@@ -80,6 +80,11 @@
         <div class="sub" id="kpiMejorHora">Mejor hora: --:--</div>
       </div>
       <div class="kpi-card">
+        <div class="label">Objetivos Cumplidos</div>
+        <div class="value" id="kpiObjetivos">0%</div>
+        <div class="sub" id="kpiObjetivosSub">0 cumplidos · 0 parciales</div>
+      </div>
+      <div class="kpi-card">
         <div class="label">Uso Promedio de IA</div>
         <div class="value" id="kpiIA">0%</div>
         <div class="sub">Equilibrio autonomía vs. copiloto</div>
@@ -88,14 +93,14 @@
 
     <!-- GRID PRINCIPAL: FORMULARIO + GRÁFICOS -->
     <div class="main-grid">
-      <!-- COLUMNA IZQUIERDA: FORMULARIO DE INGESTA -->
+      <!-- COLUMNA IZQUIERDA: FORMULARIO DE INGESTA DE BAJA FRICCIÓN -->
       <div class="panel">
         <h2>➕ Registrar Sesión</h2>
-        <div class="subtitle">Sin columna Timestamp innecesaria. Duración y XP se calculan solos.</div>
+        <div class="subtitle">Selección rápida con 1 clic. Día, franja horaria, duración y XP se calculan solos.</div>
 
         <div class="preview-pill">
           <span id="previewDuracion">⏱️ Duración: 25 min</span>
-          <strong id="previewXP">+40 XP</strong>
+          <strong id="previewXP">+45 XP</strong>
         </div>
 
         <form id="studyForm">
@@ -127,6 +132,48 @@
               <label for="horaFin">Hora Fin</label>
               <input type="time" id="horaFin" required>
               <button type="button" id="btnHoraFinActual" class="quick-btn">🏁 Poner hora actual</button>
+            </div>
+          </div>
+
+          <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (1 CLIC) -->
+          <div class="form-group">
+            <label>Tipo de Actividad</label>
+            <div class="chip-group" data-group="tipoActividad">
+              <button type="button" class="chip-btn active" data-value="Código / Práctica">💻 Código / Práctica</button>
+              <button type="button" class="chip-btn" data-value="Lectura / Teoría">📖 Lectura / Teoría</button>
+              <button type="button" class="chip-btn" data-value="Papel / A mano">✍️ Papel / A mano</button>
+              <button type="button" class="chip-btn" data-value="Tarea / Entrega">📝 Tarea / Entrega</button>
+              <button type="button" class="chip-btn" data-value="Repaso">🔁 Repaso</button>
+            </div>
+          </div>
+
+          <!-- 2. ENERGÍA PREVIA Y COMPLEJIDAD DEL TEMA -->
+          <div class="row">
+            <div class="form-group">
+              <label>Energía Previa</label>
+              <div class="chip-group" data-group="energiaPrevia">
+                <button type="button" class="chip-btn" data-value="Alta">🔋 Alta</button>
+                <button type="button" class="chip-btn active" data-value="Media">⚡ Media</button>
+                <button type="button" class="chip-btn" data-value="Baja">🪫 Baja</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Complejidad <span class="label-hint">(+XP)</span></label>
+              <div class="chip-group" data-group="complejidad">
+                <button type="button" class="chip-btn" data-value="Fácil">🟢 Fácil</button>
+                <button type="button" class="chip-btn active" data-value="Desafiante">🟡 Reto</button>
+                <button type="button" class="chip-btn" data-value="Muy difícil">🔴 Difícil</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. OBJETIVO CUMPLIDO -->
+          <div class="form-group">
+            <label>¿Objetivo Cumplido? <span class="label-hint">(+10% XP al completar)</span></label>
+            <div class="chip-group" data-group="objetivoCumplido">
+              <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Completado)</button>
+              <button type="button" class="chip-btn" data-value="Parcial">⚠️ Parcial</button>
+              <button type="button" class="chip-btn" data-value="No">❌ No</button>
             </div>
           </div>
 
@@ -186,6 +233,18 @@
             <canvas id="chartPorMateria"></canvas>
           </div>
         </div>
+
+        <div class="panel">
+          <h2>
+            <span>🧠 Patrones de Hábito: Actividad y Energía Previa</span>
+            <small class="chart-hint">Comportamiento por tipo de tarea y fatiga</small>
+          </h2>
+          <div class="subtitle">Minutos y calidad promedio según el tipo de actividad (Código, Lectura, Papel, Tarea, Repaso) y cómo rinde tu foco según tu energía inicial.</div>
+          <div class="chart-box">
+            <canvas id="chartPorActividad"></canvas>
+          </div>
+          <div id="resumenHabitosBar" class="habit-summary-bar"></div>
+        </div>
       </div>
     </div>
 
@@ -199,13 +258,14 @@
         <table>
           <thead>
             <tr>
-              <th>Fecha</th>
-              <th>Hora Inicio</th>
-              <th>Hora Fin</th>
+              <th>Fecha / Franja</th>
+              <th>Horario</th>
               <th>Materia</th>
-              <th>Duración (min)</th>
-              <th>Calidad (1-5)</th>
-              <th>% Uso IA</th>
+              <th>Actividad</th>
+              <th>Energía · Reto · Meta</th>
+              <th>Duración</th>
+              <th>Calidad</th>
+              <th>% IA</th>
               <th>XP Ganados</th>
               <th>Notas</th>
               <th></th>
@@ -232,6 +292,15 @@
           </ul>
         </div>
         <div class="guide-card">
+          <h4>🧠 Variables de Comportamiento (1 Clic)</h4>
+          <ul>
+            <li><strong>Tipo de Actividad:</strong> <code>💻 Código</code>, <code>📖 Lectura</code>, <code>✍️ Papel / A mano</code>, <code>📝 Tarea / Entrega</code>, <code>🔁 Repaso</code>.</li>
+            <li><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code> (mide impacto del cansancio).</li>
+            <li><strong>Complejidad:</strong> <code>🟢 Fácil (+0%)</code>, <code>🟡 Desafiante (+10% XP)</code>, <code>🔴 Muy difícil (+20% XP)</code>.</li>
+            <li><strong>Objetivo Cumplido:</strong> <code>✅ Sí (+10% XP)</code>, <code>⚠️ Parcial</code>, <code>❌ No</code>.</li>
+          </ul>
+        </div>
+        <div class="guide-card">
           <h4>🤖 Escala de Uso de IA (0% a 100%)</h4>
           <ul>
             <li><strong>0% (Autónomo):</strong> Lectura, código o ejercicios resueltos 100% sin asistencia.</li>
@@ -242,9 +311,9 @@
         <div class="guide-card">
           <h4>🧮 Fórmulas Automáticas en tu Excel</h4>
           <ul>
-            <li><strong>Duración (Minutos):</strong> <code>=RESIDUO(Hora_Fin - Hora_Inicio, 1) * 1440</code> (Calcula la diferencia exacta incluso si estudias pasando la medianoche).</li>
-            <li><strong>XP Ganados:</strong> <code>=REDONDEAR(Duracion * (1 + Calidad * 0.2), 0)</code> (Premia tanto la constancia en minutos como la concentración).</li>
-            <li><strong>Subida de Nivel:</strong> Cada <strong>500 XP</strong> acumulados subes 1 nivel.</li>
+            <li><strong>Automáticas:</strong> <code>Dia_Semana</code> y <code>Franja_Horaria</code> (Madrugada, Mañana, Tarde, Noche) se registran sin llenar campos extra.</li>
+            <li><strong>Duración (Minutos):</strong> <code>=MOD(TIMEVALUE(Fin)-TIMEVALUE(Inicio),1)*1440</code>.</li>
+            <li><strong>XP con Bonos:</strong> <code>=ROUND(Duracion * (1 + Calidad*0.2 + BonoComplejidad + BonoObjetivo), 0)</code>.</li>
           </ul>
         </div>
       </div>

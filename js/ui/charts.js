@@ -4,10 +4,11 @@
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
-  const { analizarPorHora, analizarPorMateria } = StudyTracker.RPG;
+  const { analizarPorHora, analizarPorMateria, analizarHabitos } = StudyTracker.RPG;
 
   let chartHoraInstance = null;
   let chartMateriaInstance = null;
+  let chartActividadInstance = null;
 
   /**
    * Actualiza o inicializa el gráfico de rendimiento por hora del día.
@@ -152,20 +153,100 @@
   }
 
   /**
-   * Renderiza ambos gráficos a partir de la lista de sesiones y devuelve el análisis por hora.
+   * Actualiza o inicializa el gráfico de hábitos (Minutos vs Calidad por Tipo de Actividad).
+   */
+  function actualizarGraficoPorActividad(datosHabitos) {
+    const canvas = document.getElementById("chartPorActividad");
+    if (!canvas) return;
+
+    const labels = datosHabitos.actividadesLabels.length
+      ? datosHabitos.actividadesLabels
+      : ["Sin datos"];
+    const dataMinutos = datosHabitos.minutosPorActividad.length
+      ? datosHabitos.minutosPorActividad
+      : [0];
+    const dataCalidad = datosHabitos.calidadPorActividad.length
+      ? datosHabitos.calidadPorActividad
+      : [0];
+
+    if (chartActividadInstance) {
+      chartActividadInstance.data.labels = labels;
+      chartActividadInstance.data.datasets[0].data = dataCalidad;
+      chartActividadInstance.data.datasets[1].data = dataMinutos;
+      chartActividadInstance.update();
+      return;
+    }
+
+    const ctxAct = canvas.getContext("2d");
+    chartActividadInstance = new Chart(ctxAct, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [
+          {
+            type: "line",
+            label: "Calidad Promedio (1-5)",
+            data: dataCalidad,
+            borderColor: "#a855f7",
+            backgroundColor: "#a855f7",
+            borderWidth: 3,
+            tension: 0.3,
+            yAxisID: "yCalAct"
+          },
+          {
+            type: "bar",
+            label: "Minutos por Actividad",
+            data: dataMinutos,
+            backgroundColor: "rgba(16, 185, 129, 0.65)",
+            borderRadius: 6,
+            yAxisID: "yMinAct"
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: "#cbd5e1" } } },
+        scales: {
+          x: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(51,65,85,0.4)" } },
+          yMinAct: {
+            type: "linear",
+            position: "left",
+            beginAtZero: true,
+            title: { display: true, text: "Minutos", color: "#94a3b8" },
+            ticks: { color: "#94a3b8" },
+            grid: { color: "rgba(51,65,85,0.4)" }
+          },
+          yCalAct: {
+            type: "linear",
+            position: "right",
+            min: 0,
+            max: 5,
+            title: { display: true, text: "Calidad (1-5)", color: "#a855f7" },
+            ticks: { color: "#a855f7", stepSize: 1 },
+            grid: { drawOnChartArea: false }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Renderiza los tres gráficos a partir de la lista de sesiones y devuelve los análisis.
    */
   function renderizarGraficos(sesiones) {
     const datosHora = analizarPorHora(sesiones);
     const datosMateria = analizarPorMateria(sesiones);
+    const datosHabitos = analizarHabitos(sesiones);
 
     actualizarGraficoPorHora(datosHora);
     actualizarGraficoPorMateria(datosMateria);
+    actualizarGraficoPorActividad(datosHabitos);
 
-    return { datosHora, datosMateria };
+    return { datosHora, datosMateria, datosHabitos };
   }
 
   StudyTracker.Charts = {
     renderizarGraficos
   };
 })(window);
-

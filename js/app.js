@@ -11,16 +11,32 @@
   }
 
   function vincularEventosDOM() {
+    // Selectores de chips de 1 clic (Actividad, Energía, Complejidad y Objetivo)
+    document.querySelectorAll(".chip-group").forEach((grupoEl) => {
+      const nombreGrupo = grupoEl.dataset.group;
+      grupoEl.addEventListener("click", (e) => {
+        const btn = e.target.closest(".chip-btn");
+        if (!btn) return;
+        UI.seleccionarChip(nombreGrupo, btn.dataset.value);
+      });
+    });
+
     // Formulario principal de registro de sesión
     const form = document.getElementById("studyForm");
     if (form) {
       form.addEventListener("submit", (e) => {
         e.preventDefault();
+        const chips = UI.obtenerValoresChips();
+
         store.agregarSesion({
           fecha: document.getElementById("fecha").value,
           horaInicio: document.getElementById("horaInicio").value,
           horaFin: document.getElementById("horaFin").value,
           materia: document.getElementById("materia").value.trim(),
+          tipoActividad: chips.tipoActividad,
+          energiaPrevia: chips.energiaPrevia,
+          complejidad: chips.complejidad,
+          objetivoCumplido: chips.objetivoCumplido,
           calidad: Number(document.getElementById("calidad").value),
           usoIA: Number(document.getElementById("usoIA").value),
           notas: document.getElementById("notas").value.trim()
@@ -144,4 +160,3 @@
     store.init();
   });
 })(window);
-
