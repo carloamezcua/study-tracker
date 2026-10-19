@@ -1,10 +1,14 @@
 # ⚔️ StudyTracker — Local-First Analytics & Excel Sync
 
-Aplicación web **Local-First** gamificada (estilo RPG) con **micro-servidor local en Node.js** para registrar, editar y eliminar bloques de estudio, evaluar hábitos cognitivos y sincronizar los datos en tiempo real directamente sobre un archivo Excel local (`data/study-tracker.xlsx`) con fórmulas nativas autocalculables.
+> 🌐 **Idioma / Language:** [🇪🇸 Español](#-español) | [🇬🇧 English](#-english)
 
 ---
 
-## ✨ Características Principales
+## 🇪🇸 Español
+
+Aplicación web **Local-First** gamificada (estilo RPG) con **micro-servidor local en Node.js** para registrar, editar y eliminar bloques de estudio, evaluar hábitos cognitivos y sincronizar los datos en tiempo real directamente sobre un archivo Excel local (`data/study-tracker.xlsx`) con fórmulas nativas autocalculables.
+
+### ✨ Características Principales
 
 - **Curva Exponencial de Nivel RPG (*"Level 92 is half of 99"*):**
   - Inspirada en *Old School RuneScape*, la experiencia requerida **se duplica cada 7 niveles**:
@@ -45,41 +49,40 @@ Aplicación web **Local-First** gamificada (estilo RPG) con **micro-servidor loc
   - Selector rápido `ES` | `EN` en la barra superior con persistencia en `localStorage` (`study_tracker_lang`).
   - Traduce al instante toda la interfaz, el cronómetro/Pomodoro, las ayudas dinámicas, los gráficos de Chart.js y la tabla de historial, manteniendo intactos los valores canónicos en el `Store` y en `data/study-tracker.xlsx` para no romper fórmulas de Excel ni filtros.
 
----
-
-## 🏗️ Arquitectura del Proyecto
+### 🏗️ Arquitectura del Proyecto
 
 ```mermaid
 flowchart TD
-    subgraph UI["Capa de Presentación (Frontend)"]
+    subgraph UI["Capa de Presentación / Frontend Layer"]
         HTML["index.html"]
         CSS["css/styles.css"]
-        I18N["js/ui/i18n.js\n(Diccionario Bilingüe ES / EN)"]
-        TIMER["js/ui/timer.js\n(Cronómetro + Pomodoro)"]
-        DASH["js/ui/dashboard.js\n(Filtro por Contexto, CRUD UI y KPIs)"]
-        CHARTS["js/ui/charts.js\n(3 Instancias Chart.js)"]
+        I18N["js/ui/i18n.js\n(Bilingual ES / EN Engine)"]
+        TIMER["js/ui/timer.js\n(Stopwatch + Pomodoro)"]
+        DASH["js/ui/dashboard.js\n(Context Filter, CRUD UI & KPIs)"]
+        CHARTS["js/ui/charts.js\n(3 Chart.js Instances)"]
     end
 
-    subgraph Controller["Controlador Principal"]
-        APP["js/app.js\n(Orquestador y Eventos)"]
+    subgraph Controller["Controlador Principal / Main Controller"]
+        APP["js/app.js\n(Orchestrator & Events)"]
     end
 
-    subgraph State["Capa de Estado"]
+    subgraph State["Capa de Estado / State Layer"]
         STORE["js/state/store.js\n(StudyStore Pub/Sub + CRUD)"]
         LS[("LocalStorage")]
     end
 
-    subgraph Domain["Capa de Dominio"]
-        METRICS["js/domain/metrics.js\n(Curva Exponencial Nv.1-99, Modos IA y Hábitos)"]
+    subgraph Domain["Capa de Dominio / Domain Layer"]
+        METRICS["js/domain/metrics.js\n(Lv.1-99 Curve, AI Modes & Habits)"]
     end
 
-    subgraph Sync["Capa de Sincronización y Backend Local"]
-        SYNC["js/services/excel-sync.js\n(SheetJS 18 cols + Cliente API)"]
-        SERVER["server.js\n(Node.js HTTP + FS nativo)"]
-        XLSX[("data/study-tracker.xlsx\n(Ignorado en Git)")]
+    subgraph Sync["Sincronización y Backend Local / Local Sync"]
+        SYNC["js/services/excel-sync.js\n(SheetJS 18 cols + API Client)"]
+        SERVER["server.js\n(Node.js HTTP + Native FS)"]
+        XLSX[("data/study-tracker.xlsx\n(Git-ignored)")]
     end
 
     HTML --> APP
+    APP --> I18N
     APP -->|Inicializa y sincroniza horas| TIMER
     TIMER -->|Auto-llena Fecha, Inicio y Fin| DASH
     APP -->|Crear / Editar / Borrar| STORE
@@ -96,9 +99,7 @@ flowchart TD
     SYNC --> METRICS
 ```
 
----
-
-## 🧮 Estructura de 18 Columnas y Fórmulas en Excel (`data/study-tracker.xlsx`)
+### 🧮 Estructura de 18 Columnas y Fórmulas en Excel (`data/study-tracker.xlsx`)
 
 El archivo Excel generado contiene dos hojas (`Registro_Estudio` y `Guia_y_Resumen`) con las siguientes columnas:
 
@@ -112,14 +113,81 @@ El archivo Excel generado contiene dos hojas (`Registro_Estudio` y `Guia_y_Resum
 | **Tasa Objetivos (Sí)** | Porcentaje de sesiones donde `Objetivo_Cumplido = "Sí"`. | `=IFERROR(COUNTIF(Registro_Estudio!L2:L1000,"Sí")/COUNTA(Registro_Estudio!G2:G1000),0)` |
 | **Bloqueos (No)** | Total de sesiones con bloqueo o sin avance (`Objetivo_Cumplido = "No"`). | `=COUNTIF(Registro_Estudio!L2:L1000,"No")` |
 
----
+### 🚀 Cómo Iniciar el Proyecto
 
-## 🚀 Cómo Iniciar el Proyecto
-
-### Opción Recomendada: Con Sincronización Automática en Excel
 No requiere instalar paquetes externos (`node_modules`), ya que `server.js` utiliza únicamente módulos nativos de Node.js:
 
 1. Haz doble clic en **`start.bat`** (o ejecuta `npm start` / `node server.js` en la terminal).
 2. Se abrirá automáticamente `http://localhost:3000`.
 3. El indicador superior mostrará **`🟢 Sincronizado en vivo: data/study-tracker.xlsx`**.
 4. Cada sesión que registres, edites (`✏️`) o elimines (`✖`) actualizará instantáneamente el archivo `data/study-tracker.xlsx`.
+
+---
+
+## 🇬🇧 English
+
+A gamified **Local-First** web application (RPG-style) powered by a **zero-dependency Node.js micro-server** to log, edit, and delete study blocks, evaluate cognitive habits, and sync your data in real time directly onto a local Excel workbook (`data/study-tracker.xlsx`) with native auto-calculating formulas.
+
+### ✨ Key Features
+
+- **Exponential RPG Level Curve (*"Level 92 is half of 99"*):**
+  - Inspired by *Old School RuneScape*, required experience **doubles every 7 levels**:
+    $$\text{XP}(\text{Level } L) = \text{ROUND}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
+  - Fast early leveling to reward consistency, progressive scaling (+10.4% per level), and the exact mathematical property where **Level 92 equals 50% of the total XP required for Level 99**.
+- **Orthogonal 1-Click Taxonomy (`4 Contexts` × `6 Activities`):**
+  - **Context / Purpose (4 chips):**
+    - `🎓 Academic` (`Académico`): University/school courses, assignments, and degree exams.
+    - `🏅 Certification` (`Certificación`): Professional certifications (e.g., *Snowflake*) and structured technical courses.
+    - `🚀 Own Project` (`Proyecto Propio`): Personal software engineering, portfolio, or duo projects.
+    - `🤝 External` (`Externo`): Third-party or friends' projects (e.g., *Ruby on Rails*), including the research required for them.
+  - **Activity Type (6 universal chips):**
+    - `📖 Theory / Docs` · `💬 Research / Dialogue` · `✍️ Design / Notes` · `💻 Dev / Code` · `🧪 Practice / Debugging` · `🔁 Review / Mock Exam`.
+- **Cognitive AI Impact & Learning Assimilation Scale (1 to 5):**
+  - Separates **mechanical speed** from **real learning**: the 1–5 scale measures your **Cognitive Assimilation** (from `1 - Mechanical / No retention` up to `5 - Deep assimilation`).
+  - **AI Interaction Mode (4 chips):**
+    - `🧠 Autonomous (+5% XP)`: 100% on your own (0% AI).
+    - `💬 Dialogue / Tutoring (+5% XP)`: Conceptual debate, *"why?"* questions, and active reinforcement with AI.
+    - `🛠️ Copilot / Support (0% adj.)`: Targeted syntax lookup or bug unblocking while understanding the fix.
+    - `🤖 Mechanical / Copy-Paste (-15% XP)`: Direct automation to deliver quickly without reading deeply.
+  - The Dashboard contrasts your **Real Learning Minutes (Autonomous / Dialogue / Copilot)** against **Mechanical Minutes (Copy-Paste)** per subject.
+- **Quick Context Filter Bar:**
+  - Interactive tab bar (`🌐 All`, `🎓 Academic`, `🏅 Certification`, `🚀 Own Project`, `🤝 External`) that instantaneously filters KPI cards, all 3 charts, and the history table while keeping your global character level in the top banner.
+- **Blocker Detector & Effort Bonuses:**
+  - **Complexity:** `🟢 Easy (+0% XP)` · `🟡 Challenging (+10% XP)` · `🔴 Very Hard (+20% XP)`.
+  - **Goal Achieved? (with live helper guide):**
+    - `✅ Yes (Achieved +10% XP)`: Completed the planned goal for the block.
+    - `⚠️ Partial (Progress +5% XP)`: Real progress and learning occurred, to be continued in another session.
+    - `❌ No (Blocked / 0% XP)`: Technical blocker, total distraction, or interruption without progress (counted in the blockers metric).
+- **Built-in Stopwatch & Pomodoro Timer:**
+  - **Stopwatch Mode (`⏱️`):** Count-up timer that automatically captures the **Date**, **Start Time** when clicking *Start*, and **End Time** when clicking *Finish* (or when submitting the form directly).
+  - **Pomodoro Mode (`🍅`):** Countdown timer with focus presets (`25m`, `50m`, or custom minutes) and break presets (`5m`, `15m`) with an acoustic chime via *Web Audio API*.
+  - Driven by real wall-clock timestamps (`Date.now()`) and `localStorage` persistence so it never drifts in background tabs or across page reloads.
+- **Real-Time Excel Synchronization (`data/study-tracker.xlsx`):**
+  - Every new entry, inline edit (`✏️`), or deletion (`✖`) directly updates `data/study-tracker.xlsx` on disk without repeated browser downloads.
+  - The `data/` folder and `.xlsx` files are excluded in `.gitignore` for privacy.
+- **Real-Time Bilingual Interface (`ES` / `EN`):**
+  - Quick `ES` | `EN` toggle in the top bar persisted in `localStorage` (`study_tracker_lang`).
+  - Instantly translates the entire UI, stopwatch/Pomodoro, dynamic helper boxes, Chart.js labels, and history table while preserving canonical data values in the `Store` and `data/study-tracker.xlsx` so Excel formulas and filters never break.
+
+### 🧮 18-Column Excel Schema & Native Formulas (`data/study-tracker.xlsx`)
+
+The generated Excel workbook contains two sheets (`Registro_Estudio` and `Guia_y_Resumen`) with the following 18 columns:
+
+`A: Fecha` · `B: Dia_Semana` · `C: Hora_Inicio` · `D: Hora_Fin` · `E: Franja_Horaria` · `F: Contexto` · `G: Materia` · `H: Tema` · `I: Tipo_Actividad` · `J: Energia_Previa` · `K: Complejidad` · `L: Objetivo_Cumplido` · `M: Duracion_Minutos` · `N: Calidad` · `O: Modo_IA` · `P: Uso_IA_Porcentaje` · `Q: XP_Ganados` · `R: Notas`
+
+| Metric | Rule / Formula in App | Injected Excel Formula (`.xlsx`) |
+| :--- | :--- | :--- |
+| **Duration (min)** | Difference between `Hora_Fin` and `Hora_Inicio` (supports midnight crossover by adding `1440` min). | `=IF(OR(C2="",D2=""),"",MOD(TIMEVALUE(D2)-TIMEVALUE(C2),1)*1440)` |
+| **XP Earned** | $\text{ROUND}\Big(\text{Duration} \times \max(0.5,\ 1 + \text{Quality}\times 0.2 + \text{ChallengeBonus} + \text{GoalBonus} + \text{AiModeBonus})\Big)$ | `=IF(M2="","",ROUND(M2*MAX(0.5,1+(N2*0.2)+IF(K2="Muy difícil",0.2,IF(K2="Desafiante",0.1,0))+IF(L2="Sí",0.1,IF(L2="Parcial",0.05,0))+IF(OR(O2="Autónomo",O2="Diálogo / Tutoría"),0.05,IF(O2="Mecánico / Copy-Paste",-0.15,0))),0))` |
+| **Exponential Level (1-99)** | $\text{XP}(L) = \text{ROUND}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Level 92 = 50% of 99)* | `=MIN(99,INT(1+7*(LN(1+SUM(Registro_Estudio!Q2:Q1000)/250)/LN(2))))` |
+| **Goal Rate (Yes)** | Percentage of sessions where `Objetivo_Cumplido = "Sí"`. | `=IFERROR(COUNTIF(Registro_Estudio!L2:L1000,"Sí")/COUNTA(Registro_Estudio!G2:G1000),0)` |
+| **Blockers (No)** | Total sessions with a blocker or no progress (`Objetivo_Cumplido = "No"`). | `=COUNTIF(Registro_Estudio!L2:L1000,"No")` |
+
+### 🚀 Getting Started
+
+No external `node_modules` installation is required, as `server.js` uses only built-in Node.js modules:
+
+1. Double-click **`start.bat`** (or run `npm start` / `node server.js` in your terminal).
+2. `http://localhost:3000` will open automatically in your browser.
+3. The top status pill will display **`🟢 Live synced: data/study-tracker.xlsx`**.
+4. Every session you log, edit (`✏️`), or delete (`✖`) will instantaneously update `data/study-tracker.xlsx`.
