@@ -1,0 +1,10 @@
+# Archivos temporales de bloqueo de Microsoft Excel
+~$*.xlsx
+~$*.xls
+
+# Dependencias y entorno
+node_modules/
+.env
+.DS_Store
+Thumbs.db
+
