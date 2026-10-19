@@ -1,6 +1,6 @@
 /**
- * Capa de Servicios: Integración con archivos Excel (.xlsx) mediante SheetJS
- * y sincronización directa en disco con File System Access API.
+ * Capa de Servicios: Construcción del libro Excel (.xlsx) con fórmulas nativas
+ * y sincronización bidireccional en tiempo real con el servidor local (server.js -> data/study-tracker.xlsx).
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
@@ -11,11 +11,11 @@
     calcularXP
   } = StudyTracker.RPG;
 
-  let archivoExcelHandle = null;
+  let servidorLocalActivo = false;
 
   /**
-   * Construye el objeto Workbook de SheetJS con pestaña de sesiones enriquecida,
-   * fórmulas nativas de Excel (incluyendo bonos por complejidad y objetivo) y guía.
+   * Construye el objeto Workbook de SheetJS con pestaña de sesiones enriquecida (15 columnas),
+   * fórmulas nativas de Excel (incluyendo bonos por complejidad y objetivo) y pestaña de guía.
    */
   function construirLibroExcel(sesiones) {
     const wb = XLSX.utils.book_new();
@@ -171,7 +171,15 @@
   }
 
   /**
-   * Extrae y normaliza las filas de un Workbook de SheetJS (compatible con versión anterior y nueva).
+   * Genera el binario ArrayBuffer (.xlsx) listo para enviarse al servidor o guardarse en disco.
+   */
+  function construirBufferExcel(sesiones) {
+    const wb = construirLibroExcel(sesiones);
+    return XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  }
+
+  /**
+   * Extrae y normaliza las filas de un Workbook de SheetJS.
    */
   function extraerSesionesDesdeWorkbook(wb) {
     const sheetName = wb.SheetNames[0];
@@ -228,15 +236,121 @@
   }
 
   /**
-   * Descarga un archivo .xlsx con todas las sesiones y fórmulas activas.
+   * Conecta al inicio con el servidor local (server.js).
+   * Si data/study-tracker.xlsx ya existe en disco, carga sus sesiones;
+   * si no existe, lo crea automáticamente con las sesiones iniciales.
    */
-  function exportarExcelConFormulas(sesiones, nombreArchivo = "Tracker_Estudio_RPG.xlsx") {
+  async function inicializarConexionServidor(sesionesActuales) {
+    if (global.location.protocol === "file:") {
+      servidorLocalActivo = false;
+      return { conectado: false, razon: "MODO_ARCHIVO_LOCAL" };
+    }
+
+    try {
+      const resStatus = await fetch("/api/status", { cache: "no-store" });
+      if (!resStatus.ok) {
+        servidorLocalActivo = false;
+        return { conectado: false };
+      }
+
+      const status = await resStatus.json();
+      servidorLocalActivo = true;
+
+      if (status.excelExists) {
+        const resExcel = await fetch("/api/excel", { cache: "no-store" });
+        if (resExcel.ok) {
+          const buffer = await resExcel.arrayBuffer();
+          const wb = XLSX.read(new Uint8Array(buffer), { type: "array" });
+          const sesiones = extraerSesionesDesdeWorkbook(wb);
+          return {
+            conectado: true,
+            origen: "leido_de_disco",
+            sesiones,
+            excelPath: status.excelPath
+          };
+        }
+      }
+
+      // Si el Excel aún no existe en data/study-tracker.xlsx, lo creamos automáticamente
+      const guardado = await guardarEnServidorLocal(sesionesActuales);
+      return {
+        conectado: guardado.ok,
+        origen: "creado_en_disco",
+        sesiones: sesionesActuales,
+        excelPath: status.excelPath
+      };
+    } catch (_) {
+      servidorLocalActivo = false;
+      return { conectado: false };
+    }
+  }
+
+  /**
+   * Envía el libro Excel actualizado al servidor local para escribirlo en data/study-tracker.xlsx.
+   */
+  async function guardarEnServidorLocal(sesiones) {
+    if (!servidorLocalActivo) {
+      return { ok: false, desconectado: true };
+    }
+
+    try {
+      const wbout = construirBufferExcel(sesiones);
+      const res = await fetch("/api/excel", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        body: new Blob([wbout], { type: "application/octet-stream" })
+      });
+
+      const payload = await res.json();
+      if (!res.ok) {
+        return {
+          ok: false,
+          bloqueado: res.status === 423,
+          mensaje: payload.message || "No se pudo actualizar el archivo Excel."
+        };
+      }
+
+      return {
+        ok: true,
+        excelPath: payload.excelPath,
+        updatedAt: payload.updatedAt
+      };
+    } catch (err) {
+      return {
+        ok: false,
+        mensaje: "Error de red con el servidor local: " + err.message
+      };
+    }
+  }
+
+  /**
+   * Recarga bajo demanda el archivo data/study-tracker.xlsx desde el servidor local
+   * (útil si el usuario hizo cambios manuales directamente en Microsoft Excel).
+   */
+  async function recargarDesdeServidorLocal() {
+    const resExcel = await fetch("/api/excel", { cache: "no-store" });
+    if (!resExcel.ok) {
+      throw new Error("No se encontró data/study-tracker.xlsx en el servidor.");
+    }
+    const buffer = await resExcel.arrayBuffer();
+    const wb = XLSX.read(new Uint8Array(buffer), { type: "array" });
+    const sesiones = extraerSesionesDesdeWorkbook(wb);
+    servidorLocalActivo = true;
+    return sesiones;
+  }
+
+  /**
+   * Descarga una copia del archivo .xlsx en el navegador.
+   */
+  function exportarExcelConFormulas(sesiones, nombreArchivo = "study-tracker.xlsx") {
     const wb = construirLibroExcel(sesiones);
     XLSX.writeFile(wb, nombreArchivo);
   }
 
   /**
-   * Lee un objeto File (.xlsx, .xls, .csv) y resuelve con las sesiones extraídas.
+   * Lee un objeto File (.xlsx, .xls, .csv) subido manualmente por el usuario.
    */
   function leerArchivoExcel(file) {
     return new Promise((resolve, reject) => {
@@ -260,66 +374,17 @@
     });
   }
 
-  /**
-   * Vincula un archivo .xlsx local usando File System Access API para lectura y escritura directa.
-   */
-  async function vincularArchivoLocal() {
-    if (!global.showOpenFilePicker) {
-      throw new Error("UNSUPPORTED_FS_API");
-    }
-    const [handle] = await global.showOpenFilePicker({
-      types: [
-        {
-          description: "Archivo Excel",
-          accept: {
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"]
-          }
-        }
-      ],
-      multiple: false
-    });
-    archivoExcelHandle = handle;
-    const file = await handle.getFile();
-    const buffer = await file.arrayBuffer();
-    const wb = XLSX.read(new Uint8Array(buffer), { type: "array" });
-    const sesiones = extraerSesionesDesdeWorkbook(wb);
-
-    return {
-      sesiones,
-      nombreArchivo: file.name
-    };
-  }
-
-  /**
-   * Sobreescribe automáticamente el archivo .xlsx vinculado en caso de estar activo.
-   */
-  async function guardarEnArchivoVinculado(sesiones) {
-    if (!archivoExcelHandle) return false;
-    try {
-      const wb = construirLibroExcel(sesiones);
-      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-      const writable = await archivoExcelHandle.createWritable();
-      await writable.write(
-        new Blob([wbout], { type: "application/octet-stream" })
-      );
-      await writable.close();
-      return true;
-    } catch (err) {
-      console.error("No se pudo sobreescribir el Excel automáticamente:", err);
-      return false;
-    }
-  }
-
-  function tieneArchivoVinculado() {
-    return Boolean(archivoExcelHandle);
+  function estaServidorConectado() {
+    return servidorLocalActivo;
   }
 
   StudyTracker.ExcelService = {
     construirLibroExcel,
+    inicializarConexionServidor,
+    guardarEnServidorLocal,
+    recargarDesdeServidorLocal,
     exportarExcelConFormulas,
     leerArchivoExcel,
-    vincularArchivoLocal,
-    guardarEnArchivoVinculado,
-    tieneArchivoVinculado
+    estaServidorConectado
   };
 })(window);
