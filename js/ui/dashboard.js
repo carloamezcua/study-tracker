@@ -1,7 +1,7 @@
 /**
  * Capa de UI (Dashboard): Renderizado seguro del DOM (prevención de XSS con textContent),
- * modo de edición en línea de sesiones, selectores rápidos de chips (1 clic),
- * actualización de KPIs, barra RPG y tabla.
+ * autocompletado dinámico de Materia/Tema, modo de edición en línea de sesiones,
+ * selectores rápidos de chips (1 clic), actualización de KPIs, barra RPG y tabla.
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
@@ -16,6 +16,7 @@
 
   // Estado local de los chips seleccionados en el formulario (1 clic)
   const estadoChips = {
+    contexto: "Escuela",
     tipoActividad: "Código / Práctica",
     energiaPrevia: "Media",
     complejidad: "Desafiante",
@@ -25,12 +26,17 @@
   // ID de la sesión que se está editando actualmente (null si es registro nuevo)
   let sesionEditandoId = null;
 
+  const ICONOS_CONTEXTO = {
+    Escuela: "🎓",
+    Personal: "🚀",
+    Externo: "🤝"
+  };
+
   const ICONOS_ACTIVIDAD = {
     "Código / Práctica": "💻",
     "Lectura / Teoría": "📖",
     "Papel / A mano": "✍️",
-    "Tarea / Entrega": "📝",
-    "Repaso": "🔁"
+    Repaso: "🔁"
   };
 
   const ICONOS_ENERGIA = {
@@ -50,6 +56,14 @@
     Parcial: "⚠️",
     No: "❌"
   };
+
+  const MATERIAS_BASE = [
+    "Base de Datos",
+    "PySpark",
+    "Algoritmos",
+    "Matemáticas",
+    "StudyTracker"
+  ];
 
   /**
    * Devuelve una copia de los valores seleccionados actualmente en los grupos de chips.
@@ -83,6 +97,40 @@
   }
 
   /**
+   * Alimenta dinámicamente los <datalist> de Materia y Tema con el historial propio del usuario.
+   */
+  function actualizarAutocompletado(sesiones) {
+    const dlMaterias = document.getElementById("listaMaterias");
+    const dlTemas = document.getElementById("listaTemas");
+
+    if (dlMaterias) {
+      const materiasUnicas = new Set(MATERIAS_BASE);
+      (Array.isArray(sesiones) ? sesiones : []).forEach((s) => {
+        if (s.materia) materiasUnicas.add(s.materia.trim());
+      });
+      dlMaterias.replaceChildren();
+      materiasUnicas.forEach((mat) => {
+        const opt = document.createElement("option");
+        opt.value = mat;
+        dlMaterias.appendChild(opt);
+      });
+    }
+
+    if (dlTemas) {
+      const temasUnicos = new Set();
+      (Array.isArray(sesiones) ? sesiones : []).forEach((s) => {
+        if (s.tema && s.tema !== "General") temasUnicos.add(s.tema.trim());
+      });
+      dlTemas.replaceChildren();
+      temasUnicos.forEach((tem) => {
+        const opt = document.createElement("option");
+        opt.value = tem;
+        dlTemas.appendChild(opt);
+      });
+    }
+  }
+
+  /**
    * Carga los datos de una sesión existente en el formulario para editarla.
    */
   function cargarSesionEnFormulario(sesion) {
@@ -93,10 +141,12 @@
     document.getElementById("horaInicio").value = sesion.horaInicio;
     document.getElementById("horaFin").value = sesion.horaFin;
     document.getElementById("materia").value = sesion.materia;
+    document.getElementById("tema").value = sesion.tema || "";
     document.getElementById("calidad").value = String(sesion.calidad);
     document.getElementById("usoIA").value = String(sesion.usoIA);
     document.getElementById("notas").value = sesion.notas || "";
 
+    seleccionarChip("contexto", sesion.contexto || "Escuela");
     seleccionarChip("tipoActividad", sesion.tipoActividad || "Código / Práctica");
     seleccionarChip("energiaPrevia", sesion.energiaPrevia || "Media");
     seleccionarChip("complejidad", sesion.complejidad || "Desafiante");
@@ -146,7 +196,10 @@
       tr.classList.remove("row-editing");
     });
 
-    document.getElementById("notas").value = "";
+    const inputTema = document.getElementById("tema");
+    const inputNotas = document.getElementById("notas");
+    if (inputTema) inputTema.value = "";
+    if (inputNotas) inputNotas.value = "";
   }
 
   /**
@@ -283,7 +336,7 @@
   }
 
   /**
-   * Crea una fila <tr> segura para la tabla de historial con botones de Editar y Eliminar.
+   * Crea una fila <tr> segura para la tabla de historial con Materia, Tema, Contexto y acciones CRUD.
    */
   function crearFilaSesion(sesion, { onEditar, onEliminar }) {
     const tr = document.createElement("tr");
@@ -292,7 +345,7 @@
       tr.classList.add("row-editing");
     }
 
-    // Fecha + Día de la semana
+    // Fecha + Día de la semana y franja
     const tdFecha = document.createElement("td");
     const divFecha = document.createElement("div");
     divFecha.textContent = sesion.fecha;
@@ -305,18 +358,22 @@
     const tdHorario = document.createElement("td");
     tdHorario.textContent = `${sesion.horaInicio} - ${sesion.horaFin}`;
 
-    // Materia
-    const tdMateria = document.createElement("td");
+    // Materia + Contexto y Tema específico
+    const tdMateriaTema = document.createElement("td");
     const strongMateria = document.createElement("strong");
     strongMateria.textContent = sesion.materia;
-    tdMateria.appendChild(strongMateria);
+    const subTema = document.createElement("small");
+    subTema.className = "cell-sub";
+    const icCtx = ICONOS_CONTEXTO[sesion.contexto] || "🎓";
+    subTema.textContent = `${icCtx} ${sesion.contexto || "Escuela"} · ${sesion.tema || "General"}`;
+    tdMateriaTema.append(strongMateria, subTema);
 
     // Actividad
     const tdActividad = document.createElement("td");
     const iconoAct = ICONOS_ACTIVIDAD[sesion.tipoActividad] || "💻";
     tdActividad.textContent = `${iconoAct} ${sesion.tipoActividad || "Código / Práctica"}`;
 
-    // Contexto (Energía + Complejidad + Objetivo)
+    // Contexto Operativo (Energía + Complejidad + Objetivo)
     const tdContexto = document.createElement("td");
     const spanContexto = document.createElement("span");
     spanContexto.className = "context-badges";
@@ -375,7 +432,7 @@
     tr.append(
       tdFecha,
       tdHorario,
-      tdMateria,
+      tdMateriaTema,
       tdActividad,
       tdContexto,
       tdDuracion,
@@ -389,11 +446,14 @@
   }
 
   /**
-   * Renderiza toda la interfaz (Barra RPG, KPIs, Tabla de Historial y Gráficos) a partir de las sesiones.
+   * Renderiza toda la interfaz (Barra RPG, KPIs, Autocompletado, Tabla y Gráficos) a partir de las sesiones.
    */
   function renderizarDashboard(sesiones, { onEditarSesion, onEliminarSesion } = {}) {
     const kpis = calcularKPIs(sesiones);
     const progreso = calcularProgresoRPG(kpis.totalXP);
+
+    // Actualizar sugerencias de autocompletado de Materia y Tema
+    actualizarAutocompletado(sesiones);
 
     // 1. Barra RPG
     document.getElementById("uiNivel").textContent = progreso.nivel;

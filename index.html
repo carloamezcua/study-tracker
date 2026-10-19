@@ -109,22 +109,32 @@
         </div>
 
         <form id="studyForm">
+          <!-- CONTEXTO / PROPÓSITO (3 CHIPS DE 1 CLIC) -->
+          <div class="form-group">
+            <label>Contexto / Propósito</label>
+            <div class="chip-group" data-group="contexto">
+              <button type="button" class="chip-btn active" data-value="Escuela">🎓 Escuela</button>
+              <button type="button" class="chip-btn" data-value="Personal">🚀 Personal</button>
+              <button type="button" class="chip-btn" data-value="Externo">🤝 Externo</button>
+            </div>
+          </div>
+
           <div class="row">
             <div class="form-group">
               <label for="fecha">Fecha</label>
               <input type="date" id="fecha" required>
             </div>
             <div class="form-group">
-              <label for="materia">Materia / Tema</label>
+              <label for="materia">Materia / Proyecto</label>
               <input type="text" id="materia" list="listaMaterias" placeholder="Ej. Base de Datos" required>
-              <datalist id="listaMaterias">
-                <option value="Base de Datos"></option>
-                <option value="PySpark"></option>
-                <option value="Algoritmos"></option>
-                <option value="Matemáticas"></option>
-                <option value="Repaso General"></option>
-              </datalist>
+              <datalist id="listaMaterias"></datalist>
             </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tema">Tema específico <span class="label-hint">(Subtema o módulo)</span></label>
+            <input type="text" id="tema" list="listaTemas" placeholder="Ej. Normalización 3FN, Índices B-Tree..." required>
+            <datalist id="listaTemas"></datalist>
           </div>
 
           <div class="row">
@@ -140,14 +150,13 @@
             </div>
           </div>
 
-          <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (1 CLIC) -->
+          <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (4 CHIPS DE 1 CLIC) -->
           <div class="form-group">
             <label>Tipo de Actividad</label>
             <div class="chip-group" data-group="tipoActividad">
               <button type="button" class="chip-btn active" data-value="Código / Práctica">💻 Código / Práctica</button>
               <button type="button" class="chip-btn" data-value="Lectura / Teoría">📖 Lectura / Teoría</button>
               <button type="button" class="chip-btn" data-value="Papel / A mano">✍️ Papel / A mano</button>
-              <button type="button" class="chip-btn" data-value="Tarea / Entrega">📝 Tarea / Entrega</button>
               <button type="button" class="chip-btn" data-value="Repaso">🔁 Repaso</button>
             </div>
           </div>
@@ -270,7 +279,7 @@
             <tr>
               <th>Fecha / Franja</th>
               <th>Horario</th>
-              <th>Materia</th>
+              <th>Materia / Tema</th>
               <th>Actividad</th>
               <th>Energía · Reto · Meta</th>
               <th>Duración</th>
@@ -304,10 +313,10 @@
         <div class="guide-card">
           <h4>🧠 Variables de Comportamiento (1 Clic)</h4>
           <ul>
-            <li><strong>Tipo de Actividad:</strong> <code>💻 Código</code>, <code>📖 Lectura</code>, <code>✍️ Papel / A mano</code>, <code>📝 Tarea / Entrega</code>, <code>🔁 Repaso</code>.</li>
+            <li><strong>Contexto:</strong> <code>🎓 Escuela</code>, <code>🚀 Personal</code> (propio o en pareja), <code>🤝 Externo</code> (encargos/otros).</li>
+            <li><strong>Tipo de Actividad:</strong> <code>💻 Código</code>, <code>📖 Lectura</code>, <code>✍️ Papel / A mano</code>, <code>🔁 Repaso</code>.</li>
             <li><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code> (mide impacto del cansancio).</li>
-            <li><strong>Complejidad:</strong> <code>🟢 Fácil (+0%)</code>, <code>🟡 Desafiante (+10% XP)</code>, <code>🔴 Muy difícil (+20% XP)</code>.</li>
-            <li><strong>Objetivo Cumplido:</strong> <code>✅ Sí (+10% XP)</code>, <code>⚠️ Parcial</code>, <code>❌ No</code>.</li>
+            <li><strong>Complejidad y Meta:</strong> <code>🟢 Fácil</code>, <code>🟡 Reto (+10% XP)</code>, <code>🔴 Difícil (+20% XP)</code> · <code>✅ Meta (+10% XP)</code>.</li>
           </ul>
         </div>
         <div class="guide-card">

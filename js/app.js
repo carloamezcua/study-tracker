@@ -62,7 +62,9 @@
           fecha: document.getElementById("fecha").value,
           horaInicio: document.getElementById("horaInicio").value,
           horaFin: document.getElementById("horaFin").value,
+          contexto: chips.contexto,
           materia: document.getElementById("materia").value.trim(),
+          tema: document.getElementById("tema").value.trim(),
           tipoActividad: chips.tipoActividad,
           energiaPrevia: chips.energiaPrevia,
           complejidad: chips.complejidad,
@@ -78,6 +80,7 @@
           UI.salirModoEdicion();
         } else {
           store.agregarSesion(datosFormulario);
+          document.getElementById("tema").value = "";
           document.getElementById("notas").value = "";
         }
       });
