@@ -1,3 +1,8 @@
+# Carpeta de datos locales y archivos Excel personales
+data/
+*.xlsx
+*.xls
+
 # Archivos temporales de bloqueo de Microsoft Excel
 ~$*.xlsx
 ~$*.xls
@@ -7,4 +12,3 @@ node_modules/
 .env
 .DS_Store
 Thumbs.db
-
