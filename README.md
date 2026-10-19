@@ -26,6 +26,10 @@ Aplicación web **Local-First** gamificada (estilo RPG) con **micro-servidor loc
     - `✅ Sí (Logrado +10% XP)`: Completaste la meta planeada para el bloque.
     - `⚠️ Parcial (Avance +5% XP)`: Hubo avance real y aprendizaje, pero continuará en otra sesión.
     - `❌ No (Bloqueo / 0% XP)`: Bloqueo técnico, distracción total o interrupción sin lograr avance (contabilizado en el indicador de bloqueos).
+- **Cronómetro y Temporizador Pomodoro Integrado (100% Libre de Anuncios):**
+  - **Modo Cronómetro (`⏱️`):** Cuenta progresiva con captura automática de la **Fecha**, **Hora de Inicio** al pulsar *Iniciar* y **Hora de Fin** al pulsar *Terminar* (o al guardar directamente la sesión).
+  - **Modo Pomodoro (`🍅`):** Cuenta regresiva por bloques de enfoque (`25m`, `50m` o personalizado) y bloques de descanso (`5m`, `15m`) con aviso acústico vía *Web Audio API* (sin anuncios ni dependencias externas).
+  - Basado en marcas de tiempo reales (`Date.now()`) y persistencia en `localStorage` para no perder precisión en segundo plano ni al recargar la pestaña.
 - **Sincronización en Tiempo Real con Excel (`data/study-tracker.xlsx`):**
   - Cada alta, edición en línea (`✏️`) o eliminación (`✖`) actualiza directamente `data/study-tracker.xlsx` en tu disco duro sin descargas repetidas.
   - La carpeta `data/` y los archivos `.xlsx` están excluidos en `.gitignore` por privacidad.
@@ -39,6 +43,7 @@ flowchart TD
     subgraph UI["Capa de Presentación (Frontend)"]
         HTML["index.html"]
         CSS["css/styles.css"]
+        TIMER["js/ui/timer.js\n(Cronómetro + Pomodoro sin anuncios)"]
         DASH["js/ui/dashboard.js\n(Filtro por Contexto, CRUD UI y KPIs)"]
         CHARTS["js/ui/charts.js\n(3 Instancias Chart.js)"]
     end
@@ -63,6 +68,8 @@ flowchart TD
     end
 
     HTML --> APP
+    APP -->|Inicializa y sincroniza horas| TIMER
+    TIMER -->|Auto-llena Fecha, Inicio y Fin| DASH
     APP -->|Crear / Editar / Borrar| STORE
     STORE -->|Respaldo rápido| LS
     STORE -->|Notifica cambios| APP
