@@ -3,40 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard &amp; Tracker de Estudio RPG (Excel Local)</title>
+  <title>StudyTracker &mdash; Analytics &amp; Excel Sync</title>
   <!-- Estilos principales de la aplicación -->
   <link rel="stylesheet" href="css/styles.css">
-  <!-- Librería SheetJS para leer y escribir archivos Excel (.xlsx) localmente -->
+  <!-- Librería SheetJS para leer y escribir archivos Excel (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <!-- Librería Chart.js para los gráficos del Dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <!-- Arquitectura modular por capas -->
-  <script src="js/domain/rpg.js" defer></script>
+  <script src="js/domain/metrics.js" defer></script>
   <script src="js/state/store.js" defer></script>
-  <script src="js/services/excel.js" defer></script>
+  <script src="js/services/excel-sync.js" defer></script>
   <script src="js/ui/charts.js" defer></script>
   <script src="js/ui/dashboard.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
 <body>
   <div class="app-wrapper">
-    <!-- BARRA SUPERIOR: CONEXIÓN EXCEL LOCAL -->
+    <!-- BARRA SUPERIOR: SINCRONIZACIÓN AUTOMÁTICA CON EXCEL LOCAL -->
     <div class="top-bar">
       <div class="brand">
-        <h1>⚔️ StudyTracker RPG &mdash; Dashboard Local</h1>
-        <p>Registra tus bloques de estudio, descubre tus patrones de hábito y sincroniza con Excel (.xlsx)</p>
+        <h1>⚔️ StudyTracker &mdash; Analytics &amp; RPG</h1>
+        <p>Sincronización en vivo con <code>data/study-tracker.xlsx</code> (Altas, ediciones y bajas en tiempo real)</p>
       </div>
       <div class="excel-actions">
-        <span id="fileStatus" class="status-pill">Modo: Memoria del Navegador</span>
-        <button id="btnConectarExcel" type="button" class="btn btn-primary" title="Vincula un archivo .xlsx de tu PC para lectura y guardado directo (Chrome/Edge)">
-          🔗 Vincular Excel (.xlsx)
+        <span id="fileStatus" class="status-pill">Conectando con servidor local...</span>
+        <button id="btnSincronizarServidor" type="button" class="btn btn-primary" title="Guarda inmediatamente todos los registros actuales en data/study-tracker.xlsx">
+          🔄 Sincronizar Excel
         </button>
-        <label class="btn" style="margin:0; cursor:pointer;" title="Importar un archivo .xlsx existente">
-          📂 Importar .xlsx
+        <button id="btnRecargarExcel" type="button" class="btn" title="Vuelve a leer data/study-tracker.xlsx si hiciste cambios manuales desde Microsoft Excel">
+          📂 Recargar de Excel
+        </button>
+        <label class="btn" style="margin:0; cursor:pointer;" title="Importar un archivo .xlsx externo">
+          📤 Importar otro .xlsx
           <input type="file" id="importInput" accept=".xlsx,.xls,.csv" style="display:none">
         </label>
-        <button id="btnExportarExcel" type="button" class="btn btn-success" title="Descarga tu archivo .xlsx con todas las sesiones, fórmulas de Excel y pestaña de Guía">
-          📥 Guardar / Descargar Excel (.xlsx)
+        <button id="btnExportarExcel" type="button" class="btn btn-success" title="Descarga una copia de respaldo de study-tracker.xlsx">
+          📥 Descargar copia (.xlsx)
         </button>
       </div>
     </div>
@@ -93,10 +96,12 @@
 
     <!-- GRID PRINCIPAL: FORMULARIO + GRÁFICOS -->
     <div class="main-grid">
-      <!-- COLUMNA IZQUIERDA: FORMULARIO DE INGESTA DE BAJA FRICCIÓN -->
-      <div class="panel">
-        <h2>➕ Registrar Sesión</h2>
-        <div class="subtitle">Selección rápida con 1 clic. Día, franja horaria, duración y XP se calculan solos.</div>
+      <!-- COLUMNA IZQUIERDA: FORMULARIO DE INGESTA Y EDICIÓN -->
+      <div class="panel" id="formPanel">
+        <h2>
+          <span id="formTitle">➕ Registrar Sesión</span>
+        </h2>
+        <div class="subtitle">Selección rápida con 1 clic. Cada cambio actualiza <code>data/study-tracker.xlsx</code> automáticamente.</div>
 
         <div class="preview-pill">
           <span id="previewDuracion">⏱️ Duración: 25 min</span>
@@ -204,9 +209,14 @@
             <textarea id="notas" rows="2" placeholder="¿Qué aprendiste, qué te costó o qué te distrajo?"></textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-submit">
-            💾 Registrar Sesión y Sumar XP
-          </button>
+          <div class="form-actions">
+            <button type="submit" id="btnSubmitForm" class="btn btn-primary btn-submit">
+              💾 Registrar Sesión y Sumar XP
+            </button>
+            <button type="button" id="btnCancelEdit" class="btn btn-cancel-edit" style="display:none;">
+              ✖ Cancelar edición
+            </button>
+          </div>
         </form>
       </div>
 
@@ -251,7 +261,7 @@
     <!-- HISTORIAL DE SESIONES -->
     <div class="panel history-panel">
       <h2>
-        <span>📋 Historial de Sesiones Registradas</span>
+        <span>📋 Historial de Sesiones Registradas (Clic en ✏️ para editar o ✖ para borrar)</span>
         <button id="btnVaciarTodo" type="button" class="btn btn-clear">🗑️ Vaciar todo / Reiniciar a 0</button>
       </h2>
       <div class="table-wrapper">
@@ -268,7 +278,7 @@
               <th>% IA</th>
               <th>XP Ganados</th>
               <th>Notas</th>
-              <th></th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="tablaBody"></tbody>
@@ -311,7 +321,7 @@
         <div class="guide-card">
           <h4>🧮 Fórmulas Automáticas en tu Excel</h4>
           <ul>
-            <li><strong>Automáticas:</strong> <code>Dia_Semana</code> y <code>Franja_Horaria</code> (Madrugada, Mañana, Tarde, Noche) se registran sin llenar campos extra.</li>
+            <li><strong>Sincronización en vivo:</strong> Se guarda en <code>data/study-tracker.xlsx</code> automáticamente al crear, editar o borrar filas.</li>
             <li><strong>Duración (Minutos):</strong> <code>=MOD(TIMEVALUE(Fin)-TIMEVALUE(Inicio),1)*1440</code>.</li>
             <li><strong>XP con Bonos:</strong> <code>=ROUND(Duracion * (1 + Calidad*0.2 + BonoComplejidad + BonoObjetivo), 0)</code>.</li>
           </ul>

@@ -1,6 +1,7 @@
 /**
  * Capa de UI (Dashboard): Renderizado seguro del DOM (prevención de XSS con textContent),
- * selectores rápidos de chips (1 clic), actualización de KPIs, barra RPG y tabla.
+ * modo de edición en línea de sesiones, selectores rápidos de chips (1 clic),
+ * actualización de KPIs, barra RPG y tabla.
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
@@ -20,6 +21,9 @@
     complejidad: "Desafiante",
     objetivoCumplido: "Sí"
   };
+
+  // ID de la sesión que se está editando actualmente (null si es registro nuevo)
+  let sesionEditandoId = null;
 
   const ICONOS_ACTIVIDAD = {
     "Código / Práctica": "💻",
@@ -55,6 +59,13 @@
   }
 
   /**
+   * Devuelve el ID de la sesión que se está editando, o null si estamos creando una nueva.
+   */
+  function obtenerIdSesionEditando() {
+    return sesionEditandoId;
+  }
+
+  /**
    * Selecciona un chip dentro de su grupo y actualiza la vista previa de XP.
    */
   function seleccionarChip(grupo, valor) {
@@ -69,6 +80,73 @@
     }
 
     actualizarPreview();
+  }
+
+  /**
+   * Carga los datos de una sesión existente en el formulario para editarla.
+   */
+  function cargarSesionEnFormulario(sesion) {
+    if (!sesion) return;
+    sesionEditandoId = sesion.id;
+
+    document.getElementById("fecha").value = sesion.fecha;
+    document.getElementById("horaInicio").value = sesion.horaInicio;
+    document.getElementById("horaFin").value = sesion.horaFin;
+    document.getElementById("materia").value = sesion.materia;
+    document.getElementById("calidad").value = String(sesion.calidad);
+    document.getElementById("usoIA").value = String(sesion.usoIA);
+    document.getElementById("notas").value = sesion.notas || "";
+
+    seleccionarChip("tipoActividad", sesion.tipoActividad || "Código / Práctica");
+    seleccionarChip("energiaPrevia", sesion.energiaPrevia || "Media");
+    seleccionarChip("complejidad", sesion.complejidad || "Desafiante");
+    seleccionarChip("objetivoCumplido", sesion.objetivoCumplido || "Sí");
+
+    actualizarAyudaCalidad();
+    actualizarAyudaIA();
+    actualizarPreview();
+
+    const formPanel = document.getElementById("formPanel");
+    const formTitle = document.getElementById("formTitle");
+    const btnSubmit = document.getElementById("btnSubmitForm");
+    const btnCancel = document.getElementById("btnCancelEdit");
+
+    if (formPanel) formPanel.classList.add("panel-editing");
+    if (formTitle) formTitle.textContent = "✏️ Editando Sesión";
+    if (btnSubmit) btnSubmit.textContent = "💾 Actualizar Sesión y Sincronizar Excel";
+    if (btnCancel) btnCancel.style.display = "inline-flex";
+
+    // Resaltar fila activa en la tabla
+    document.querySelectorAll("#tablaBody tr").forEach((tr) => {
+      tr.classList.toggle("row-editing", tr.dataset.id === sesion.id);
+    });
+
+    if (formPanel) {
+      formPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+
+  /**
+   * Sale del modo edición y restaura el formulario al modo de creación.
+   */
+  function salirModoEdicion() {
+    sesionEditandoId = null;
+
+    const formPanel = document.getElementById("formPanel");
+    const formTitle = document.getElementById("formTitle");
+    const btnSubmit = document.getElementById("btnSubmitForm");
+    const btnCancel = document.getElementById("btnCancelEdit");
+
+    if (formPanel) formPanel.classList.remove("panel-editing");
+    if (formTitle) formTitle.textContent = "➕ Registrar Sesión";
+    if (btnSubmit) btnSubmit.textContent = "💾 Registrar Sesión y Sumar XP";
+    if (btnCancel) btnCancel.style.display = "none";
+
+    document.querySelectorAll("#tablaBody tr.row-editing").forEach((tr) => {
+      tr.classList.remove("row-editing");
+    });
+
+    document.getElementById("notas").value = "";
   }
 
   /**
@@ -162,16 +240,19 @@
   }
 
   /**
-   * Actualiza el indicador visual del estado de conexión con Excel.
+   * Actualiza el indicador visual del estado de sincronización con Excel.
+   * @param {string} texto
+   * @param {"connected" | "warning" | "default"} tipoEstado
    */
-  function actualizarEstadoArchivo(texto, conectado = false) {
+  function actualizarEstadoArchivo(texto, tipoEstado = "default") {
     const status = document.getElementById("fileStatus");
     if (!status) return;
     status.textContent = texto;
-    if (conectado) {
+    status.classList.remove("connected", "warning");
+    if (tipoEstado === "connected" || tipoEstado === true) {
       status.classList.add("connected");
-    } else {
-      status.classList.remove("connected");
+    } else if (tipoEstado === "warning") {
+      status.classList.add("warning");
     }
   }
 
@@ -202,11 +283,14 @@
   }
 
   /**
-   * Crea una fila <tr> segura para la tabla de historial sin usar innerHTML con datos de usuario.
+   * Crea una fila <tr> segura para la tabla de historial con botones de Editar y Eliminar.
    */
-  function crearFilaSesion(sesion, onEliminar) {
+  function crearFilaSesion(sesion, { onEditar, onEliminar }) {
     const tr = document.createElement("tr");
     tr.dataset.id = sesion.id;
+    if (sesion.id === sesionEditandoId) {
+      tr.classList.add("row-editing");
+    }
 
     // Fecha + Día de la semana
     const tdFecha = document.createElement("td");
@@ -268,15 +352,25 @@
     tdNotas.className = "notes-cell";
     tdNotas.textContent = sesion.notas || "-";
 
-    // Botón eliminar
+    // Acciones: Editar y Eliminar
     const tdAcciones = document.createElement("td");
+    tdAcciones.className = "actions-cell";
+
+    const btnEditar = document.createElement("button");
+    btnEditar.type = "button";
+    btnEditar.className = "action-icon-btn edit-btn";
+    btnEditar.title = "Editar esta sesión";
+    btnEditar.textContent = "✏️";
+    btnEditar.addEventListener("click", () => onEditar(sesion));
+
     const btnEliminar = document.createElement("button");
     btnEliminar.type = "button";
-    btnEliminar.className = "delete-btn";
-    btnEliminar.title = "Eliminar fila";
+    btnEliminar.className = "action-icon-btn delete-btn";
+    btnEliminar.title = "Eliminar esta sesión";
     btnEliminar.textContent = "✖";
     btnEliminar.addEventListener("click", () => onEliminar(sesion.id));
-    tdAcciones.appendChild(btnEliminar);
+
+    tdAcciones.append(btnEditar, btnEliminar);
 
     tr.append(
       tdFecha,
@@ -297,7 +391,7 @@
   /**
    * Renderiza toda la interfaz (Barra RPG, KPIs, Tabla de Historial y Gráficos) a partir de las sesiones.
    */
-  function renderizarDashboard(sesiones, { onEliminarSesion } = {}) {
+  function renderizarDashboard(sesiones, { onEditarSesion, onEliminarSesion } = {}) {
     const kpis = calcularKPIs(sesiones);
     const progreso = calcularProgresoRPG(kpis.totalXP);
 
@@ -333,9 +427,16 @@
       const fragment = document.createDocumentFragment();
       sesiones.forEach((s) => {
         fragment.appendChild(
-          crearFilaSesion(s, (id) => {
-            if (typeof onEliminarSesion === "function") {
-              onEliminarSesion(id);
+          crearFilaSesion(s, {
+            onEditar: (sesionSeleccionada) => {
+              if (typeof onEditarSesion === "function") {
+                onEditarSesion(sesionSeleccionada);
+              }
+            },
+            onEliminar: (id) => {
+              if (typeof onEliminarSesion === "function") {
+                onEliminarSesion(id);
+              }
             }
           })
         );
@@ -359,7 +460,10 @@
 
   StudyTracker.UI = {
     obtenerValoresChips,
+    obtenerIdSesionEditando,
     seleccionarChip,
+    cargarSesionEnFormulario,
+    salirModoEdicion,
     inicializarFormulario,
     ponerHoraActual,
     actualizarAyudaCalidad,
