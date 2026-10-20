@@ -6,7 +6,7 @@
 **Cómo usar este archivo**
 
 - Escribe la idea en una línea, sin filtrarla. Refínala después.
-- Etiqueta cada una con esfuerzo (`S` horas · `M` días · `L` semanas) e impacto (⭐ a ⭐⭐⭐).1
+- Etiqueta cada una con esfuerzo (`S` horas · `M` días · `L` semanas) e impacto (⭐ a ⭐⭐⭐).
 
 ## 🔥 Prioridad alta (siguiente a considerar)
 
