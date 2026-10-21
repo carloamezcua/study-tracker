@@ -1,7 +1,7 @@
 {
   "name": "study-tracker",
   "version": "2.0.0",
-  "description": "Local-first study analytics dashboard with real-time Excel (.xlsx) synchronization",
+  "description": "Local-first study analytics dashboard with real-time CSV synchronization",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -9,7 +9,7 @@
   "keywords": [
     "study-tracker",
     "analytics",
-    "excel",
+    "csv",
     "productivity",
     "local-first"
   ],

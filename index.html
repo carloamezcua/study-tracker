@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyTracker &mdash; Analytics &amp; Excel Sync</title>
+  <title>StudyTracker &mdash; Analytics &amp; CSV Sync</title>
   <!-- Estilos principales de la aplicación -->
   <link rel="stylesheet" href="css/styles.css">
-  <!-- Librería SheetJS para leer y escribir archivos Excel (.xlsx) -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <!-- Librería Chart.js para los gráficos del Dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <!-- Arquitectura modular por capas -->
@@ -22,11 +20,11 @@
 </head>
 <body>
   <div class="app-wrapper">
-    <!-- BARRA SUPERIOR: SINCRONIZACIÓN AUTOMÁTICA CON EXCEL LOCAL E IDIOMA -->
+    <!-- BARRA SUPERIOR: SINCRONIZACIÓN AUTOMÁTICA CON CSV LOCAL E IDIOMA -->
     <div class="top-bar">
       <div class="brand">
         <h1 data-i18n="brandTitle">⚔️ StudyTracker &mdash; Analytics &amp; RPG</h1>
-        <p data-i18n-html="brandSubtitle">Sincronización en vivo con <code>data/study-tracker.xlsx</code> (Altas, ediciones y bajas en tiempo real)</p>
+        <p data-i18n-html="brandSubtitle">Sincronización en vivo con <code>data/study-tracker.csv</code> (Altas, ediciones y bajas en tiempo real)</p>
       </div>
       <div class="excel-actions">
         <div class="lang-switch" id="langSwitch" title="Cambiar idioma / Switch language">
@@ -34,18 +32,18 @@
           <button type="button" class="lang-switch-btn" data-lang="en">EN</button>
         </div>
         <span id="fileStatus" class="status-pill" data-i18n="statusConnecting">Conectando con servidor local...</span>
-        <button id="btnSincronizarServidor" type="button" class="btn btn-primary" data-i18n="btnSyncExcel" data-i18n-title="btnSyncExcelTitle" title="Guarda inmediatamente todos los registros actuales en data/study-tracker.xlsx">
-          🔄 Sincronizar Excel
+        <button id="btnSincronizarServidor" type="button" class="btn btn-primary" data-i18n="btnSyncExcel" data-i18n-title="btnSyncExcelTitle" title="Guarda inmediatamente todos los registros actuales en data/study-tracker.csv">
+          🔄 Sincronizar CSV
         </button>
-        <button id="btnRecargarExcel" type="button" class="btn" data-i18n="btnReloadExcel" data-i18n-title="btnReloadExcelTitle" title="Vuelve a leer data/study-tracker.xlsx si hiciste cambios manuales desde Microsoft Excel">
-          📂 Recargar de Excel
+        <button id="btnRecargarExcel" type="button" class="btn" data-i18n="btnReloadExcel" data-i18n-title="btnReloadExcelTitle" title="Vuelve a leer data/study-tracker.csv si hiciste cambios manuales">
+          📂 Recargar CSV
         </button>
-        <label class="btn" style="margin:0; cursor:pointer;" data-i18n-title="btnImportExcelTitle" title="Importar un archivo .xlsx externo">
-          <span data-i18n="btnImportExcel">📤 Importar otro .xlsx</span>
-          <input type="file" id="importInput" accept=".xlsx,.xls,.csv" style="display:none">
+        <label class="btn" style="margin:0; cursor:pointer;" data-i18n-title="btnImportExcelTitle" title="Importar un archivo .csv externo">
+          <span data-i18n="btnImportExcel">📤 Importar .csv</span>
+          <input type="file" id="importInput" accept=".csv,text/csv" style="display:none">
         </label>
-        <button id="btnExportarExcel" type="button" class="btn btn-success" data-i18n="btnExportExcel" data-i18n-title="btnExportExcelTitle" title="Descarga una copia de respaldo de study-tracker.xlsx">
-          📥 Descargar copia (.xlsx)
+        <button id="btnExportarExcel" type="button" class="btn btn-success" data-i18n="btnExportExcel" data-i18n-title="btnExportExcelTitle" title="Descarga una copia de respaldo de study-tracker.csv">
+          📥 Descargar copia (.csv)
         </button>
       </div>
     </div>
@@ -119,7 +117,7 @@
         <h2>
           <span id="formTitle" data-i18n="formTitleNew">➕ Registrar Sesión</span>
         </h2>
-        <div class="subtitle" data-i18n-html="formSubtitle">Cronometra tu sesión o regístrala en 1 clic. Sincronización automática con <code>data/study-tracker.xlsx</code>.</div>
+        <div class="subtitle" data-i18n-html="formSubtitle">Cronometra tu sesión o regístrala en 1 clic. Sincronización automática con <code>data/study-tracker.csv</code>.</div>
 
         <!-- CRONÓMETRO Y POMODORO INTEGRADO -->
         <div class="timer-widget" id="timerWidgetCard">
@@ -225,16 +223,21 @@
             </div>
           </div>
 
-          <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (6 CHIPS EN GRID 3x2) -->
+          <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (8 CHIPS EN GRID 2x4) -->
           <div class="form-group">
             <label data-i18n="labelActivity">Tipo de Actividad</label>
             <div class="chip-group chip-grid-6" data-group="tipoActividad">
+              <button type="button" class="chip-btn" data-value="Preparación / Contexto">🗂️ Preparación / Contexto</button>
+              <button type="button" class="chip-btn" data-value="Clase / Cátedra">👨‍🏫 Clase / Cátedra</button>
               <button type="button" class="chip-btn" data-value="Teoría / Docs">📖 Teoría / Docs</button>
               <button type="button" class="chip-btn" data-value="Investigación / Diálogo">💬 Investigación / Diálogo</button>
               <button type="button" class="chip-btn" data-value="Diseño / Apuntes">✍️ Diseño / Apuntes</button>
               <button type="button" class="chip-btn active" data-value="Desarrollo / Código">💻 Desarrollo / Código</button>
               <button type="button" class="chip-btn" data-value="Práctica / Debugging">🧪 Práctica / Debugging</button>
               <button type="button" class="chip-btn" data-value="Repaso / Simulacro">🔁 Repaso / Simulacro</button>
+            </div>
+            <div id="ayudaActividad" class="helper-box">
+              Construir e implementar: escribir código, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea.
             </div>
           </div>
 
@@ -258,16 +261,16 @@
             </div>
           </div>
 
-          <!-- 3. OBJETIVO CUMPLIDO -->
+          <!-- 3. OBJETIVO CUMPLIDO / AVANCE DEL BLOQUE -->
           <div class="form-group">
-            <label><span data-i18n="labelGoal">¿Objetivo Cumplido?</span> <span class="label-hint" data-i18n="labelGoalHint">(+10% Sí · +5% Parcial)</span></label>
+            <label><span data-i18n="labelGoal">¿Avance del Bloque / Meta?</span> <span class="label-hint" data-i18n="labelGoalHint">(+10% Buen avance · +5% Con tropiezos)</span></label>
             <div class="chip-group" data-group="objetivoCumplido">
-              <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Logrado +10%)</button>
-              <button type="button" class="chip-btn" data-value="Parcial">⚠️ Parcial (+5%)</button>
+              <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Buen avance +10%)</button>
+              <button type="button" class="chip-btn" data-value="Parcial">⚠️ Parcial (Con tropiezos +5%)</button>
               <button type="button" class="chip-btn" data-value="No">❌ No (Bloqueo)</button>
             </div>
             <div id="ayudaObjetivo" class="helper-box">
-              Meta lograda: completaste lo planeado para este bloque (+10% XP).
+              Buen avance del bloque (+10% XP): completaste la meta o avanzaste a buen ritmo en una tarea larga que seguirá en otra sesión.
             </div>
           </div>
 
@@ -384,6 +387,12 @@
           <tbody id="tablaBody"></tbody>
         </table>
       </div>
+      <div class="table-footer" id="tableFooter">
+        <span class="table-footer-info" id="tableFooterInfo">Mostrando los últimos 5 registros</span>
+        <button id="btnToggleHistorial" type="button" class="btn btn-toggle-history">
+          📂 Ver todos
+        </button>
+      </div>
     </div>
 
     <!-- GUÍA Y ESCALAS DE REFERENCIA PARA CUALQUIER USUARIO -->
@@ -402,12 +411,12 @@
           </ul>
         </div>
         <div class="guide-card">
-          <h4 data-i18n="guideCard2Title">🧠 Contexto y 6 Tipos de Actividad</h4>
+          <h4 data-i18n="guideCard2Title">🧠 Contexto y 8 Tipos de Actividad</h4>
           <ul>
             <li data-i18n-html="guideCard2Li1"><strong>Contexto:</strong> <code>🎓 Académico</code>, <code>🏅 Certificación</code>, <code>🚀 Proyecto Propio</code>, <code>🤝 Externo</code>.</li>
-            <li data-i18n-html="guideCard2Li2"><strong>Actividades:</strong> <code>📖 Teoría / Docs</code>, <code>💬 Investigación / Diálogo</code>, <code>✍️ Diseño / Apuntes</code>, <code>💻 Desarrollo / Código</code>, <code>🧪 Práctica / Debugging</code>, <code>🔁 Repaso / Simulacro</code>.</li>
+            <li data-i18n-html="guideCard2Li2"><strong>Actividades:</strong> <code>🗂️ Preparación / Contexto</code>, <code>👨‍🏫 Clase / Cátedra</code>, <code>📖 Teoría / Docs</code>, <code>💬 Investigación / Diálogo</code>, <code>✍️ Diseño / Apuntes</code>, <code>💻 Desarrollo / Código</code>, <code>🧪 Práctica / Debugging</code>, <code>🔁 Repaso / Simulacro</code>.</li>
             <li data-i18n-html="guideCard2Li3"><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code>.</li>
-            <li data-i18n-html="guideCard2Li4"><strong>Objetivo:</strong> <code>✅ Sí (+10% XP)</code>, <code>⚠️ Parcial (+5% XP)</code>, <code>❌ No (0% / Bloqueo)</code>.</li>
+            <li data-i18n-html="guideCard2Li4"><strong>Avance del Bloque:</strong> <code>✅ Sí (+10% XP: buen avance)</code>, <code>⚠️ Parcial (+5% XP: con tropiezos)</code>, <code>❌ No (0% / Bloqueo)</code>.</li>
           </ul>
         </div>
         <div class="guide-card">
@@ -420,11 +429,11 @@
           </ul>
         </div>
         <div class="guide-card">
-          <h4 data-i18n="guideCard4Title">🧮 Curva Exponencial y Fórmulas en Excel</h4>
+          <h4 data-i18n="guideCard4Title">🧮 Curva Exponencial y Fórmulas en JavaScript</h4>
           <ul>
             <li data-i18n-html="guideCard4Li1"><strong>Curva RPG (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code> (El XP necesario se duplica cada 7 niveles).</li>
-            <li data-i18n-html="guideCard4Li2"><strong>Duración (Minutos):</strong> <code>=MOD(TIMEVALUE(Fin)-TIMEVALUE(Inicio),1)*1440</code>.</li>
-            <li data-i18n-html="guideCard4Li3"><strong>XP con Bonos y Modo IA:</strong> <code>=ROUND(Duracion * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoMeta + BonoModoIA), 0)</code>.</li>
+            <li data-i18n-html="guideCard4Li2"><strong>Duración (Minutos):</strong> Calculada en JS a partir de <code>Hora_Inicio</code> y <code>Hora_Fin</code> (soporta cruce de medianoche).</li>
+            <li data-i18n-html="guideCard4Li3"><strong>XP con Bonos y Modo IA:</strong> <code>ROUND(Duracion * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoMeta + BonoModoIA))</code>.</li>
           </ul>
         </div>
       </div>

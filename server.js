@@ -1,7 +1,7 @@
 /**
- * Servidor Local de Sincronización Automática (Cero dependencias externas).
+ * Servidor Local de Sincronización Automática CSV (Cero dependencias externas).
  * Sirve el frontend en http://localhost:3000 y sincroniza en tiempo real
- * todas las altas, bajas y ediciones directamente sobre data/study-tracker.xlsx.
+ * todas las altas, bajas y ediciones directamente sobre data/study-tracker.csv.
  */
 const http = require("node:http");
 const fs = require("node:fs");
@@ -10,15 +10,15 @@ const path = require("node:path");
 const PORT = process.env.PORT || 3000;
 const ROOT_DIR = __dirname;
 const DATA_DIR = path.join(ROOT_DIR, "data");
-const EXCEL_FILE_PATH = path.join(DATA_DIR, "study-tracker.xlsx");
-const EXCEL_RELATIVE_PATH = "data/study-tracker.xlsx";
+const CSV_FILE_PATH = path.join(DATA_DIR, "study-tracker.csv");
+const CSV_RELATIVE_PATH = "data/study-tracker.csv";
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
-  ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ".csv": "text/csv; charset=utf-8",
   ".png": "image/png",
   ".svg": "image/svg+xml",
   ".ico": "image/x-icon"
@@ -40,11 +40,11 @@ function enviarJSON(res, statusCode, payload) {
 
 function manejarApiStatus(req, res) {
   asegurarDirectorioDatos();
-  const existe = fs.existsSync(EXCEL_FILE_PATH);
+  const existe = fs.existsSync(CSV_FILE_PATH);
   let updatedAt = null;
   if (existe) {
     try {
-      const stats = fs.statSync(EXCEL_FILE_PATH);
+      const stats = fs.statSync(CSV_FILE_PATH);
       updatedAt = stats.mtime.toISOString();
     } catch (_) {
       updatedAt = null;
@@ -52,27 +52,29 @@ function manejarApiStatus(req, res) {
   }
   enviarJSON(res, 200, {
     ok: true,
+    csvExists: existe,
     excelExists: existe,
-    excelPath: EXCEL_RELATIVE_PATH,
+    csvPath: CSV_RELATIVE_PATH,
+    excelPath: CSV_RELATIVE_PATH,
     updatedAt
   });
 }
 
-function manejarGetExcel(req, res) {
+function manejarGetCsv(req, res) {
   asegurarDirectorioDatos();
-  if (!fs.existsSync(EXCEL_FILE_PATH)) {
+  if (!fs.existsSync(CSV_FILE_PATH)) {
     enviarJSON(res, 404, {
       ok: false,
       error: "NOT_FOUND",
-      message: "El archivo Excel aún no existe en data/study-tracker.xlsx"
+      message: "El archivo CSV aún no existe en data/study-tracker.csv"
     });
     return;
   }
 
   try {
-    const buffer = fs.readFileSync(EXCEL_FILE_PATH);
+    const buffer = fs.readFileSync(CSV_FILE_PATH);
     res.writeHead(200, {
-      "Content-Type": MIME_TYPES[".xlsx"],
+      "Content-Type": MIME_TYPES[".csv"],
       "Content-Length": buffer.length,
       "Cache-Control": "no-store"
     });
@@ -81,12 +83,12 @@ function manejarGetExcel(req, res) {
     enviarJSON(res, 500, {
       ok: false,
       error: err.code || "READ_ERROR",
-      message: "No se pudo leer data/study-tracker.xlsx"
+      message: "No se pudo leer data/study-tracker.csv"
     });
   }
 }
 
-function manejarPutExcel(req, res) {
+function manejarPutCsv(req, res) {
   asegurarDirectorioDatos();
   const chunks = [];
 
@@ -97,17 +99,18 @@ function manejarPutExcel(req, res) {
       enviarJSON(res, 400, {
         ok: false,
         error: "EMPTY_BODY",
-        message: "No se recibieron datos para guardar en el archivo Excel."
+        message: "No se recibieron datos para guardar en el archivo CSV."
       });
       return;
     }
 
     try {
-      fs.writeFileSync(EXCEL_FILE_PATH, buffer);
-      const stats = fs.statSync(EXCEL_FILE_PATH);
+      fs.writeFileSync(CSV_FILE_PATH, buffer);
+      const stats = fs.statSync(CSV_FILE_PATH);
       enviarJSON(res, 200, {
         ok: true,
-        excelPath: EXCEL_RELATIVE_PATH,
+        csvPath: CSV_RELATIVE_PATH,
+        excelPath: CSV_RELATIVE_PATH,
         updatedAt: stats.mtime.toISOString()
       });
     } catch (err) {
@@ -116,7 +119,7 @@ function manejarPutExcel(req, res) {
           ok: false,
           error: "FILE_LOCKED",
           message:
-            "El archivo data/study-tracker.xlsx está abierto en Microsoft Excel. Ciérralo y pulsa 'Sincronizar ahora'."
+            "El archivo data/study-tracker.csv está bloqueado por otro programa. Ciérralo y pulsa 'Sincronizar CSV'."
         });
         return;
       }
@@ -124,7 +127,7 @@ function manejarPutExcel(req, res) {
       enviarJSON(res, 500, {
         ok: false,
         error: err.code || "WRITE_ERROR",
-        message: "Error al escribir en data/study-tracker.xlsx: " + err.message
+        message: "Error al escribir en data/study-tracker.csv: " + err.message
       });
     }
   });
@@ -175,13 +178,13 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (pathname === "/api/excel" && req.method === "GET") {
-    manejarGetExcel(req, res);
+  if ((pathname === "/api/csv" || pathname === "/api/excel") && req.method === "GET") {
+    manejarGetCsv(req, res);
     return;
   }
 
-  if (pathname === "/api/excel" && req.method === "PUT") {
-    manejarPutExcel(req, res);
+  if ((pathname === "/api/csv" || pathname === "/api/excel") && req.method === "PUT") {
+    manejarPutCsv(req, res);
     return;
   }
 
@@ -192,7 +195,6 @@ server.listen(PORT, () => {
   asegurarDirectorioDatos();
   console.log("==========================================================");
   console.log(`🚀 StudyTracker ejecutándose en: http://localhost:${PORT}`);
-  console.log(`📊 Archivo Excel vinculado:      ${EXCEL_RELATIVE_PATH}`);
+  console.log(`📄 Archivo CSV vinculado:        ${CSV_RELATIVE_PATH}`);
   console.log("==========================================================");
 });
-

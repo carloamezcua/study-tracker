@@ -180,13 +180,25 @@
       btnHoraFin.addEventListener("click", () => UI.ponerHoraActual("horaFin"));
     }
 
-    // Botón: Sincronizar / Guardar manualmente en el Excel del servidor
+    // Botón: Sincronizar / Guardar manualmente en el CSV del servidor (o vincular archivo local desde el navegador)
     const btnSincronizarServidor = document.getElementById("btnSincronizarServidor");
     if (btnSincronizarServidor) {
       btnSincronizarServidor.addEventListener("click", async () => {
         if (!ExcelService.estaServidorConectado()) {
           const conexion = await ExcelService.inicializarConexionServidor(store.getSesiones());
           if (!conexion.conectado) {
+            if (typeof ExcelService.vincularArchivoLocalNavegador === "function") {
+              const vinculado = await ExcelService.vincularArchivoLocalNavegador(store.getSesiones());
+              if (vinculado.ok) {
+                if (vinculado.sesiones && vinculado.sesiones.length > 0) {
+                  UI.salirModoEdicion();
+                  store.reemplazarSesiones(vinculado.sesiones, "servidor_init");
+                }
+                fijarEstadoArchivo("statusLiveSynced", { path: vinculado.nombreArchivo }, "connected");
+                return;
+              }
+              if (vinculado.cancelado) return;
+            }
             alert(t("alertServerOffline"));
             return;
           }
@@ -250,6 +262,18 @@
           UI.salirModoEdicion();
           store.vaciarSesiones();
         }
+      });
+    }
+
+    // Botón para alternar entre los últimos 5 registros y todo el historial
+    const btnToggleHistorial = document.getElementById("btnToggleHistorial");
+    if (btnToggleHistorial) {
+      btnToggleHistorial.addEventListener("click", () => {
+        UI.alternarVistaHistorial();
+        UI.renderizarDashboard(store.getSesiones(), {
+          onEditarSesion: manejarEditarSesion,
+          onEliminarSesion: manejarEliminarSesion
+        });
       });
     }
   }

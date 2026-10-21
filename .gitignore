@@ -1,5 +1,6 @@
-# Carpeta de datos locales y archivos Excel personales
+# Carpeta de datos locales y archivos CSV / Excel personales
 data/
+*.csv
 *.xlsx
 *.xls
 

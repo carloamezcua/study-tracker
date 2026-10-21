@@ -17,24 +17,24 @@
       // Top bar
       brandTitle: "⚔️ StudyTracker — Analytics & RPG",
       brandSubtitle:
-        'Sincronización en vivo con <code>data/study-tracker.xlsx</code> (Altas, ediciones y bajas en tiempo real)',
+        'Sincronización en vivo con <code>data/study-tracker.csv</code> (Altas, ediciones y bajas en tiempo real)',
       statusConnecting: "Conectando con servidor local...",
       statusBrowserMode:
-        "Modo navegador (Ejecuta start.bat para sincronizar data/study-tracker.xlsx)",
+        "Modo navegador (Pulsa 'Sincronizar CSV' para vincular un archivo .csv o ejecuta start.bat)",
       statusLiveSynced: "🟢 Sincronizado en vivo: {path}",
-      statusReloaded: "🟢 Recargado desde: data/study-tracker.xlsx",
+      statusReloaded: "🟢 Recargado desde: data/study-tracker.csv",
       statusLoadedFile: "Cargado: {file}",
-      statusExcelLocked: "⚠️ Archivo abierto en Excel — Ciérralo y pulsa 'Sincronizar'",
-      btnSyncExcel: "🔄 Sincronizar Excel",
+      statusExcelLocked: "⚠️ Archivo CSV bloqueado — Ciérralo y pulsa 'Sincronizar CSV'",
+      btnSyncExcel: "🔄 Sincronizar CSV",
       btnSyncExcelTitle:
-        "Guarda inmediatamente todos los registros actuales en data/study-tracker.xlsx",
-      btnReloadExcel: "📂 Recargar de Excel",
+        "Guarda inmediatamente todos los registros actuales en data/study-tracker.csv (o vincula un .csv local)",
+      btnReloadExcel: "📂 Recargar CSV",
       btnReloadExcelTitle:
-        "Vuelve a leer data/study-tracker.xlsx si hiciste cambios manuales desde Microsoft Excel",
-      btnImportExcel: "📤 Importar otro .xlsx",
-      btnImportExcelTitle: "Importar un archivo .xlsx externo",
-      btnExportExcel: "📥 Descargar copia (.xlsx)",
-      btnExportExcelTitle: "Descarga una copia de respaldo de study-tracker.xlsx",
+        "Vuelve a leer data/study-tracker.csv si hiciste cambios manuales en el archivo",
+      btnImportExcel: "📤 Importar .csv",
+      btnImportExcelTitle: "Importar un archivo .csv externo",
+      btnExportExcel: "📥 Descargar copia (.csv)",
+      btnExportExcelTitle: "Descarga una copia de respaldo de study-tracker.csv",
 
       // Banner RPG
       rpgLevelSmall: "Nivel",
@@ -65,7 +65,7 @@
       formTitleNew: "➕ Registrar Sesión",
       formTitleEdit: "✏️ Editando Sesión",
       formSubtitle:
-        'Cronometra tu sesión o regístrala en 1 clic. Sincronización automática con <code>data/study-tracker.xlsx</code>.',
+        'Cronometra tu sesión o regístrala en 1 clic. Sincronización automática con <code>data/study-tracker.csv</code>.',
       timerTabStopwatch: "⏱️ Cronómetro",
       timerTabStopwatchTitle: "Cuenta progresiva con captura de inicio y fin",
       timerTabPomodoro: "🍅 Pomodoro",
@@ -98,8 +98,8 @@
       previewDurationBonuses: "⏱️ {min} min ({bonuses})",
       bonusChallenge: "+10% reto",
       bonusHard: "+20% difícil",
-      bonusGoalYes: "+10% meta",
-      bonusGoalPartial: "+5% avance",
+      bonusGoalYes: "+10% buen avance",
+      bonusGoalPartial: "+5% con tropiezos",
       bonusAiAuton: "+5% autónomo",
       bonusAiDialogue: "+5% diálogo IA",
       bonusAiMech: "-15% mecánico",
@@ -120,12 +120,13 @@
       labelEnergy: "Energía Previa",
       labelComplexity: "Complejidad",
       labelComplexityHint: "(+XP)",
-      labelGoal: "¿Objetivo Cumplido?",
-      labelGoalHint: "(+10% Sí · +5% Parcial)",
+      labelGoal: "¿Avance del Bloque / Meta?",
+      labelGoalHint: "(+10% Buen avance · +5% Con tropiezos)",
       labelAiMode: "Modo de Uso de IA",
       labelAiModeHint: "(+5% Autónomo/Diálogo · -15% Mecánico)",
       labelAiSlider: "Porcentaje de apoyo IA:",
       labelQuality: "Calidad de Aprendizaje / Asimilación (1 al 5)",
+      labelQualityClass: "Concentración, Interés y Retención en Clase (1 al 5)",
       qualityOpt1: "1 - ⭐️ Mecánico / Sin retención (Solo copié o distraído)",
       qualityOpt2: "2 - ⭐️⭐️ Superficial / Pasivo (Entendí por encima)",
       qualityOpt3: "3 - ⭐️⭐️⭐️ Comprensión estándar (Entendí la lógica)",
@@ -134,15 +135,38 @@
       labelNotes: "Notas breves",
       placeholderNotes: "¿Qué aprendiste, qué debatiste o dónde te trabaste?",
       btnSubmitNew: "💾 Registrar Sesión y Sumar XP",
-      btnSubmitEdit: "💾 Actualizar Sesión y Sincronizar Excel",
+      btnSubmitEdit: "💾 Actualizar Sesión y Sincronizar CSV",
       btnCancelEdit: "✖ Cancelar edición",
 
       // Textos dinámicos de ayuda en el formulario
-      helpGoalYes: "Meta lograda: completaste lo planeado para este bloque (+10% XP).",
+      helpActPrep:
+        "🗂️ Antes de estudiar/programar: armar el ambiente, recopilar fuentes o 'masticar' contexto en un LLM para reutilizarlo en varias sesiones.",
+      helpActClass:
+        "👨‍🏫 En vivo con profesor: mide tu atención e interés. Por defecto pone IA en 0%, pero si usaste IA en clase (para resolver dudas o para acabar rápido una actividad), selecciona abajo el Modo de IA correspondiente.",
+      helpActTheory:
+        "📖 Estudio estructurado por tu cuenta: leer documentación oficial, libros, artículos técnicos o ver un curso grabado.",
+      helpActResearch:
+        "💬 Explorar dudas abiertas: investigar cómo/por qué funciona algo, comparar opciones o debatir conceptos a fondo (ej. tutoría socrática con IA).",
+      helpActDesign:
+        "✍️ Sintetizar y estructurar: redactar apuntes propios (en cuaderno o compu), hacer resúmenes, diagramas o planear una arquitectura.",
+      helpActDev:
+        "💻 Construir e implementar: escribir código, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea.",
+      helpActPractice:
+        "🧪 Ejercitar o destrabar: resolver problemas prácticos, laboratorios o depurar errores (debugging) hasta corregir la causa.",
+      helpActReview:
+        "🔁 Consolidar memoria: repasar apuntes previos, flashcards, explicar un tema sin mirar o hacer exámenes de simulacro.",
+      helpGoalYes:
+        "Buen avance del bloque (+10% XP): completaste la meta o avanzaste a buen ritmo en una tarea larga que seguirá en otra sesión.",
       helpGoalPartial:
-        "En progreso: hubo avance real y aprendizaje, pero continuará en otra sesión (+5% XP).",
+        "Avance con tropiezos (+5% XP): hubo progreso, pero fue menor o más lento de lo esperado por dudas o distracciones.",
       helpGoalNo:
-        "Bloqueo o sin avance: te trabaste en un error, hubo distracción total o interrupción (0% bono, alerta de bloqueo).",
+        "Bloqueo o sin avance (0% bono): te trabaste en un error, hubo distracción total o interrupción (alerta de bloqueo).",
+      helpQualityClassNote:
+        " 👨‍🏫 En Clase: evalúa aquí tu nivel de concentración, interés y retención de la cátedra.",
+      helpQualityClassAiDialogue:
+        " 👨‍🏫 Clase + IA de apoyo: usaste IA para despejar dudas que surgieron en vivo; califica qué tanto comprendiste y retuviste la clase.",
+      helpQualityClassAiMech:
+        " ⚠️ Clase + IA Mecánica: si usaste IA solo para acabar rápido una actividad de clase sin procesarla, considera nivel 1 o 2 (además del ajuste de -15% XP).",
       helpQuality1:
         "Mecánico / Sin retención: Solo copié/pegué respuestas o estuve distraído; no asimilé el tema.",
       helpQuality2:
@@ -177,7 +201,7 @@
       chart3Title: "🧠 Patrones de Hábito: Actividad y Energía Previa",
       chart3Hint: "Comportamiento por tipo de tarea y fatiga",
       chart3Subtitle:
-        "Minutos y asimilación promedio según los 6 tipos de actividad y cómo rinde tu aprendizaje según tu energía inicial.",
+        "Minutos y asimilación promedio según los 8 tipos de actividad y cómo rinde tu aprendizaje según tu energía inicial.",
       chartNoData: "Sin datos",
       chartAxisMinutes: "Minutos",
       chartAxisAssimilation: "Asimilación (1-5)",
@@ -194,6 +218,10 @@
       // Tabla de Historial
       historyTitle: "📋 Historial de Sesiones Registradas (Clic en ✏️ para editar o ✖ para borrar)",
       btnClearAll: "🗑️ Vaciar todo / Reiniciar a 0",
+      historyShowingRecent: "Mostrando los últimos {shown} de {total} registros (más recientes primero)",
+      historyShowingAll: "Mostrando los {total} registros (más recientes primero)",
+      btnShowAllHistory: "📂 Ver todos ({total})",
+      btnShowRecentHistory: "⬆️ Mostrar solo últimos 5",
       thDateSlot: "Fecha / Franja",
       thSchedule: "Horario",
       thSubjectTopic: "Materia / Tema",
@@ -212,7 +240,7 @@
       // Guía de Referencia inferior
       guideMainTitle: "📖 Guía de Referencia y Escalas del Sistema",
       guideMainSubtitle:
-        "Documentación integrada para evaluar el impacto cognitivo de cada bloque y cómo se calculan las fórmulas en Excel.",
+        "Documentación integrada para evaluar el impacto cognitivo de cada bloque y cómo se calculan las métricas en JavaScript y CSV.",
       guideCard1Title: "⭐️ Calidad de Aprendizaje / Asimilación (1 al 5)",
       guideCard1Li1:
         "<strong>1 (Mecánico / Sin retención):</strong> Solo copié/pegué respuestas o estuve distraído; no asimilé el tema.",
@@ -224,15 +252,15 @@
         "<strong>4 (Aprendizaje sólido):</strong> Razoné activamente el problema, comprendí el porqué y puedo replicarlo.",
       guideCard1Li5:
         "<strong>5 (Asimilación profunda):</strong> Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda.",
-      guideCard2Title: "🧠 Contexto y 6 Tipos de Actividad",
+      guideCard2Title: "🧠 Contexto y 8 Tipos de Actividad",
       guideCard2Li1:
         "<strong>Contexto:</strong> <code>🎓 Académico</code>, <code>🏅 Certificación</code>, <code>🚀 Proyecto Propio</code>, <code>🤝 Externo</code>.",
       guideCard2Li2:
-        "<strong>Actividades:</strong> <code>📖 Teoría / Docs</code>, <code>💬 Investigación / Diálogo</code>, <code>✍️ Diseño / Apuntes</code>, <code>💻 Desarrollo / Código</code>, <code>🧪 Práctica / Debugging</code>, <code>🔁 Repaso / Simulacro</code>.",
+        "<strong>Actividades:</strong> <code>🗂️ Preparación / Contexto</code>, <code>👨‍🏫 Clase / Cátedra</code>, <code>📖 Teoría / Docs</code>, <code>💬 Investigación / Diálogo</code>, <code>✍️ Diseño / Apuntes</code>, <code>💻 Desarrollo / Código</code>, <code>🧪 Práctica / Debugging</code>, <code>🔁 Repaso / Simulacro</code>.",
       guideCard2Li3:
         "<strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code>.",
       guideCard2Li4:
-        "<strong>Objetivo:</strong> <code>✅ Sí (+10% XP)</code>, <code>⚠️ Parcial (+5% XP)</code>, <code>❌ No (0% / Bloqueo)</code>.",
+        "<strong>Avance del Bloque:</strong> <code>✅ Sí (+10% XP: buen avance)</code>, <code>⚠️ Parcial (+5% XP: con tropiezos)</code>, <code>❌ No (0% / Bloqueo)</code>.",
       guideCard3Title: "🤖 Modo de Uso de IA (Impacto Cognitivo)",
       guideCard3Li1:
         "<strong>🧠 Autónomo (+5% XP):</strong> 100% por tu cuenta (0% IA).",
@@ -242,47 +270,47 @@
         "<strong>🛠️ Copiloto / Apoyo (0% ajuste):</strong> Consulta puntual de sintaxis o desbloqueo de bugs entendiendo la solución.",
       guideCard3Li4:
         "<strong>🤖 Mecánico / Copy-Paste (-15% XP):</strong> Automatización directa para entregar rápido sin leer a fondo.",
-      guideCard4Title: "🧮 Curva Exponencial y Fórmulas en Excel",
+      guideCard4Title: "🧮 Curva Exponencial y Fórmulas en JavaScript",
       guideCard4Li1:
         "<strong>Curva RPG (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code> (El XP necesario se duplica cada 7 niveles).",
       guideCard4Li2:
-        "<strong>Duración (Minutos):</strong> <code>=MOD(TIMEVALUE(Fin)-TIMEVALUE(Inicio),1)*1440</code>.",
+        "<strong>Duración (Minutos):</strong> Calculada automáticamente en JS a partir de <code>Hora_Inicio</code> y <code>Hora_Fin</code> (soporta cruce de medianoche).",
       guideCard4Li3:
-        "<strong>XP con Bonos y Modo IA:</strong> <code>=ROUND(Duracion * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoMeta + BonoModoIA), 0)</code>.",
+        "<strong>XP con Bonos y Modo IA:</strong> <code>ROUND(Duracion * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoMeta + BonoModoIA))</code>.",
 
       // Alertas y confirmaciones
       alertServerOffline:
-        "El servidor local no está activo. Ejecuta 'start.bat' o 'npm start' para activar el guardado directo en data/study-tracker.xlsx.",
+        "El servidor local no está activo. Ejecuta 'start.bat' o 'npm start' para activar el guardado directo en data/study-tracker.csv.",
       alertReloadError:
-        "No se pudo leer data/study-tracker.xlsx desde el servidor local. Asegúrate de haber iniciado 'start.bat' o 'npm start'.",
+        "No se pudo leer data/study-tracker.csv desde el servidor local. Asegúrate de haber iniciado 'start.bat' o 'npm start'.",
       alertImportError:
-        "No se pudo leer el archivo seleccionado. Verifica que sea un .xlsx válido.",
+        "No se pudo leer el archivo seleccionado. Verifica que sea un .csv válido.",
       confirmClearAll:
-        "¿Seguro que deseas vaciar todas las sesiones registradas en el dashboard y en el Excel?"
+        "¿Seguro que deseas vaciar todas las sesiones registradas en el dashboard y en el CSV?"
     },
 
     en: {
       // Top bar
       brandTitle: "⚔️ StudyTracker — Analytics & RPG",
       brandSubtitle:
-        'Live sync with <code>data/study-tracker.xlsx</code> (Real-time create, edit & delete)',
+        'Live sync with <code>data/study-tracker.csv</code> (Real-time create, edit & delete)',
       statusConnecting: "Connecting to local server...",
       statusBrowserMode:
-        "Browser mode (Run start.bat to sync data/study-tracker.xlsx)",
+        "Browser mode (Click 'Sync CSV' to link a local .csv file or run start.bat)",
       statusLiveSynced: "🟢 Live synced: {path}",
-      statusReloaded: "🟢 Reloaded from: data/study-tracker.xlsx",
+      statusReloaded: "🟢 Reloaded from: data/study-tracker.csv",
       statusLoadedFile: "Loaded: {file}",
-      statusExcelLocked: "⚠️ File open in Excel — Close it and click 'Sync Excel'",
-      btnSyncExcel: "🔄 Sync Excel",
+      statusExcelLocked: "⚠️ CSV file locked — Close it and click 'Sync CSV'",
+      btnSyncExcel: "🔄 Sync CSV",
       btnSyncExcelTitle:
-        "Immediately save all current records to data/study-tracker.xlsx",
-      btnReloadExcel: "📂 Reload Excel",
+        "Immediately save all current records to data/study-tracker.csv (or link a local .csv file)",
+      btnReloadExcel: "📂 Reload CSV",
       btnReloadExcelTitle:
-        "Re-read data/study-tracker.xlsx if you made manual edits in Microsoft Excel",
-      btnImportExcel: "📤 Import .xlsx",
-      btnImportExcelTitle: "Import an external .xlsx file",
-      btnExportExcel: "📥 Download Copy (.xlsx)",
-      btnExportExcelTitle: "Download a backup copy of study-tracker.xlsx",
+        "Re-read data/study-tracker.csv if you made manual edits to the file",
+      btnImportExcel: "📤 Import .csv",
+      btnImportExcelTitle: "Import an external .csv file",
+      btnExportExcel: "📥 Download Copy (.csv)",
+      btnExportExcelTitle: "Download a backup copy of study-tracker.csv",
 
       // Banner RPG
       rpgLevelSmall: "Level",
@@ -313,7 +341,7 @@
       formTitleNew: "➕ Log Session",
       formTitleEdit: "✏️ Editing Session",
       formSubtitle:
-        'Time your session or log it in 1 click. Auto-synced with <code>data/study-tracker.xlsx</code>.',
+        'Time your session or log it in 1 click. Auto-synced with <code>data/study-tracker.csv</code>.',
       timerTabStopwatch: "⏱️ Stopwatch",
       timerTabStopwatchTitle: "Count up timer with automatic start & end capture",
       timerTabPomodoro: "🍅 Pomodoro",
@@ -346,8 +374,8 @@
       previewDurationBonuses: "⏱️ {min} min ({bonuses})",
       bonusChallenge: "+10% challenge",
       bonusHard: "+20% hard",
-      bonusGoalYes: "+10% goal",
-      bonusGoalPartial: "+5% progress",
+      bonusGoalYes: "+10% solid progress",
+      bonusGoalPartial: "+5% rough progress",
       bonusAiAuton: "+5% autonomous",
       bonusAiDialogue: "+5% AI dialogue",
       bonusAiMech: "-15% mechanical",
@@ -368,12 +396,13 @@
       labelEnergy: "Prior Energy",
       labelComplexity: "Complexity",
       labelComplexityHint: "(+XP)",
-      labelGoal: "Goal Achieved?",
-      labelGoalHint: "(+10% Yes · +5% Partial)",
+      labelGoal: "Block Progress / Goal?",
+      labelGoalHint: "(+10% Solid progress · +5% Rough progress)",
       labelAiMode: "AI Interaction Mode",
       labelAiModeHint: "(+5% Auton/Dialogue · -15% Mechanical)",
       labelAiSlider: "AI assistance percentage:",
       labelQuality: "Learning Quality / Assimilation (1 to 5)",
+      labelQualityClass: "Class Focus, Interest & Retention (1 to 5)",
       qualityOpt1: "1 - ⭐️ Mechanical / No retention (Copied or distracted)",
       qualityOpt2: "2 - ⭐️⭐️ Superficial / Passive (Surface understanding)",
       qualityOpt3: "3 - ⭐️⭐️⭐️ Standard comprehension (Understood the logic)",
@@ -382,15 +411,38 @@
       labelNotes: "Short notes",
       placeholderNotes: "What did you learn, debate, or get stuck on?",
       btnSubmitNew: "💾 Log Session & Earn XP",
-      btnSubmitEdit: "💾 Update Session & Sync Excel",
+      btnSubmitEdit: "💾 Update Session & Sync CSV",
       btnCancelEdit: "✖ Cancel edit",
 
       // Textos dinámicos de ayuda en el formulario
-      helpGoalYes: "Goal achieved: you completed what was planned for this block (+10% XP).",
+      helpActPrep:
+        "🗂️ Before studying/coding: setting up the environment, gathering sources, or 'digesting' context in an LLM to reuse across multiple sessions.",
+      helpActClass:
+        "👨‍🏫 Live with professor: measures your focus and interest. Defaults to 0% AI, but if you used AI in class (to clarify questions or rush an in-class activity), select the matching AI Mode below.",
+      helpActTheory:
+        "📖 Self-paced structured study: reading official documentation, books, technical articles, or watching a recorded course.",
+      helpActResearch:
+        "💬 Exploring open questions: investigating how/why something works, comparing options, or debating concepts deeply (e.g., Socratic AI tutoring).",
+      helpActDesign:
+        "✍️ Synthesizing & structuring: writing your own notes (notebook or PC), summaries, diagrams, or planning software architecture.",
+      helpActDev:
+        "💻 Building & implementing: writing code, SQL queries, scripts, or developing project/assignment features.",
+      helpActPractice:
+        "🧪 Practicing or unblocking: solving hands-on exercises, labs, or debugging errors until finding and fixing the root cause.",
+      helpActReview:
+        "🔁 Consolidating memory: reviewing past notes, flashcards, explaining a topic from memory, or taking mock exams.",
+      helpGoalYes:
+        "Solid block progress (+10% XP): you finished the goal or made steady progress on a long multi-session task.",
       helpGoalPartial:
-        "In progress: real progress and learning occurred, to be continued next session (+5% XP).",
+        "Progress with hurdles (+5% XP): you moved forward, but slower than expected due to doubts or partial distractions.",
       helpGoalNo:
-        "Blocked or no progress: stuck on an error, total distraction, or interruption (0% bonus, blocker alert).",
+        "Blocked or no progress (0% bonus): stuck on an error, total distraction, or interruption (blocker alert).",
+      helpQualityClassNote:
+        " 👨‍🏫 In Class: use this scale to rate your focus, interest, and retention during the lecture.",
+      helpQualityClassAiDialogue:
+        " 👨‍🏫 Class + AI Support: you used AI to clarify questions that came up live; rate how well you understood and retained the class.",
+      helpQualityClassAiMech:
+        " ⚠️ Class + Mechanical AI: if you used AI just to finish an in-class activity quickly without processing it, consider level 1 or 2 (along with the -15% XP adjustment).",
       helpQuality1:
         "Mechanical / No retention: Only copied/pasted answers or was distracted; did not assimilate the topic.",
       helpQuality2:
@@ -425,7 +477,7 @@
       chart3Title: "🧠 Habit Patterns: Activity & Prior Energy",
       chart3Hint: "Behavior by task type and fatigue",
       chart3Subtitle:
-        "Minutes and average assimilation across the 6 activity types and how your learning performs based on starting energy.",
+        "Minutes and average assimilation across the 8 activity types and how your learning performs based on starting energy.",
       chartNoData: "No data",
       chartAxisMinutes: "Minutes",
       chartAxisAssimilation: "Assimilation (1-5)",
@@ -442,6 +494,10 @@
       // Tabla de Historial
       historyTitle: "📋 Logged Sessions History (Click ✏️ to edit or ✖ to delete)",
       btnClearAll: "🗑️ Clear All / Reset to 0",
+      historyShowingRecent: "Showing latest {shown} of {total} records (newest first)",
+      historyShowingAll: "Showing all {total} records (newest first)",
+      btnShowAllHistory: "📂 View all ({total})",
+      btnShowRecentHistory: "⬆️ Show latest 5 only",
       thDateSlot: "Date / Time Slot",
       thSchedule: "Schedule",
       thSubjectTopic: "Subject / Topic",
@@ -460,7 +516,7 @@
       // Guía de Referencia inferior
       guideMainTitle: "📖 System Reference Guide & Scales",
       guideMainSubtitle:
-        "Built-in documentation to evaluate the cognitive impact of each block and how Excel formulas are calculated.",
+        "Built-in documentation to evaluate the cognitive impact of each block and how metrics are calculated in JavaScript and CSV.",
       guideCard1Title: "⭐️ Learning Quality / Assimilation (1 to 5)",
       guideCard1Li1:
         "<strong>1 (Mechanical / No retention):</strong> Only copied/pasted answers or was distracted; did not assimilate.",
@@ -472,15 +528,15 @@
         "<strong>4 (Solid learning):</strong> Actively reasoned through the problem, understood the 'why', and can replicate it.",
       guideCard1Li5:
         "<strong>5 (Deep assimilation):</strong> Maximum mental effort; mastered the concept and can explain it unaided.",
-      guideCard2Title: "🧠 Context & 6 Activity Types",
+      guideCard2Title: "🧠 Context & 8 Activity Types",
       guideCard2Li1:
         "<strong>Context:</strong> <code>🎓 Academic</code>, <code>🏅 Certification</code>, <code>🚀 Own Project</code>, <code>🤝 External</code>.",
       guideCard2Li2:
-        "<strong>Activities:</strong> <code>📖 Theory / Docs</code>, <code>💬 Research / Dialogue</code>, <code>✍️ Design / Notes</code>, <code>💻 Dev / Code</code>, <code>🧪 Practice / Debugging</code>, <code>🔁 Review / Mock Exam</code>.",
+        "<strong>Activities:</strong> <code>🗂️ Prep / Context</code>, <code>👨‍🏫 Class / Lecture</code>, <code>📖 Theory / Docs</code>, <code>💬 Research / Dialogue</code>, <code>✍️ Design / Notes</code>, <code>💻 Dev / Code</code>, <code>🧪 Practice / Debugging</code>, <code>🔁 Review / Mock Exam</code>.",
       guideCard2Li3:
         "<strong>Prior Energy:</strong> <code>🔋 High</code>, <code>⚡ Medium</code>, <code>🪫 Low</code>.",
       guideCard2Li4:
-        "<strong>Goal:</strong> <code>✅ Yes (+10% XP)</code>, <code>⚠️ Partial (+5% XP)</code>, <code>❌ No (0% / Blocked)</code>.",
+        "<strong>Block Progress:</strong> <code>✅ Yes (+10% XP: solid progress)</code>, <code>⚠️ Partial (+5% XP: with hurdles)</code>, <code>❌ No (0% / Blocked)</code>.",
       guideCard3Title: "🤖 AI Usage Mode (Cognitive Impact)",
       guideCard3Li1:
         "<strong>🧠 Autonomous (+5% XP):</strong> 100% on your own (0% AI).",
@@ -490,23 +546,23 @@
         "<strong>🛠️ Copilot / Support (0% adj.):</strong> Targeted syntax lookup or bug unblocking while understanding the fix.",
       guideCard3Li4:
         "<strong>🤖 Mechanical / Copy-Paste (-15% XP):</strong> Direct automation to deliver quickly without reading deeply.",
-      guideCard4Title: "🧮 Exponential Curve & Excel Formulas",
+      guideCard4Title: "🧮 Exponential Curve & JavaScript Formulas",
       guideCard4Li1:
         "<strong>RPG Curve (Lv. 92 = 50% of 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code> (Required XP doubles every 7 levels).",
       guideCard4Li2:
-        "<strong>Duration (Minutes):</strong> <code>=MOD(TIMEVALUE(End)-TIMEVALUE(Start),1)*1440</code>.",
+        "<strong>Duration (Minutes):</strong> Automatically calculated in JS from <code>Hora_Inicio</code> and <code>Hora_Fin</code> (supports midnight crossover).",
       guideCard4Li3:
-        "<strong>XP with Bonuses & AI Mode:</strong> <code>=ROUND(Duration * MAX(0.5, 1 + Quality*0.2 + ChallengeBonus + GoalBonus + AiModeBonus), 0)</code>.",
+        "<strong>XP with Bonuses & AI Mode:</strong> <code>ROUND(Duration * MAX(0.5, 1 + Quality*0.2 + ChallengeBonus + GoalBonus + AiModeBonus))</code>.",
 
       // Alertas y confirmaciones
       alertServerOffline:
-        "Local server is not running. Run 'start.bat' or 'npm start' to enable direct saving to data/study-tracker.xlsx.",
+        "Local server is not running. Run 'start.bat' or 'npm start' to enable direct saving to data/study-tracker.csv.",
       alertReloadError:
-        "Could not read data/study-tracker.xlsx from local server. Make sure you started 'start.bat' or 'npm start'.",
+        "Could not read data/study-tracker.csv from local server. Make sure you started 'start.bat' or 'npm start'.",
       alertImportError:
-        "Could not read the selected file. Please verify it is a valid .xlsx file.",
+        "Could not read the selected file. Please verify it is a valid .csv file.",
       confirmClearAll:
-        "Are you sure you want to clear all logged sessions in the dashboard and Excel?"
+        "Are you sure you want to clear all logged sessions in the dashboard and CSV?"
     }
   };
 
@@ -528,6 +584,8 @@
     },
     tipoActividad: {
       es: {
+        "Preparación / Contexto": "Preparación / Contexto",
+        "Clase / Cátedra": "Clase / Cátedra",
         "Teoría / Docs": "Teoría / Docs",
         "Investigación / Diálogo": "Investigación / Diálogo",
         "Diseño / Apuntes": "Diseño / Apuntes",
@@ -536,6 +594,8 @@
         "Repaso / Simulacro": "Repaso / Simulacro"
       },
       en: {
+        "Preparación / Contexto": "Prep / Context",
+        "Clase / Cátedra": "Class / Lecture",
         "Teoría / Docs": "Theory / Docs",
         "Investigación / Diálogo": "Research / Dialogue",
         "Diseño / Apuntes": "Design / Notes",
@@ -590,13 +650,13 @@
     },
     objetivoChip: {
       es: {
-        Sí: "✅ Sí (Logrado +10%)",
-        Parcial: "⚠️ Parcial (+5%)",
+        Sí: "✅ Sí (Buen avance +10%)",
+        Parcial: "⚠️ Parcial (Con tropiezos +5%)",
         No: "❌ No (Bloqueo)"
       },
       en: {
-        Sí: "✅ Yes (Achieved +10%)",
-        Parcial: "⚠️ Partial (+5%)",
+        Sí: "✅ Yes (Solid progress +10%)",
+        Parcial: "⚠️ Partial (With hurdles +5%)",
         No: "❌ No (Blocked)"
       }
     },
@@ -733,6 +793,8 @@
     });
 
     const iconosActividad = {
+      "Preparación / Contexto": "🗂️",
+      "Clase / Cátedra": "👨‍🏫",
       "Teoría / Docs": "📖",
       "Investigación / Diálogo": "💬",
       "Diseño / Apuntes": "✍️",
