@@ -52,16 +52,12 @@ Hoy solo hay **XP → Nivel → Rango**. Esto es lo que añadiría profundidad. 
 
 ## 🗃️ Ideas sueltas / sin clasificar
 
-_Pega aquí cualquier cosa sin pensar demasiado._
-
----
+_Ninguna por ahora._
 
 ## ❌ Descartadas
 
-_Anota también lo que decidiste NO hacer y por qué. Evita volver a discutirlo._
-
-| Idea | Fecha | Motivo |
-| ---- | ----- | ------ |
+| Idea                                       | Fecha      | Motivo                                                                                                                             |
+| ------------------------------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Actividad `🗂️ Preparación / Contexto` | 2026-10-20 | No es estudio real sino logística previa; se eliminó del sistema para no ensuciar las métricas cognitivas ni inflar minutos/XP. |
 
 ---
@@ -71,10 +67,11 @@ _Anota también lo que decidiste NO hacer y por qué. Evita volver a discutirlo.
 | Idea                                                                                                                                                                                                                                    | Fecha      | Commit/PR    |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------ |
 | Mostrar solo los últimos 5 registros en el historial (con botón *Ver todos*)                                                                                                                                                        | 2026-10-20 | Tanda 1      |
-| Redefinir *Objetivo Cumplido* a *Fluidez y Avance del Bloque* (`Sí = Flujo limpio +10%`, `Parcial = Con tropiezos +5%`, `No = Bloqueo`) con Regla de Oro para evitar malinterpretaciones                                              | 2026-10-20 | Tanda 1 / 2  |
+| Redefinir *Objetivo Cumplido* a *Fluidez y Avance del Bloque* (`Sí = Flujo limpio +10%`, `Parcial = Con tropiezos +5%`, `No = Bloqueo`) con Regla de Oro para evitar malinterpretaciones                                     | 2026-10-20 | Tanda 1 / 2  |
 | Actividad `👨‍🏫 Clase / Cátedra` con ajuste automático de IA a 0% y escala enfocada en concentración e interés                                                                                                                  | 2026-10-20 | Tanda 1      |
 | Migrar persistencia de `.xlsx` (SheetJS + fórmulas de Excel duplicadas) a `.csv` puro (`data/study-tracker.csv`) con fórmulas 100% en JS                                                                                        | 2026-10-20 | CSV Refactor |
 | Dashboard Analítico Interactivo en 4 pestañas (Evolución Día/Semana/Mes + Racha, Mapa de Calor Circadiano 7×4, Cuadrante Cognitivo IA en burbujas, Balance Consumo/Producción e Inspector de Subtemas/Notas con filtros cruzados) | 2026-10-20 | Analytics v2 |
-| **Tanda 2 — Medio analógico vs. digital (`💻 Digital`, `📝 Papel / A mano`, `🔀 Híbrido`)** en formulario, CSV (20 columnas), tabla y Dashboard Analítico                                                                           | 2026-10-20 | Tanda 2      |
-| **Tanda 2 — Familiaridad del tema (`🌱 Tema Nuevo` vs. `🧱 Con base`)** + nuevo gráfico de **Matriz de Fricción** (`Sí / Parcial / No` por Complejidad y Familiaridad)                                                             | 2026-10-20 | Tanda 2      |
-| Rediseño completo de la **Guía de Referencia del Sistema** en 6 tarjetas temáticas dentro del Dashboard y en `README.md`                                                                                                               | 2026-10-20 | Tanda 2      |
+| **Refactor Tanda 2 — Nivel de Producción Propia (`👀 Consumo`, `📋 Reproducción`, `🧠 Generación propia`)** reemplaza medio digital/papel para capturar esfuerzo cognitivo real sin sesgo de soporte                                  | 2026-10-20 | Tanda 2 Refactor |
+| **Refactor Tanda 2 — Dominio Previo en 3 niveles (`🌱 Nuevo`, `🌿 Con lagunas`, `🌳 Dominado`)** + Matriz de Fricción adaptada y Curva de Dominio en Inspector de Materia                                                          | 2026-10-20 | Tanda 2 Refactor |
+| **Reclasificación de sesiones históricas Cheatsheet (5 sesiones)** como `📋 Reproducción` y `🌿 Con lagunas` (material sintetizado por IA y reproducido a mano)                                                                        | 2026-10-20 | Tanda 2 Refactor |
+| Rediseño completo de la **Guía de Referencia del Sistema** en 6 tarjetas temáticas dentro del Dashboard y en `README.md`                                                                                                     | 2026-10-20 | Tanda 2      |

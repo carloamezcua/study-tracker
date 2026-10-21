@@ -8,8 +8,8 @@
   const {
     CONTEXTOS,
     TIPOS_ACTIVIDAD,
-    MEDIOS_TRABAJO,
-    NIVELES_FAMILIARIDAD,
+    NIVELES_PRODUCCION,
+    NIVELES_DOMINIO,
     MODOS_IA,
     NIVELES_ENERGIA,
     NIVELES_COMPLEJIDAD,
@@ -24,8 +24,8 @@
 
   const VALORES_CONTEXTO = new Set(CONTEXTOS.map((c) => c.valor));
   const VALORES_ACTIVIDAD = new Set(TIPOS_ACTIVIDAD.map((t) => t.valor));
-  const VALORES_MEDIO = new Set((MEDIOS_TRABAJO || []).map((m) => m.valor));
-  const VALORES_FAMILIARIDAD = new Set((NIVELES_FAMILIARIDAD || []).map((f) => f.valor));
+  const VALORES_PRODUCCION = new Set((NIVELES_PRODUCCION || []).map((p) => p.valor));
+  const VALORES_DOMINIO = new Set((NIVELES_DOMINIO || []).map((d) => d.valor));
   const VALORES_MODO_IA = new Set(MODOS_IA.map((m) => m.valor));
   const VALORES_ENERGIA = new Set(NIVELES_ENERGIA.map((e) => e.valor));
   const VALORES_COMPLEJIDAD = new Set(NIVELES_COMPLEJIDAD.map((c) => c.valor));
@@ -35,6 +35,22 @@
     Escuela: "Académico",
     Personal: "Proyecto Propio"
   };
+
+  // Migración del antiguo campo "Familiaridad" (2 niveles) al nuevo "Dominio Previo" (3 niveles)
+  const MAPA_MIGRACION_DOMINIO = {
+    "Con base": "Con lagunas"
+  };
+
+  const ACTIVIDADES_CONSUMO = new Set(["Clase / Cátedra", "Teoría / Docs", "Investigación / Diálogo"]);
+
+  /**
+   * Infiere el Nivel de Producción Propia de sesiones antiguas que no lo tienen definido.
+   */
+  function inferirProduccion(tipoActividad, modoIA, usoIA) {
+    if (ACTIVIDADES_CONSUMO.has(tipoActividad)) return "Consumo";
+    if (modoIA === "Mecánico / Copy-Paste" || usoIA >= 50) return "Reproducción";
+    return "Generación propia";
+  }
 
   const MAPA_MIGRACION_ACTIVIDAD = {
     "Preparación / Contexto": "Teoría / Docs",
@@ -146,28 +162,15 @@
       : "Desarrollo / Código";
 
     const notasStr = String(raw.notas || "").trim();
-    const notasLower = notasStr.toLowerCase();
 
-    let medio = raw.medio;
-    if (!VALORES_MEDIO.has(medio)) {
-      medio =
-        notasLower.includes("a mano") ||
-        notasLower.includes("papel") ||
-        notasLower.includes("cuaderno") ||
-        notasLower.includes("escrito")
-          ? "Analógico / Papel"
-          : "Digital";
-    }
-
-    let familiaridad = raw.familiaridad;
-    if (!VALORES_FAMILIARIDAD.has(familiaridad)) {
-      familiaridad =
-        tipoActividad === "Repaso / Simulacro" ||
-        notasLower.includes("ya vistos") ||
-        notasLower.includes("cheatsheet")
-          ? "Con base"
-          : "Nuevo";
-    }
+    // Dominio Previo (migra el antiguo campo "familiaridad": Con base -> Con lagunas)
+    const dominioCandidato =
+      raw.dominioPrevio || MAPA_MIGRACION_DOMINIO[raw.familiaridad] || raw.familiaridad;
+    const dominioPrevio = VALORES_DOMINIO.has(dominioCandidato)
+      ? dominioCandidato
+      : tipoActividad === "Repaso / Simulacro"
+      ? "Dominado"
+      : "Con lagunas";
 
     const energiaPrevia = VALORES_ENERGIA.has(raw.energiaPrevia)
       ? raw.energiaPrevia
@@ -190,6 +193,11 @@
       usoIA = 0;
     }
 
+    // Nivel de Producción Propia (si falta, se infiere de la actividad y del uso de IA)
+    const produccion = VALORES_PRODUCCION.has(raw.produccion)
+      ? raw.produccion
+      : inferirProduccion(tipoActividad, modoIA, usoIA);
+
     const duracionCalculada = calcularMinutos(horaInicio, horaFin);
     const duracion =
       raw.duracion !== undefined && Number(raw.duracion) > 0 && !raw.recalcularDuracion
@@ -209,8 +217,8 @@
       materia,
       tema,
       tipoActividad,
-      medio,
-      familiaridad,
+      produccion,
+      dominioPrevio,
       energiaPrevia,
       complejidad,
       objetivoCumplido,

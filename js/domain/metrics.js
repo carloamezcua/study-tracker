@@ -83,39 +83,51 @@
     }
   ];
 
-  const MEDIOS_TRABAJO = [
+  // Nivel de Producción Propia: mide QUIÉN generó el contenido (tu cabeza vs. una fuente / IA),
+  // sin importar el soporte físico (papel o pantalla).
+  const NIVELES_PRODUCCION = [
     {
-      valor: "Digital",
-      icono: "💻",
-      etiqueta: "💻 Digital (PC / Teclado)",
-      ayuda: "Trabajo en computadora, IDE o notas digitales."
+      valor: "Consumo",
+      icono: "👀",
+      etiqueta: "👀 Consumo",
+      ayuda:
+        "👀 Consumo: leíste, viste o escuchaste sin producir nada propio (PDF, video, documentación, clase)."
     },
     {
-      valor: "Analógico / Papel",
-      icono: "📝",
-      etiqueta: "📝 Analógico / Papel (A mano)",
-      ayuda: "Escritura a mano en cuaderno, hojas o pizarrón: fuerza a sintetizar sin copy-paste y eleva la retención."
+      valor: "Reproducción",
+      icono: "📋",
+      etiqueta: "📋 Reproducción",
+      ayuda:
+        "📋 Reproducción: escribiste o programaste, pero copiando o siguiendo algo ya masticado por una fuente o la IA (a mano o en teclado). Hay algo de retención, pero te saltas los obstáculos que obligan a pensar."
     },
     {
-      valor: "Híbrido",
-      icono: "🔀",
-      etiqueta: "🔀 Híbrido (PC + Papel)",
-      ayuda: "Combinación de lectura/código en pantalla con esquemas, fórmulas o apuntes escritos a mano."
+      valor: "Generación propia",
+      icono: "🧠",
+      etiqueta: "🧠 Generación propia",
+      ayuda:
+        "🧠 Generación propia: lo escribiste o programaste con TUS palabras y TU lógica, enfrentando los obstáculos tú mismo (a mano o en PC). Es el tipo de esfuerzo que más retención genera."
     }
   ];
 
-  const NIVELES_FAMILIARIDAD = [
+  // Dominio Previo: cuánto sabías del tema ANTES de sentarte (la dificultad de HOY va en Complejidad).
+  const NIVELES_DOMINIO = [
     {
       valor: "Nuevo",
       icono: "🌱",
-      etiqueta: "🌱 Tema Nuevo (1ª vez)",
-      ayuda: "Primer acercamiento al concepto: normal que tome más tiempo y requiera mayor carga cognitiva."
+      etiqueta: "🌱 Nuevo",
+      ayuda: "🌱 Nuevo: primera vez que ves el concepto."
     },
     {
-      valor: "Con base",
-      icono: "🧱",
-      etiqueta: "🧱 Con base previa / Ya visto",
-      ayuda: "Ya conocías los fundamentos o habías visto el tema antes: el flujo suele ser más constante y ágil."
+      valor: "Con lagunas",
+      icono: "🌿",
+      etiqueta: "🌿 Visto, con lagunas",
+      ayuda: "🌿 Visto, con lagunas: ya lo conocías, pero no lo dominas; quedan huecos o te sigue costando."
+    },
+    {
+      valor: "Dominado",
+      icono: "🌳",
+      etiqueta: "🌳 Dominado",
+      ayuda: "🌳 Dominado: lo manejas bien; es repaso o mantenimiento (ej. derivadas)."
     }
   ];
 
@@ -593,9 +605,9 @@
     const pctProduccion = totalMinBalance ? Math.round((minProduccion / totalMinBalance) * 100) : 0;
     const pctConsumo = totalMinBalance ? 100 - pctProduccion : 0;
 
-    // 7. Rendimiento según Medio de Trabajo (Digital vs. Analógico / Papel vs. Híbrido)
-    const resumenMedio = MEDIOS_TRABAJO.map((med) => {
-      const filtradas = lista.filter((s) => (s.medio || "Digital") === med.valor);
+    // 7. Rendimiento según Nivel de Producción Propia (Consumo vs. Reproducción vs. Generación propia)
+    const resumenProduccion = NIVELES_PRODUCCION.map((med) => {
+      const filtradas = lista.filter((s) => (s.produccion || "Reproducción") === med.valor);
       const conteo = filtradas.length;
       const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
       const calidadProm = conteo
@@ -613,9 +625,9 @@
       };
     });
 
-    // 8. Rendimiento según Familiaridad del Tema (Nuevo vs. Con base)
-    const resumenFamiliaridad = NIVELES_FAMILIARIDAD.map((fam) => {
-      const filtradas = lista.filter((s) => (s.familiaridad || "Con base") === fam.valor);
+    // 8. Rendimiento según Dominio Previo del Tema (Nuevo vs. Con lagunas vs. Dominado)
+    const resumenDominio = NIVELES_DOMINIO.map((fam) => {
+      const filtradas = lista.filter((s) => (s.dominioPrevio || "Con lagunas") === fam.valor);
       const conteo = filtradas.length;
       const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
       const calidadProm = conteo
@@ -636,20 +648,21 @@
       };
     });
 
-    // 9. Matriz de Fricción: distribución Sí / Parcial / No por Complejidad y Familiaridad
+    // 9. Matriz de Fricción: distribución Sí / Parcial / No por Complejidad y Dominio Previo
     const categoriasFriccion = [
       { clave: "Fácil", tipo: "complejidad", etiqueta: "🟢 Fácil" },
       { clave: "Desafiante", tipo: "complejidad", etiqueta: "🟡 Desafiante" },
       { clave: "Muy difícil", tipo: "complejidad", etiqueta: "🔴 Muy difícil" },
-      { clave: "Nuevo", tipo: "familiaridad", etiqueta: "🌱 Tema Nuevo" },
-      { clave: "Con base", tipo: "familiaridad", etiqueta: "🧱 Con base" }
+      { clave: "Nuevo", tipo: "dominioPrevio", etiqueta: "🌱 Nuevo" },
+      { clave: "Con lagunas", tipo: "dominioPrevio", etiqueta: "🌿 Con lagunas" },
+      { clave: "Dominado", tipo: "dominioPrevio", etiqueta: "🌳 Dominado" }
     ];
 
     const matrizFriccion = categoriasFriccion.map((cat) => {
       const sub = lista.filter((s) =>
         cat.tipo === "complejidad"
           ? (s.complejidad || "Desafiante") === cat.clave
-          : (s.familiaridad || "Con base") === cat.clave
+          : (s.dominioPrevio || "Con lagunas") === cat.clave
       );
       const total = sub.length;
       const si = sub.filter((s) => s.objetivoCumplido === "Sí").length;
@@ -675,8 +688,8 @@
       resumenContextos,
       resumenObjetivos,
       resumenComplejidad,
-      resumenMedio,
-      resumenFamiliaridad,
+      resumenProduccion,
+      resumenDominio,
       matrizFriccion,
       balanceCognitivo: {
         minConsumo,
@@ -934,8 +947,8 @@
         tema: s.tema || "General",
         modoIA: modo,
         tipoActividad: s.tipoActividad || "Desarrollo / Código",
-        medio: s.medio || "Digital",
-        familiaridad: s.familiaridad || "Con base",
+        produccion: s.produccion || "Reproducción",
+        dominioPrevio: s.dominioPrevio || "Con lagunas",
         fecha: s.fecha || ""
       });
     });
@@ -953,12 +966,18 @@
 
   /**
    * Desglosa las sesiones por Subtema (Tema específico) y recopila la bitácora de notas.
+   * Incluye la "Curva de Dominio" de cada subtema: la secuencia cronológica de su Dominio Previo
+   * (ej. Nuevo → Con lagunas → Dominado), compactando repeticiones consecutivas.
    */
   function analizarInspectorMateria(sesiones) {
     const lista = Array.isArray(sesiones) ? sesiones : [];
     const mapaTemas = {};
 
-    lista.forEach((s) => {
+    const ordenadas = [...lista].sort((a, b) =>
+      `${a.fecha || ""} ${a.horaInicio || ""}`.localeCompare(`${b.fecha || ""} ${b.horaInicio || ""}`)
+    );
+
+    ordenadas.forEach((s) => {
       const mat = (s.materia || "General").trim() || "General";
       const tem = (s.tema || "General").trim() || "General";
       const key = `${mat}|||${tem}`;
@@ -972,7 +991,8 @@
           sumaCalidad: 0,
           sumaIA: 0,
           xp: 0,
-          ultimaFecha: s.fecha || ""
+          ultimaFecha: s.fecha || "",
+          curvaDominio: []
         };
       }
 
@@ -984,6 +1004,11 @@
       item.xp += Number(s.xp) || 0;
       if ((s.fecha || "") >= item.ultimaFecha) {
         item.ultimaFecha = s.fecha || "";
+      }
+
+      const dominio = s.dominioPrevio || "Con lagunas";
+      if (item.curvaDominio[item.curvaDominio.length - 1] !== dominio) {
+        item.curvaDominio.push(dominio);
       }
     });
 
@@ -1011,6 +1036,22 @@
   function obtenerTextoAyudaActividad(tipoActividad) {
     const item = TIPOS_ACTIVIDAD.find((a) => a.valor === tipoActividad);
     return item ? item.ayuda : TIPOS_ACTIVIDAD[4].ayuda;
+  }
+
+  /**
+   * Devuelve el texto explicativo para un Nivel de Producción Propia.
+   */
+  function obtenerTextoAyudaProduccion(produccion) {
+    const item = NIVELES_PRODUCCION.find((p) => p.valor === produccion);
+    return item ? item.ayuda : NIVELES_PRODUCCION[1].ayuda;
+  }
+
+  /**
+   * Devuelve el texto explicativo para un nivel de Dominio Previo.
+   */
+  function obtenerTextoAyudaDominio(dominioPrevio) {
+    const item = NIVELES_DOMINIO.find((d) => d.valor === dominioPrevio);
+    return item ? item.ayuda : NIVELES_DOMINIO[1].ayuda;
   }
 
   /**
@@ -1061,8 +1102,8 @@
     TRAMOS_RANGO,
     CONTEXTOS,
     TIPOS_ACTIVIDAD,
-    MEDIOS_TRABAJO,
-    NIVELES_FAMILIARIDAD,
+    NIVELES_PRODUCCION,
+    NIVELES_DOMINIO,
     MODOS_IA,
     NIVELES_ENERGIA,
     NIVELES_COMPLEJIDAD,
@@ -1086,6 +1127,8 @@
     analizarCuadranteIA,
     analizarInspectorMateria,
     obtenerTextoAyudaActividad,
+    obtenerTextoAyudaProduccion,
+    obtenerTextoAyudaDominio,
     obtenerTextoAyudaObjetivo,
     obtenerTextoAyudaCalidad,
     obtenerTextoAyudaIA

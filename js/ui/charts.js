@@ -204,12 +204,12 @@
               label(context) {
                 const raw = context.raw || {};
                 const modoTrad = trVal("modoIA", raw.modoIA || "");
-                const medioTrad = trVal("medio", raw.medio || "Digital");
-                const famTrad = trVal("familiaridad", raw.familiaridad || "Con base");
+                const prodTrad = trVal("produccion", raw.produccion || "Reproducción");
+                const domTrad = trVal("dominioPrevio", raw.dominioPrevio || "Con lagunas");
                 return [
                   `📚 ${raw.materia || ""} — ${raw.tema || ""}`,
                   `⭐️ ${t("thAssimilation")}: ${raw.calidadReal}/5 | 🤖 IA: ${raw.iaReal}% (${modoTrad})`,
-                  `📝 ${medioTrad} | 🌱 ${famTrad}`,
+                  `🧠 ${prodTrad} | 🌱 ${domTrad}`,
                   `⏱️ ${t("thDuration")}: ${raw.duracion} min (${raw.fecha || ""})`
                 ];
               }
@@ -512,7 +512,7 @@
   }
 
   /**
-   * 6. Gráfico de Matriz de Fricción (Barras Apiladas Sí / Parcial / No por Complejidad y Familiaridad).
+   * 6. Gráfico de Matriz de Fricción (Barras Apiladas Sí / Parcial / No por Complejidad y Dominio Previo).
    */
   function actualizarGraficoMatrizFriccion(datosHabitos) {
     const canvas = document.getElementById("chartMatrizFriccion");
@@ -522,7 +522,7 @@
     const labels = filas.map((f) =>
       f.tipo === "complejidad"
         ? trVal("complejidad", f.clave)
-        : trVal("familiaridad", f.clave)
+        : trVal("dominioPrevio", f.clave)
     );
     const dataSi = filas.map((f) => f.si);
     const dataParcial = filas.map((f) => f.parcial);

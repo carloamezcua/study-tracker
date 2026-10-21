@@ -125,8 +125,8 @@
       btnNowStart: "⏱️ Poner hora actual",
       btnNowEnd: "🏁 Poner hora actual",
       labelActivity: "Tipo de Actividad",
-      labelMedium: "Medio de Trabajo",
-      labelFamiliarity: "Familiaridad del Tema",
+      labelProduction: "Nivel de Producción Propia",
+      labelMastery: "Dominio Previo del Tema",
       labelEnergy: "Energía Previa",
       labelComplexity: "Complejidad",
       labelComplexityHint: "(+XP)",
@@ -247,18 +247,18 @@
       balanceConsumeLabel: "📖 Consumo (Clase / Teoría / Inv.): {min} min ({pct}%)",
       balanceProduceLabel: "💻 Producción (Apuntes / Código / Práctica): {min} min ({pct}%)",
       frictionChartTitle: "🧱 Matriz de Fricción: Fluidez vs. Tropiezos y Bloqueos",
-      frictionChartHint: "Por Complejidad y Familiaridad del tema",
+      frictionChartHint: "Por Complejidad y Dominio Previo",
       frictionChartSubtitle:
-        "Proporción de bloques con flujo limpio (✅ Sí), con tropiezos (⚠️ Parcial) o bloqueos (❌ No) según el nivel de reto y si el tema es nuevo o ya tenías base.",
+        "Proporción de bloques con flujo limpio (✅ Sí), con tropiezos (⚠️ Parcial) o bloqueos (❌ No) según el nivel de reto y tu dominio previo del concepto.",
       frictionDsYes: "✅ Sí (Flujo limpio)",
       frictionDsPartial: "⚠️ Parcial (Con tropiezos)",
       frictionDsNo: "❌ No (Bloqueo)",
       frictionAxisSessions: "Sesiones",
-      habitMatrixTitle: "📝 Impacto de Medio (Papel vs. Digital), Familiaridad, Energía y Reto",
+      habitMatrixTitle: "🧠 Impacto de Producción Propia, Dominio Previo, Energía y Reto",
       habitMatrixSubtitle:
-        "Descubre cómo cambia tu retención promedio y el uso de IA cuando escribes a mano vs. digital, cuando abordas un tema nuevo vs. con base, y según tu energía inicial.",
-      habitByMediumTitle: "📝 Por Medio de Trabajo (Papel vs. Digital)",
-      habitByFamiliarityTitle: "🌱 Por Familiaridad del Tema (Nuevo vs. Con Base)",
+        "Descubre cómo cambia tu retención promedio y el uso de IA cuando generas con tu propia cabeza vs. reproduces, según tu dominio previo del tema y tu energía inicial.",
+      habitByProductionTitle: "🧠 Por Nivel de Producción Propia",
+      habitByMasteryTitle: "🌱 Por Dominio Previo del Tema",
       habitByEnergyTitle: "🔋 Por Energía Inicial",
       habitByComplexityTitle: "🎯 Por Complejidad del Tema",
       inspectorTopicsTitle: "🗂️ Radiografía por Subtemas (Tema específico)",
@@ -328,11 +328,11 @@
         "<strong>⚠️ Parcial — Con tropiezos (+5% XP):</strong> Sí hubo progreso, pero perdiste buena parte del bloque atorado en un bug, con distracciones, cansancio o yendo a la mitad de velocidad.",
       guideCard2Li4:
         "<strong>❌ No — Bloqueo real (0% bono):</strong> Te quedaste estancado casi toda la sesión en un obstáculo técnico/conceptual sin destrabarlo, o abortaste la sesión sin avance efectivo.",
-      guideCard3Title: "📝 3. Medio, Familiaridad, Energía y Reto",
+      guideCard3Title: "🧠 3. Producción Propia, Dominio Previo, Energía y Reto",
       guideCard3Li1:
-        "<strong>Medio de Trabajo:</strong> <code>💻 Digital</code> (teclado/IDE), <code>📝 Papel / A mano</code> (fuerza a sintetizar sin copy-paste y suele elevar la retención) o <code>🔀 Híbrido</code> (pantalla + cuaderno).",
+        "<strong>Producción Propia:</strong> <code>👀 Consumo</code> (solo leer/escuchar/ver sin producir), <code>📋 Reproducción</code> (copiar, transcribir o seguir algo ya masticado por IA/fuente) o <code>🧠 Generación propia</code> (pensar y redactar/codear con tu lógica y palabras; máximo impacto en retención).",
       guideCard3Li2:
-        "<strong>Familiaridad:</strong> <code>🌱 Tema Nuevo</code> (1ª vez que ves el concepto; mayor carga cognitiva) vs. <code>🧱 Con base</code> (tema ya visto en clase o repaso; flujo más constante).",
+        "<strong>Dominio Previo:</strong> <code>🌱 Nuevo</code> (primer contacto), <code>🌿 Visto, con lagunas</code> (ya visto pero aún cuesta o hay huecos) vs. <code>🌳 Dominado</code> (repaso o consolidación ágil).",
       guideCard3Li3:
         "<strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code> o <code>🪫 Baja</code> al sentarte a estudiar (alimenta el Mapa de Calor Circadiano).",
       guideCard3Li4:
@@ -490,8 +490,8 @@
       btnNowStart: "⏱️ Set current time",
       btnNowEnd: "🏁 Set current time",
       labelActivity: "Activity Type",
-      labelMedium: "Work Medium",
-      labelFamiliarity: "Topic Familiarity",
+      labelProduction: "Own Production Level",
+      labelMastery: "Prior Topic Mastery",
       labelEnergy: "Prior Energy",
       labelComplexity: "Complexity",
       labelComplexityHint: "(+XP)",
@@ -612,18 +612,18 @@
       balanceConsumeLabel: "📖 Consumption (Class / Theory / Research): {min} min ({pct}%)",
       balanceProduceLabel: "💻 Production (Notes / Code / Practice): {min} min ({pct}%)",
       frictionChartTitle: "🧱 Friction Matrix: Fluency vs. Hurdles & Blockers",
-      frictionChartHint: "By Topic Complexity and Familiarity",
+      frictionChartHint: "By Topic Complexity and Prior Mastery",
       frictionChartSubtitle:
-        "Proportion of blocks with clean flow (✅ Yes), hurdles (⚠️ Partial), or blockers (❌ No) by challenge level and whether the topic is new or familiar.",
+        "Proportion of blocks with clean flow (✅ Yes), hurdles (⚠️ Partial), or blockers (❌ No) by challenge level and your prior mastery of the concept.",
       frictionDsYes: "✅ Yes (Clean flow)",
       frictionDsPartial: "⚠️ Partial (With hurdles)",
       frictionDsNo: "❌ No (Blocker)",
       frictionAxisSessions: "Sessions",
-      habitMatrixTitle: "📝 Medium (Paper vs. Digital), Familiarity, Energy & Challenge Impact",
+      habitMatrixTitle: "🧠 Own Production, Prior Mastery, Energy & Challenge Impact",
       habitMatrixSubtitle:
-        "See how your average retention and AI usage change when writing by hand vs. digital, studying a new vs. familiar topic, and by starting energy.",
-      habitByMediumTitle: "📝 By Work Medium (Paper vs. Digital)",
-      habitByFamiliarityTitle: "🌱 By Topic Familiarity (New vs. Familiar)",
+        "See how your average retention and AI usage change when generating from your own brain vs. reproducing, by prior topic mastery, and by starting energy.",
+      habitByProductionTitle: "🧠 By Own Production Level",
+      habitByMasteryTitle: "🌱 By Prior Topic Mastery",
       habitByEnergyTitle: "🔋 By Starting Energy",
       habitByComplexityTitle: "🎯 By Topic Complexity",
       inspectorTopicsTitle: "🗂️ Subtopic Breakdown (Specific Topic)",
@@ -693,11 +693,11 @@
         "<strong>⚠️ Partial — With hurdles (+5% XP):</strong> You made progress, but lost significant time stuck on a bug, distraction, fatigue, or moving at half speed.",
       guideCard2Li4:
         "<strong>❌ No — Real blocker (0% bonus):</strong> Stuck for almost the whole session on a technical/conceptual obstacle without unblocking it, or aborted with no effective progress.",
-      guideCard3Title: "📝 3. Medium, Familiarity, Energy & Challenge",
+      guideCard3Title: "🧠 3. Own Production, Prior Mastery, Energy & Challenge",
       guideCard3Li1:
-        "<strong>Work Medium:</strong> <code>💻 Digital</code> (keyboard/IDE), <code>📝 Paper / Handwritten</code> (forces synthesis without copy-pasting and boosts retention), or <code>🔀 Hybrid</code> (screen + notebook).",
+        "<strong>Own Production:</strong> <code>👀 Consumption</code> (only reading/listening/watching without producing), <code>📋 Reproduction</code> (copying, transcribing, or following material pre-digested by AI/sources), or <code>🧠 Own Generation</code> (thinking and writing/coding in your own words and logic; highest retention impact).",
       guideCard3Li2:
-        "<strong>Familiarity:</strong> <code>🌱 New Topic</code> (1st contact with the concept; higher cognitive load) vs. <code>🧱 Familiar</code> (already seen in class or review; steadier flow).",
+        "<strong>Prior Mastery:</strong> <code>🌱 New</code> (first contact), <code>🌿 Seen, with gaps</code> (previously seen but still tricky or has knowledge gaps) vs. <code>🌳 Mastered</code> (swift review or consolidation).",
       guideCard3Li3:
         "<strong>Prior Energy:</strong> <code>🔋 High</code>, <code>⚡ Medium</code>, or <code>🪫 Low</code> when sitting down to study (feeds the Circadian Heatmap).",
       guideCard3Li4:
@@ -780,48 +780,52 @@
         "Repaso / Simulacro": "Review / Mock"
       }
     },
-    medio: {
+    produccion: {
       es: {
-        Digital: "Digital",
-        "Analógico / Papel": "Papel / A mano",
-        Híbrido: "Híbrido"
+        Consumo: "Consumo",
+        Reproducción: "Reproducción",
+        "Generación propia": "Generación propia"
       },
       en: {
-        Digital: "Digital",
-        "Analógico / Papel": "Paper / Handwritten",
-        Híbrido: "Hybrid"
+        Consumo: "Consumption",
+        Reproducción: "Reproduction",
+        "Generación propia": "Own generation"
       }
     },
-    medioChip: {
+    produccionChip: {
       es: {
-        Digital: "💻 Digital",
-        "Analógico / Papel": "📝 Papel / A mano",
-        Híbrido: "🔀 Híbrido"
+        Consumo: "👀 Consumo",
+        Reproducción: "📋 Reproducción",
+        "Generación propia": "🧠 Generación propia"
       },
       en: {
-        Digital: "💻 Digital",
-        "Analógico / Papel": "📝 Paper / Hand",
-        Híbrido: "🔀 Hybrid"
+        Consumo: "👀 Consumption",
+        Reproducción: "📋 Reproduction",
+        "Generación propia": "🧠 Own generation"
       }
     },
-    familiaridad: {
+    dominioPrevio: {
       es: {
-        Nuevo: "Tema Nuevo",
-        "Con base": "Con base"
+        Nuevo: "Nuevo",
+        "Con lagunas": "Con lagunas",
+        Dominado: "Dominado"
       },
       en: {
-        Nuevo: "New Topic",
-        "Con base": "Familiar"
+        Nuevo: "New",
+        "Con lagunas": "With gaps",
+        Dominado: "Mastered"
       }
     },
-    familiaridadChip: {
+    dominioPrevioChip: {
       es: {
-        Nuevo: "🌱 Tema Nuevo",
-        "Con base": "🧱 Con base"
+        Nuevo: "🌱 Nuevo",
+        "Con lagunas": "🌿 Con lagunas",
+        Dominado: "🌳 Dominado"
       },
       en: {
-        Nuevo: "🌱 New Topic",
-        "Con base": "🧱 Familiar"
+        Nuevo: "🌱 New",
+        "Con lagunas": "🌿 With gaps",
+        Dominado: "🌳 Mastered"
       }
     },
     modoIA: {
@@ -1029,17 +1033,17 @@
       });
 
     document
-      .querySelectorAll('.chip-group[data-group="medio"] .chip-btn')
+      .querySelectorAll('.chip-group[data-group="produccion"] .chip-btn')
       .forEach((btn) => {
         const val = btn.dataset.value;
-        btn.textContent = traducirValor("medioChip", val);
+        btn.textContent = traducirValor("produccionChip", val);
       });
 
     document
-      .querySelectorAll('.chip-group[data-group="familiaridad"] .chip-btn')
+      .querySelectorAll('.chip-group[data-group="dominioPrevio"] .chip-btn')
       .forEach((btn) => {
         const val = btn.dataset.value;
-        btn.textContent = traducirValor("familiaridadChip", val);
+        btn.textContent = traducirValor("dominioPrevioChip", val);
       });
 
     const iconosEnergia = { Alta: "🔋", Media: "⚡", Baja: "🪫" };

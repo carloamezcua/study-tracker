@@ -14,15 +14,21 @@ Aplicación web **Local-First** gamificada (estilo RPG) ultra-ligera con **micro
   - Inspirada en *Old School RuneScape*, la experiencia requerida **se duplica cada 7 niveles**:
     $$\text{XP}(\text{Nivel } L) = \text{REDONDEAR}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
   - Subida rápida en los primeros niveles para motivar la constancia, progresión creciente (+10.4% por nivel) y propiedad matemática exacta donde el **Nivel 92 representa el 50% del XP total hacia el Nivel 99**.
-- **Taxonomía Ortogonal de 1 Clic (`4 Contextos` × `7 Actividades` × `Medio` × `Familiaridad`):**
+- **Taxonomía Ortogonal de 1 Clic (`4 Contextos` × `7 Actividades` × `Producción Propia` × `Dominio Previo`):**
   - **Contexto / Propósito (4 chips):**
     - `🎓 Académico`: Materias universitarias/escolares, tareas y exámenes de carrera.
     - `🏅 Certificación`: Certificaciones profesionales (ej. *Snowflake*) y cursos técnicos estructurados.
     - `🚀 Proyecto Propio`: Desarrollo de software personal, portafolio o proyectos en pareja.
     - `🤝 Externo`: Proyectos de amigos/terceros (ej. *Ruby on Rails*), incluyendo el estudio requerido para ellos.
-  - **Medio de Trabajo y Familiaridad del Tema:**
-    - **Medio (`Medio_Trabajo`):** `💻 Digital` (teclado/IDE), `📝 Papel / A mano` (escritura manual en cuaderno/hojas que obliga a sintetizar sin copy-paste y eleva la retención) o `🔀 Híbrido` (pantalla + apuntes en papel).
-    - **Familiaridad (`Familiaridad`):** `🌱 Tema Nuevo` (primer acercamiento al concepto; mayor carga cognitiva) vs. `🧱 Con base` (tema ya visto en clase o repaso; flujo más constante).
+  - **Nivel de Producción Propia y Dominio Previo del Tema:**
+    - **Producción Propia (`Produccion_Propia`):**
+      - `👀 Consumo`: Leíste, viste o escuchaste sin producir nada propio (PDF, video, documentación, clase).
+      - `📋 Reproducción`: Escribiste o programaste, pero copiando, transcribiendo o siguiendo algo ya masticado por una fuente o la IA (a mano o en PC).
+      - `🧠 Generación propia`: Lo escribiste o programaste con tus palabras y tu lógica, resolviendo los obstáculos por tu cuenta. Máximo impacto en retención.
+    - **Dominio Previo (`Dominio_Previo`):**
+      - `🌱 Nuevo`: Primer contacto con el concepto (mayor carga cognitiva).
+      - `🌿 Con lagunas`: Ya lo conocías o viste en clase, pero aún no lo dominas o te sigue costando.
+      - `🌳 Dominado`: Lo manejas con fluidez; bloque de repaso, mantenimiento o consolidación ágil.
   - **Tipo de Actividad (7 chips con ayuda dinámica en vivo):**
 
 | Actividad | ¿Qué significa y cuándo usarla? | ¿Cómo no confundirla con otras? |
@@ -124,7 +130,7 @@ flowchart TD
 
 El archivo `data/study-tracker.csv` se guarda en texto plano `UTF-8 con BOM` (estándar RFC 4180, listo para Python, Pandas, Snowflake, SQLite o Excel) con las siguientes 20 columnas:
 
-`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tema,Tipo_Actividad,Medio_Trabajo,Familiaridad,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,Modo_IA,Uso_IA_Porcentaje,XP_Ganados,Notas`
+`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tema,Tipo_Actividad,Produccion_Propia,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,Modo_IA,Uso_IA_Porcentaje,XP_Ganados,Notas`
 
 | Métrica | Regla / Fórmula en JavaScript (`js/domain/metrics.js`) |
 | :--- | :--- |
@@ -155,15 +161,21 @@ An ultra-lightweight gamified **Local-First** web application (RPG-style) powere
   - Inspired by *Old School RuneScape*, required experience **doubles every 7 levels**:
     $$\text{XP}(\text{Level } L) = \text{ROUND}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
   - Fast early leveling to reward consistency, progressive scaling (+10.4% per level), and the exact mathematical property where **Level 92 equals 50% of the total XP required for Level 99**.
-- **Orthogonal 1-Click Taxonomy (`4 Contexts` × `7 Activities` × `Medium` × `Familiarity`):**
+- **Orthogonal 1-Click Taxonomy (`4 Contexts` × `7 Activities` × `Own Production` × `Prior Mastery`):**
   - **Context / Purpose (4 chips):**
     - `🎓 Academic` (`Académico`): University/school courses, assignments, and degree exams.
     - `🏅 Certification` (`Certificación`): Professional certifications (e.g., *Snowflake*) and structured technical courses.
     - `🚀 Own Project` (`Proyecto Propio`): Personal software engineering, portfolio, or duo projects.
     - `🤝 External` (`Externo`): Third-party or friends' projects (e.g., *Ruby on Rails*), including the research required for them.
-  - **Work Medium & Topic Familiarity:**
-    - **Medium (`Medio_Trabajo`):** `💻 Digital` (keyboard/IDE), `📝 Paper / Handwritten` (writing by hand forces synthesis without copy-pasting and boosts retention), or `🔀 Hybrid` (screen + notebook).
-    - **Familiarity (`Familiaridad`):** `🌱 New Topic` (first contact with the concept; higher cognitive load) vs. `🧱 Familiar` (already seen in class or review; steadier flow).
+  - **Own Production Level & Topic Prior Mastery:**
+    - **Own Production (`Produccion_Propia`):**
+      - `👀 Consumption` (`Consumo`): Reading, watching, or listening without producing your own output (PDF, video, documentation, lecture).
+      - `📋 Reproduction` (`Reproducción`): Writing or coding, but copying, transcribing, or following material pre-digested by an AI or external source.
+      - `🧠 Own generation` (`Generación propia`): Writing or coding in your own words and logic, tackling the mental hurdles yourself. Highest retention impact.
+    - **Prior Mastery (`Dominio_Previo`):**
+      - `🌱 New` (`Nuevo`): First encounter with the concept (highest cognitive load).
+      - `🌿 With gaps` (`Con lagunas`): Already seen in class or past studies, but not yet mastered or still tricky.
+      - `🌳 Mastered` (`Dominado`): Solid grasp; fast-paced review, maintenance, or consolidation.
   - **Activity Type (7 chips with live dynamic helper):**
 
 | Activity | What it means & when to use it | How to distinguish it from similar ones |
@@ -215,7 +227,7 @@ An ultra-lightweight gamified **Local-First** web application (RPG-style) powere
 
 The generated `data/study-tracker.csv` file is stored in plain-text `UTF-8 with BOM` (RFC 4180 standard, ready for Python, Pandas, Snowflake, SQLite, or Excel) with the following 20 columns:
 
-`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tema,Tipo_Actividad,Medio_Trabajo,Familiaridad,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,Modo_IA,Uso_IA_Porcentaje,XP_Ganados,Notas`
+`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tema,Tipo_Actividad,Produccion_Propia,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,Modo_IA,Uso_IA_Porcentaje,XP_Ganados,Notas`
 
 | Metric | Rule / Formula in JavaScript (`js/domain/metrics.js`) |
 | :--- | :--- |

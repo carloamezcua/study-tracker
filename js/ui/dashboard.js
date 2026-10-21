@@ -22,8 +22,8 @@
   const estadoChips = {
     contexto: "Académico",
     tipoActividad: "Desarrollo / Código",
-    medio: "Digital",
-    familiaridad: "Con base",
+    produccion: "Reproducción",
+    dominioPrevio: "Con lagunas",
     energiaPrevia: "Media",
     complejidad: "Desafiante",
     objetivoCumplido: "Sí",
@@ -64,15 +64,16 @@
     "Repaso / Simulacro": "🔁"
   };
 
-  const ICONOS_MEDIO = {
-    Digital: "💻",
-    "Analógico / Papel": "📝",
-    Híbrido: "🔀"
+  const ICONOS_PRODUCCION = {
+    Consumo: "👀",
+    Reproducción: "📋",
+    "Generación propia": "🧠"
   };
 
-  const ICONOS_FAMILIARIDAD = {
+  const ICONOS_DOMINIO = {
     Nuevo: "🌱",
-    "Con base": "🧱"
+    "Con lagunas": "🌿",
+    Dominado: "🌳"
   };
 
   const ICONOS_MODO_IA = {
@@ -338,8 +339,8 @@
 
     seleccionarChip("contexto", sesion.contexto || "Académico");
     seleccionarChip("tipoActividad", sesion.tipoActividad || "Desarrollo / Código");
-    seleccionarChip("medio", sesion.medio || "Digital");
-    seleccionarChip("familiaridad", sesion.familiaridad || "Con base");
+    seleccionarChip("produccion", sesion.produccion || "Reproducción");
+    seleccionarChip("dominioPrevio", sesion.dominioPrevio || "Con lagunas");
     seleccionarChip("energiaPrevia", sesion.energiaPrevia || "Media");
     seleccionarChip("complejidad", sesion.complejidad || "Desafiante");
     seleccionarChip("objetivoCumplido", sesion.objetivoCumplido || "Sí");
@@ -892,18 +893,18 @@
       boxBalance.append(header, barTrack);
     }
 
-    // 1B. Resumen por Medio de Trabajo (Digital vs. Analógico / Papel vs. Híbrido)
-    const contenedorMedio = document.getElementById("resumenMedioBar");
-    if (contenedorMedio && Array.isArray(datosHabitos.resumenMedio)) {
-      contenedorMedio.replaceChildren();
-      datosHabitos.resumenMedio.forEach((item) => {
+    // 1B. Resumen por Nivel de Producción Propia (Consumo vs. Reproducción vs. Generación propia)
+    const contenedorProd = document.getElementById("resumenProduccionBar");
+    if (contenedorProd && Array.isArray(datosHabitos.resumenProduccion)) {
+      contenedorProd.replaceChildren();
+      datosHabitos.resumenProduccion.forEach((item) => {
         const pill = document.createElement("div");
         pill.className = "habit-stat-pill";
 
         const title = document.createElement("span");
         title.className = "habit-stat-title";
-        const medioTrad = trVal("medio", item.valor);
-        title.textContent = `${item.icono} ${medioTrad}:`;
+        const prodTrad = trVal("produccion", item.valor);
+        title.textContent = `${item.icono} ${prodTrad}:`;
 
         const val = document.createElement("strong");
         val.textContent = item.conteo
@@ -911,22 +912,22 @@
           : t("habitNoRecords");
 
         pill.append(title, val);
-        contenedorMedio.appendChild(pill);
+        contenedorProd.appendChild(pill);
       });
     }
 
-    // 1C. Resumen por Familiaridad del Tema (Nuevo vs. Con base)
-    const contenedorFam = document.getElementById("resumenFamiliaridadBar");
-    if (contenedorFam && Array.isArray(datosHabitos.resumenFamiliaridad)) {
-      contenedorFam.replaceChildren();
-      datosHabitos.resumenFamiliaridad.forEach((item) => {
+    // 1C. Resumen por Dominio Previo del Tema (Nuevo vs. Con lagunas vs. Dominado)
+    const contenedorDom = document.getElementById("resumenDominioBar");
+    if (contenedorDom && Array.isArray(datosHabitos.resumenDominio)) {
+      contenedorDom.replaceChildren();
+      datosHabitos.resumenDominio.forEach((item) => {
         const pill = document.createElement("div");
         pill.className = "habit-stat-pill";
 
         const title = document.createElement("span");
         title.className = "habit-stat-title";
-        const famTrad = trVal("familiaridad", item.valor);
-        title.textContent = `${item.icono} ${famTrad}:`;
+        const domTrad = trVal("dominioPrevio", item.valor);
+        title.textContent = `${item.icono} ${domTrad}:`;
 
         const val = document.createElement("strong");
         val.textContent = item.conteo
@@ -934,7 +935,7 @@
           : t("habitNoRecords");
 
         pill.append(title, val);
-        contenedorFam.appendChild(pill);
+        contenedorDom.appendChild(pill);
       });
     }
 
@@ -1024,9 +1025,16 @@
 
           const statsWrap = document.createElement("div");
           statsWrap.className = "topic-card-stats";
-          statsWrap.textContent = `⏱️ ${st.minutos}m (${st.sesiones} ${t(
+          let statsTexto = `⏱️ ${st.minutos}m (${st.sesiones} ${t(
             "habitSessionsShort"
           )}) · ⭐️ ${st.calidadProm} · 🤖 ${st.iaProm}% · +${st.xp} XP`;
+          if (Array.isArray(st.curvaDominio) && st.curvaDominio.length > 0) {
+            const curvaStr = st.curvaDominio
+              .map((d) => `${ICONOS_DOMINIO[d] || ""} ${trVal("dominioPrevio", d)}`)
+              .join(" → ");
+            statsTexto += ` · ${curvaStr}`;
+          }
+          statsWrap.textContent = statsTexto;
 
           topRow.append(titleWrap, statsWrap);
 
@@ -1110,23 +1118,23 @@
     subTema.textContent = `${icCtx} ${trVal("contexto", ctxVal)} · ${sesion.tema || "General"}`;
     tdMateriaTema.append(strongMateria, subTema);
 
-    // Actividad + Medio y Familiaridad
+    // Actividad + Producción Propia y Dominio Previo
     const tdActividad = document.createElement("td");
     const actVal = sesion.tipoActividad || "Desarrollo / Código";
     const iconoAct = ICONOS_ACTIVIDAD[actVal] || "💻";
     const divAct = document.createElement("div");
     divAct.textContent = `${iconoAct} ${trVal("tipoActividad", actVal)}`;
-    const subMedioFam = document.createElement("small");
-    subMedioFam.className = "cell-sub";
-    const medVal = sesion.medio || "Digital";
-    const famVal = sesion.familiaridad || "Con base";
-    const icMed = ICONOS_MEDIO[medVal] || "💻";
-    const icFam = ICONOS_FAMILIARIDAD[famVal] || "🧱";
-    subMedioFam.textContent = `${icMed} ${trVal("medio", medVal)} · ${icFam} ${trVal(
-      "familiaridad",
-      famVal
+    const subProdDom = document.createElement("small");
+    subProdDom.className = "cell-sub";
+    const prodVal = sesion.produccion || "Reproducción";
+    const domVal = sesion.dominioPrevio || "Con lagunas";
+    const icProd = ICONOS_PRODUCCION[prodVal] || "📋";
+    const icDom = ICONOS_DOMINIO[domVal] || "🌿";
+    subProdDom.textContent = `${icProd} ${trVal("produccion", prodVal)} · ${icDom} ${trVal(
+      "dominioPrevio",
+      domVal
     )}`;
-    tdActividad.append(divAct, subMedioFam);
+    tdActividad.append(divAct, subProdDom);
 
     // Contexto Operativo (Energía + Complejidad + Objetivo)
     const tdContexto = document.createElement("td");

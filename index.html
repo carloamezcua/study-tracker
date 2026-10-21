@@ -262,21 +262,22 @@
             </div>
           </div>
 
-          <!-- 1B. MEDIO DE TRABAJO (DIGITAL VS. PAPEL) Y FAMILIARIDAD DEL TEMA -->
+          <!-- 1B. NIVEL DE PRODUCCIÓN PROPIA Y DOMINIO PREVIO -->
           <div class="row">
             <div class="form-group">
-              <label data-i18n="labelMedium">Medio de Trabajo</label>
-              <div class="chip-group" data-group="medio">
-                <button type="button" class="chip-btn active" data-value="Digital">💻 Digital</button>
-                <button type="button" class="chip-btn" data-value="Analógico / Papel">📝 Papel / A mano</button>
-                <button type="button" class="chip-btn" data-value="Híbrido">🔀 Híbrido</button>
+              <label data-i18n="labelProduction">Nivel de Producción Propia</label>
+              <div class="chip-group" data-group="produccion">
+                <button type="button" class="chip-btn" data-value="Consumo">👀 Consumo</button>
+                <button type="button" class="chip-btn active" data-value="Reproducción">📋 Reproducción</button>
+                <button type="button" class="chip-btn" data-value="Generación propia">🧠 Generación propia</button>
               </div>
             </div>
             <div class="form-group">
-              <label data-i18n="labelFamiliarity">Familiaridad del Tema</label>
-              <div class="chip-group" data-group="familiaridad">
-                <button type="button" class="chip-btn" data-value="Nuevo">🌱 Tema Nuevo</button>
-                <button type="button" class="chip-btn active" data-value="Con base">🧱 Con base</button>
+              <label data-i18n="labelMastery">Dominio Previo del Tema</label>
+              <div class="chip-group" data-group="dominioPrevio">
+                <button type="button" class="chip-btn" data-value="Nuevo">🌱 Nuevo</button>
+                <button type="button" class="chip-btn active" data-value="Con lagunas">🌿 Con lagunas</button>
+                <button type="button" class="chip-btn" data-value="Dominado">🌳 Dominado</button>
               </div>
             </div>
           </div>
@@ -480,9 +481,9 @@
           <div class="panel">
             <h2>
               <span data-i18n="frictionChartTitle">🧱 Matriz de Fricción: Fluidez vs. Tropiezos y Bloqueos</span>
-              <small class="chart-hint" data-i18n="frictionChartHint">Por Complejidad y Familiaridad del tema</small>
+              <small class="chart-hint" data-i18n="frictionChartHint">Por Complejidad y Dominio Previo</small>
             </h2>
-            <div class="subtitle" data-i18n="frictionChartSubtitle">Proporción de bloques con flujo limpio (✅ Sí), con tropiezos (⚠️ Parcial) o bloqueos (❌ No) según el nivel de reto y si el tema es nuevo o ya tenías base.</div>
+            <div class="subtitle" data-i18n="frictionChartSubtitle">Proporción de bloques con flujo limpio (✅ Sí), con tropiezos (⚠️ Parcial) o bloqueos (❌ No) según el nivel de reto y tu dominio previo del concepto.</div>
             <div class="chart-box">
               <canvas id="chartMatrizFriccion"></canvas>
             </div>
@@ -490,13 +491,13 @@
 
           <div class="panel">
             <h2>
-              <span data-i18n="habitMatrixTitle">📝 Impacto de Medio (Papel vs. Digital), Familiaridad, Energía y Reto</span>
+              <span data-i18n="habitMatrixTitle">🧠 Impacto de Producción Propia, Dominio Previo, Energía y Reto</span>
             </h2>
-            <div class="subtitle" data-i18n="habitMatrixSubtitle">Descubre cómo cambia tu retención promedio y el uso de IA cuando escribes a mano vs. digital, cuando abordas un tema nuevo vs. con base, y según tu energía inicial.</div>
-            <h4 class="sub-section-title" data-i18n="habitByMediumTitle">📝 Por Medio de Trabajo (Papel vs. Digital)</h4>
-            <div id="resumenMedioBar" class="habit-summary-bar"></div>
-            <h4 class="sub-section-title" data-i18n="habitByFamiliarityTitle">🌱 Por Familiaridad del Tema (Nuevo vs. Con Base)</h4>
-            <div id="resumenFamiliaridadBar" class="habit-summary-bar"></div>
+            <div class="subtitle" data-i18n="habitMatrixSubtitle">Descubre cómo cambia tu retención promedio y el uso de IA cuando generas con tu propia cabeza vs. reproduces, según tu dominio previo del tema y tu energía inicial.</div>
+            <h4 class="sub-section-title" data-i18n="habitByProductionTitle">🧠 Por Nivel de Producción Propia</h4>
+            <div id="resumenProduccionBar" class="habit-summary-bar"></div>
+            <h4 class="sub-section-title" data-i18n="habitByMasteryTitle">🌱 Por Dominio Previo del Tema</h4>
+            <div id="resumenDominioBar" class="habit-summary-bar"></div>
             <h4 class="sub-section-title" data-i18n="habitByEnergyTitle">🔋 Por Energía Inicial</h4>
             <div id="resumenHabitosBar" class="habit-summary-bar"></div>
             <h4 class="sub-section-title" data-i18n="habitByComplexityTitle">🎯 Por Complejidad del Tema</h4>
@@ -588,12 +589,12 @@
           </ul>
         </div>
 
-        <!-- TARJETA 3: MEDIO (PAPEL VS DIGITAL), FAMILIARIDAD Y ENERGÍA -->
+        <!-- TARJETA 3: PRODUCCIÓN PROPIA, DOMINIO PREVIO, ENERGÍA Y RETO -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard3Title">📝 3. Medio, Familiaridad, Energía y Reto</h4>
+          <h4 data-i18n="guideCard3Title">🧠 3. Producción Propia, Dominio Previo, Energía y Reto</h4>
           <ul>
-            <li data-i18n-html="guideCard3Li1"><strong>Medio de Trabajo:</strong> <code>💻 Digital</code> (teclado/IDE), <code>📝 Papel / A mano</code> (fuerza a sintetizar sin copy-paste y suele elevar la retención) o <code>🔀 Híbrido</code> (pantalla + cuaderno).</li>
-            <li data-i18n-html="guideCard3Li2"><strong>Familiaridad:</strong> <code>🌱 Tema Nuevo</code> (1ª vez que ves el concepto; mayor carga cognitiva) vs. <code>🧱 Con base</code> (tema ya visto en clase o repaso; flujo más constante).</li>
+            <li data-i18n-html="guideCard3Li1"><strong>Producción Propia:</strong> <code>👀 Consumo</code> (solo leer/escuchar/ver sin producir), <code>📋 Reproducción</code> (copiar, transcribir o seguir algo ya masticado por IA/fuente) o <code>🧠 Generación propia</code> (pensar y redactar/codear con tu lógica y palabras; máximo impacto en retención).</li>
+            <li data-i18n-html="guideCard3Li2"><strong>Dominio Previo:</strong> <code>🌱 Nuevo</code> (primer contacto), <code>🌿 Visto, con lagunas</code> (ya visto pero aún cuesta o hay huecos) vs. <code>🌳 Dominado</code> (repaso o consolidación ágil).</li>
             <li data-i18n-html="guideCard3Li3"><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code> o <code>🪫 Baja</code> al sentarte a estudiar (alimenta el Mapa de Calor Circadiano).</li>
             <li data-i18n-html="guideCard3Li4"><strong>Complejidad del Reto:</strong> <code>🟢 Fácil (0%)</code>, <code>🟡 Desafiante (+10% XP)</code>, <code>🔴 Muy difícil (+20% XP)</code>.</li>
           </ul>
