@@ -11,6 +11,7 @@
     calcularXP,
     calcularProgresoRPG,
     calcularKPIs,
+    filtrarSesionesAvanzado,
     obtenerTextoAyudaActividad,
     obtenerTextoAyudaObjetivo,
     obtenerTextoAyudaCalidad,
@@ -30,8 +31,15 @@
   // ID de la sesión que se está editando actualmente (null si es registro nuevo)
   let sesionEditandoId = null;
 
-  // Filtro activo en el Dashboard ("Todos" o uno de los 4 contextos)
+  // Filtros globales combinables del Dashboard
   let filtroContextoActual = "Todos";
+  let filtroPeriodoActual = "todo";
+  let filtroMateriaActual = "Todas";
+
+  // Estado de navegación analítica interactiva
+  let pestanaAnaliticaActual = "tiempo";
+  let agrupacionTemporalActual = "dia";
+  let metricaHeatmapActual = "minutos";
 
   // Control de vista compacta de la tabla (por defecto muestra solo los últimos 5 registros)
   const LIMITE_HISTORIAL_RECIENTE = 5;
@@ -108,8 +116,87 @@
    */
   function cambiarFiltroContexto(nuevoContexto) {
     filtroContextoActual = nuevoContexto || "Todos";
-    document.querySelectorAll("#contextFilterBar .filter-pill").forEach((btn) => {
+    document.querySelectorAll("#contextFilterPills .filter-pill").forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.filter === filtroContextoActual);
+    });
+    actualizarVisibilidadResetFiltros();
+  }
+
+  /**
+   * Cambia el filtro de periodo temporal ("todo", "7d", "30d", "hoy").
+   */
+  function cambiarFiltroPeriodo(nuevoPeriodo) {
+    filtroPeriodoActual = nuevoPeriodo || "todo";
+    document.querySelectorAll("#periodFilterPills .period-pill").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.period === filtroPeriodoActual);
+    });
+    actualizarVisibilidadResetFiltros();
+  }
+
+  /**
+   * Cambia el filtro de materia activa ("Todas" o el nombre de una materia).
+   */
+  function cambiarFiltroMateria(nuevaMateria) {
+    filtroMateriaActual = nuevaMateria || "Todas";
+    const select = document.getElementById("subjectFilterSelect");
+    if (select && select.value !== filtroMateriaActual) {
+      select.value = filtroMateriaActual;
+    }
+    actualizarVisibilidadResetFiltros();
+  }
+
+  /**
+   * Restablece todos los filtros globales a sus valores por defecto.
+   */
+  function resetearFiltros() {
+    cambiarFiltroContexto("Todos");
+    cambiarFiltroPeriodo("todo");
+    cambiarFiltroMateria("Todas");
+  }
+
+  function actualizarVisibilidadResetFiltros() {
+    const btnReset = document.getElementById("btnResetFilters");
+    if (!btnReset) return;
+    const hayFiltroActivo =
+      filtroContextoActual !== "Todos" ||
+      filtroPeriodoActual !== "todo" ||
+      filtroMateriaActual !== "Todas";
+    btnReset.style.display = hayFiltroActivo ? "inline-flex" : "none";
+  }
+
+  /**
+   * Cambia la pestaña activa del centro analítico ("tiempo", "ia", "habitos", "inspector").
+   */
+  function cambiarPestanaAnalitica(nuevaPestana) {
+    pestanaAnaliticaActual = nuevaPestana || "tiempo";
+    document.querySelectorAll("#analyticsTabsBar .analytics-tab-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.tab === pestanaAnaliticaActual);
+    });
+    document.querySelectorAll(".analytics-tab-panel").forEach((panel) => {
+      panel.classList.toggle("active", panel.id === `tabPanel-${pestanaAnaliticaActual}`);
+    });
+    if (StudyTracker.Charts && typeof StudyTracker.Charts.refrescarTamanoGraficos === "function") {
+      setTimeout(() => StudyTracker.Charts.refrescarTamanoGraficos(), 30);
+    }
+  }
+
+  /**
+   * Cambia la agrupación del gráfico de evolución ("dia", "semana", "mes").
+   */
+  function cambiarAgrupacionTemporal(nuevaAgrupacion) {
+    agrupacionTemporalActual = nuevaAgrupacion || "dia";
+    document.querySelectorAll("#evoGroupingBtns .seg-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.group === agrupacionTemporalActual);
+    });
+  }
+
+  /**
+   * Cambia la métrica visualizada en el Mapa de Calor Circadiano ("minutos", "calidad", "energia").
+   */
+  function cambiarMetricaHeatmap(nuevaMetrica) {
+    metricaHeatmapActual = nuevaMetrica || "minutos";
+    document.querySelectorAll("#heatmapMetricBtns .seg-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.metric === metricaHeatmapActual);
     });
   }
 
@@ -545,7 +632,7 @@
   }
 
   /**
-   * Actualiza los contadores de sesiones en la barra de filtro rápido por Contexto.
+   * Actualiza los contadores de sesiones en la barra de filtro rápido por Contexto y el selector de Materia.
    */
   function actualizarContadoresFiltro(todasLasSesiones) {
     const lista = Array.isArray(todasLasSesiones) ? todasLasSesiones : [];
@@ -564,33 +651,368 @@
         btn.textContent = `${ctx.icono} ${etiquetaTraducida} (${conteo})`;
       }
     });
+
+    // Actualizar selector desplegable de Materias
+    const selectMateria = document.getElementById("subjectFilterSelect");
+    if (selectMateria) {
+      const conteoPorMateria = {};
+      lista.forEach((s) => {
+        const mat = (s.materia || "General").trim() || "General";
+        conteoPorMateria[mat] = (conteoPorMateria[mat] || 0) + 1;
+      });
+      const materiasOrdenadas = Object.keys(conteoPorMateria).sort();
+      if (filtroMateriaActual !== "Todas" && !conteoPorMateria[filtroMateriaActual]) {
+        filtroMateriaActual = "Todas";
+      }
+
+      selectMateria.replaceChildren();
+      const optTodas = document.createElement("option");
+      optTodas.value = "Todas";
+      optTodas.textContent = `${t("filterAllSubjects")} (${lista.length})`;
+      selectMateria.appendChild(optTodas);
+
+      materiasOrdenadas.forEach((mat) => {
+        const opt = document.createElement("option");
+        opt.value = mat;
+        opt.textContent = `${mat} (${conteoPorMateria[mat]})`;
+        selectMateria.appendChild(opt);
+      });
+
+      selectMateria.value = filtroMateriaActual;
+    }
+
+    actualizarVisibilidadResetFiltros();
   }
 
   /**
-   * Renderiza las tarjetas de resumen de Energía Previa vs Calidad en el panel de hábitos.
+   * Renderiza los indicadores rápidos de Evolución Temporal (Racha, Días activos y Promedio/día).
+   */
+  function renderizarResumenEvolucion(datosEvolucion) {
+    if (!datosEvolucion) return;
+    const elStreak = document.getElementById("evoStreakBadge");
+    const elActive = document.getElementById("evoActiveDaysBadge");
+    const elAvg = document.getElementById("evoAvgDayBadge");
+
+    if (elStreak) {
+      elStreak.textContent = t("evoStreakBadgeText", {
+        streak: datosEvolucion.rachaActual,
+        best: datosEvolucion.mejorRacha
+      });
+    }
+    if (elActive) {
+      elActive.textContent = t("evoActiveDaysBadgeText", {
+        days: datosEvolucion.diasActivos
+      });
+    }
+    if (elAvg) {
+      elAvg.textContent = t("evoAvgDayBadgeText", {
+        min: datosEvolucion.promedioMinPorDiaActivo
+      });
+    }
+  }
+
+  /**
+   * Renderiza el Mapa de Calor Circadiano (7 Días x 4 Franjas Horarias) con color dinámico.
+   */
+  function renderizarMapaCalorCircadiano(datosMapaCalor) {
+    const contenedor = document.getElementById("heatmapCircadiano");
+    const badgeGolden = document.getElementById("heatmapGoldenBadge");
+    if (!contenedor || !datosMapaCalor) return;
+
+    if (badgeGolden) {
+      if (datosMapaCalor.mejorCelda) {
+        const mc = datosMapaCalor.mejorCelda;
+        badgeGolden.textContent = t("heatmapGoldenText", {
+          day: trVal("diaSemana", mc.dia),
+          slot: trVal("franjaHoraria", mc.franja),
+          quality: mc.calidadProm,
+          min: mc.minutos
+        });
+      } else {
+        badgeGolden.textContent = t("heatmapGoldenEmpty");
+      }
+    }
+
+    contenedor.replaceChildren();
+    const tabla = document.createElement("table");
+    tabla.className = "heatmap-table";
+
+    const thead = document.createElement("thead");
+    const trHead = document.createElement("tr");
+    const thCorner = document.createElement("th");
+    thCorner.textContent = t("heatmapCornerLabel");
+    trHead.appendChild(thCorner);
+
+    datosMapaCalor.ordenFranjas.forEach((franja) => {
+      const th = document.createElement("th");
+      th.textContent = trVal("franjaHoraria", franja);
+      trHead.appendChild(th);
+    });
+    thead.appendChild(trHead);
+    tabla.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    const maxMin = Math.max(1, datosMapaCalor.maxMinutosCelda || 60);
+
+    datosMapaCalor.ordenDias.forEach((dia) => {
+      const tr = document.createElement("tr");
+      const tdDia = document.createElement("td");
+      tdDia.className = "heatmap-day-cell";
+      tdDia.textContent = trVal("diaSemana", dia);
+      tr.appendChild(tdDia);
+
+      datosMapaCalor.ordenFranjas.forEach((franja) => {
+        const celda = datosMapaCalor.matriz[dia][franja];
+        const td = document.createElement("td");
+        td.className = "heatmap-val-cell";
+
+        if (!celda || celda.sesiones === 0) {
+          td.classList.add("heatmap-empty");
+          td.textContent = "—";
+        } else {
+          let bg = "rgba(99, 102, 241, 0.25)";
+          let textoPrincipal = `${celda.minutos}m`;
+          let textoSecundario = `⭐️ ${celda.calidadProm}`;
+
+          if (metricaHeatmapActual === "minutos") {
+            const alpha = +(0.18 + Math.min(1, celda.minutos / maxMin) * 0.68).toFixed(2);
+            bg = `rgba(99, 102, 241, ${alpha})`;
+            textoPrincipal = `${celda.minutos} min`;
+            textoSecundario = `⭐️ ${celda.calidadProm} · ${celda.sesiones}s`;
+          } else if (metricaHeatmapActual === "calidad") {
+            if (celda.calidadProm >= 4) {
+              bg = "rgba(16, 185, 129, 0.45)";
+            } else if (celda.calidadProm >= 3) {
+              bg = "rgba(245, 158, 11, 0.38)";
+            } else {
+              bg = "rgba(239, 68, 68, 0.42)";
+            }
+            textoPrincipal = `⭐️ ${celda.calidadProm}`;
+            textoSecundario = `${celda.minutos} min (${celda.sesiones}s)`;
+          } else if (metricaHeatmapActual === "energia") {
+            if (celda.energiaProm >= 2.5) {
+              bg = "rgba(16, 185, 129, 0.42)";
+              textoPrincipal = `🔋 ${celda.energiaProm}/3`;
+            } else if (celda.energiaProm >= 1.7) {
+              bg = "rgba(245, 158, 11, 0.36)";
+              textoPrincipal = `⚡ ${celda.energiaProm}/3`;
+            } else {
+              bg = "rgba(239, 68, 68, 0.38)";
+              textoPrincipal = `🪫 ${celda.energiaProm}/3`;
+            }
+            textoSecundario = `⭐️ ${celda.calidadProm} · ${celda.minutos}m`;
+          }
+
+          td.style.background = bg;
+          const strong = document.createElement("strong");
+          strong.textContent = textoPrincipal;
+          const small = document.createElement("small");
+          small.textContent = textoSecundario;
+          td.append(strong, small);
+        }
+
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    tabla.appendChild(tbody);
+    contenedor.appendChild(tabla);
+  }
+
+  /**
+   * Renderiza los contadores de los 4 cuadrantes cognitivos de IA vs. Retención.
+   */
+  function renderizarBadgesCuadrante(datosCuadrante) {
+    if (!datosCuadrante || !datosCuadrante.cuadrantes) return;
+    const { qSinergia, qAutonomo, qMecanico, qFatiga } = datosCuadrante.cuadrantes;
+    const elSyn = document.getElementById("quadBadgeSynergy");
+    const elAut = document.getElementById("quadBadgeAuton");
+    const elMech = document.getElementById("quadBadgeMech");
+    const elFat = document.getElementById("quadBadgeFatigue");
+
+    if (elSyn) elSyn.textContent = t("quadSynergyText", { count: qSinergia });
+    if (elAut) elAut.textContent = t("quadAutonText", { count: qAutonomo });
+    if (elMech) elMech.textContent = t("quadMechText", { count: qMecanico });
+    if (elFat) elFat.textContent = t("quadFatigueText", { count: qFatiga });
+  }
+
+  /**
+   * Renderiza el Balance Cognitivo (Preparación/Teoría vs. Producción/Práctica),
+   * las tarjetas de Energía Previa y las de Complejidad.
    */
   function renderizarResumenHabitos(datosHabitos) {
-    const contenedor = document.getElementById("resumenHabitosBar");
-    if (!contenedor || !datosHabitos) return;
-    contenedor.replaceChildren();
+    if (!datosHabitos) return;
 
-    datosHabitos.resumenEnergia.forEach((item) => {
-      const pill = document.createElement("div");
-      pill.className = "habit-stat-pill";
+    // 1. Barra de Balance Cognitivo
+    const boxBalance = document.getElementById("balanceCognitivoBox");
+    if (boxBalance && datosHabitos.balanceCognitivo) {
+      const { minConsumo, minProduccion, pctConsumo, pctProduccion } =
+        datosHabitos.balanceCognitivo;
+      boxBalance.replaceChildren();
 
-      const title = document.createElement("span");
-      title.className = "habit-stat-title";
-      const energiaTrad = trVal("energiaPrevia", item.etiqueta);
-      title.textContent = `${item.icono} ${t("habitEnergyPrefix")} ${energiaTrad}:`;
+      const header = document.createElement("div");
+      header.className = "balance-header";
+      const spanCons = document.createElement("span");
+      spanCons.textContent = t("balanceConsumeLabel", {
+        min: minConsumo,
+        pct: pctConsumo
+      });
+      const spanProd = document.createElement("span");
+      spanProd.textContent = t("balanceProduceLabel", {
+        min: minProduccion,
+        pct: pctProduccion
+      });
+      header.append(spanCons, spanProd);
 
-      const val = document.createElement("strong");
-      val.textContent = item.conteo
-        ? `⭐️ ${item.calidadProm} (${item.conteo} ${t("habitSessionsShort")})`
-        : t("habitNoRecords");
+      const barTrack = document.createElement("div");
+      barTrack.className = "balance-track";
+      const fillCons = document.createElement("div");
+      fillCons.className = "balance-fill-consume";
+      fillCons.style.width = `${pctConsumo}%`;
+      const fillProd = document.createElement("div");
+      fillProd.className = "balance-fill-produce";
+      fillProd.style.width = `${pctProduccion}%`;
+      barTrack.append(fillCons, fillProd);
 
-      pill.append(title, val);
-      contenedor.appendChild(pill);
-    });
+      boxBalance.append(header, barTrack);
+    }
+
+    // 2. Resumen por Energía Previa
+    const contenedorEnergia = document.getElementById("resumenHabitosBar");
+    if (contenedorEnergia) {
+      contenedorEnergia.replaceChildren();
+      datosHabitos.resumenEnergia.forEach((item) => {
+        const pill = document.createElement("div");
+        pill.className = "habit-stat-pill";
+
+        const title = document.createElement("span");
+        title.className = "habit-stat-title";
+        const energiaTrad = trVal("energiaPrevia", item.etiqueta);
+        title.textContent = `${item.icono} ${t("habitEnergyPrefix")} ${energiaTrad}:`;
+
+        const val = document.createElement("strong");
+        val.textContent = item.conteo
+          ? `⭐️ ${item.calidadProm} (${item.conteo} ${t("habitSessionsShort")})`
+          : t("habitNoRecords");
+
+        pill.append(title, val);
+        contenedorEnergia.appendChild(pill);
+      });
+    }
+
+    // 3. Resumen por Complejidad
+    const contenedorComp = document.getElementById("resumenComplejidadBar");
+    if (contenedorComp && Array.isArray(datosHabitos.resumenComplejidad)) {
+      contenedorComp.replaceChildren();
+      datosHabitos.resumenComplejidad.forEach((item) => {
+        const pill = document.createElement("div");
+        pill.className = "habit-stat-pill";
+
+        const title = document.createElement("span");
+        title.className = "habit-stat-title";
+        const compTrad = trVal("complejidad", item.etiqueta);
+        title.textContent = `${item.icono} ${compTrad}:`;
+
+        const val = document.createElement("strong");
+        val.textContent = item.conteo
+          ? `⭐️ ${item.calidadProm} · ${item.minutos}m (${item.conteo} ${t("habitSessionsShort")})`
+          : t("habitNoRecords");
+
+        pill.append(title, val);
+        contenedorComp.appendChild(pill);
+      });
+    }
+  }
+
+  /**
+   * Renderiza la Pestaña 4: Inspector de Subtemas y Bitácora de Notas.
+   */
+  function renderizarInspector(datosInspector, { onClickMateria } = {}) {
+    const listaTemasEl = document.getElementById("inspectorSubtemasList");
+    const listaNotasEl = document.getElementById("inspectorNotasList");
+    if (!datosInspector) return;
+
+    if (listaTemasEl) {
+      listaTemasEl.replaceChildren();
+      if (!datosInspector.subtemas.length) {
+        const empty = document.createElement("div");
+        empty.className = "inspector-empty";
+        empty.textContent = t("habitNoRecords");
+        listaTemasEl.appendChild(empty);
+      } else {
+        const maxMinTema = Math.max(1, datosInspector.subtemas[0].minutos);
+        datosInspector.subtemas.forEach((st) => {
+          const card = document.createElement("div");
+          card.className = "topic-inspector-card";
+          card.addEventListener("click", () => {
+            if (typeof onClickMateria === "function") {
+              onClickMateria(st.materia);
+            }
+          });
+
+          const topRow = document.createElement("div");
+          topRow.className = "topic-card-top";
+
+          const titleWrap = document.createElement("div");
+          const strongTema = document.createElement("strong");
+          strongTema.textContent = st.tema;
+          const subMat = document.createElement("small");
+          subMat.className = "cell-sub";
+          subMat.textContent = `📚 ${st.materia} · ${st.ultimaFecha}`;
+          titleWrap.append(strongTema, subMat);
+
+          const statsWrap = document.createElement("div");
+          statsWrap.className = "topic-card-stats";
+          statsWrap.textContent = `⏱️ ${st.minutos}m (${st.sesiones} ${t(
+            "habitSessionsShort"
+          )}) · ⭐️ ${st.calidadProm} · 🤖 ${st.iaProm}% · +${st.xp} XP`;
+
+          topRow.append(titleWrap, statsWrap);
+
+          const progressBg = document.createElement("div");
+          progressBg.className = "topic-progress-bg";
+          const progressFill = document.createElement("div");
+          progressFill.className = "topic-progress-fill";
+          progressFill.style.width = `${Math.round((st.minutos / maxMinTema) * 100)}%`;
+          progressBg.appendChild(progressFill);
+
+          card.append(topRow, progressBg);
+          listaTemasEl.appendChild(card);
+        });
+      }
+    }
+
+    if (listaNotasEl) {
+      listaNotasEl.replaceChildren();
+      if (!datosInspector.bitacoraNotas.length) {
+        const empty = document.createElement("div");
+        empty.className = "inspector-empty";
+        empty.textContent = t("inspectorNoNotes");
+        listaNotasEl.appendChild(empty);
+      } else {
+        datosInspector.bitacoraNotas.slice(0, 15).forEach((s) => {
+          const item = document.createElement("div");
+          item.className = "note-log-card";
+
+          const meta = document.createElement("div");
+          meta.className = "note-log-meta";
+          const icAct = ICONOS_ACTIVIDAD[s.tipoActividad] || "💻";
+          meta.textContent = `${s.fecha} · 📚 ${s.materia} (${s.tema}) · ${icAct} ${trVal(
+            "tipoActividad",
+            s.tipoActividad
+          )} · ⭐️ ${s.calidad}/5 · 🤖 ${s.usoIA}%`;
+
+          const text = document.createElement("div");
+          text.className = "note-log-text";
+          text.textContent = `“${s.notas}”`;
+
+          item.append(meta, text);
+          listaNotasEl.appendChild(item);
+        });
+      }
+    }
   }
 
   /**
@@ -750,11 +1172,12 @@
     document.getElementById("uiXpBar").style.width = `${progreso.porcentajeBarra}%`;
     document.getElementById("uiXpTotalBadge").textContent = `${progreso.totalXP} XP`;
 
-    // Aplicar filtro de Contexto para KPIs, Gráficos y Tabla
-    const sesionesFiltradas =
-      filtroContextoActual === "Todos"
-        ? listaGlobal
-        : listaGlobal.filter((s) => (s.contexto || "Académico") === filtroContextoActual);
+    // Aplicar filtros globales combinados (Contexto + Periodo + Materia) para KPIs, Gráficos y Tabla
+    const sesionesFiltradas = filtrarSesionesAvanzado(listaGlobal, {
+      contexto: filtroContextoActual,
+      periodo: filtroPeriodoActual,
+      materia: filtroMateriaActual
+    });
 
     const kpis = calcularKPIs(sesionesFiltradas);
 
@@ -848,9 +1271,30 @@
       }
     }
 
-    // 4. Gráficos, resumen de hábitos y mejor hora de enfoque
-    const { datosHora, datosHabitos } = StudyTracker.Charts.renderizarGraficos(sesionesFiltradas);
+    // 4. Gráficos, Mapa de Calor, Cuadrante IA, Hábitos e Inspector de Subtemas
+    const manejarClickMateria = (materiaClick) => {
+      const nueva = filtroMateriaActual === materiaClick ? "Todas" : materiaClick;
+      cambiarFiltroMateria(nueva);
+      renderizarDashboard(todasLasSesiones, { onEditarSesion, onEliminarSesion });
+    };
+
+    const {
+      datosEvolucion,
+      datosMapaCalor,
+      datosCuadrante,
+      datosHora,
+      datosHabitos,
+      datosInspector
+    } = StudyTracker.Charts.renderizarGraficos(sesionesFiltradas, {
+      agrupacionTemporal: agrupacionTemporalActual,
+      onSeleccionarMateria: manejarClickMateria
+    });
+
+    renderizarResumenEvolucion(datosEvolucion);
+    renderizarMapaCalorCircadiano(datosMapaCalor);
+    renderizarBadgesCuadrante(datosCuadrante);
     renderizarResumenHabitos(datosHabitos);
+    renderizarInspector(datosInspector, { onClickMateria: manejarClickMateria });
 
     const elMejorHora = document.getElementById("kpiMejorHora");
     if (elMejorHora) {
@@ -869,6 +1313,12 @@
     obtenerValoresChips,
     obtenerIdSesionEditando,
     cambiarFiltroContexto,
+    cambiarFiltroPeriodo,
+    cambiarFiltroMateria,
+    resetearFiltros,
+    cambiarPestanaAnalitica,
+    cambiarAgrupacionTemporal,
+    cambiarMetricaHeatmap,
     alternarVistaHistorial,
     seleccionarChip,
     cargarSesionEnFormulario,

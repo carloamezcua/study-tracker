@@ -43,9 +43,17 @@
       rpgMaxLevel: "MÁX",
       rpgTotalXpLabel: "XP Total Acumulado",
 
-      // Filtro por Contexto
-      filterLabel: "🔍 Filtrar analítica y tabla por contexto:",
+      // Filtros Globales (Contexto, Periodo y Materia)
+      filterLabel: "🔍 Contexto:",
       filterAll: "🌐 Todos",
+      filterPeriodLabel: "📅 Periodo:",
+      periodAll: "Todo",
+      period7d: "Últimos 7 días",
+      period30d: "Últimos 30 días",
+      periodToday: "Hoy",
+      filterSubjectLabel: "📚 Materia:",
+      filterAllSubjects: "Todas las materias",
+      btnResetFilters: "✖ Quitar filtros",
 
       // Tarjetas KPI
       kpiTotalTimeLabel: "Tiempo Total Estudiado",
@@ -189,19 +197,68 @@
       helpAiMech:
         "Delegación mecánica: automatización directa o copiar/pegar para entregar rápido sin profundizar (-15% XP).",
 
-      // Gráficos
+      // Pestañas y Gráficos Analíticos Interactivos
+      tabTimeTitle: "📈 1. Tiempo y Ritmo",
+      tabAiTitle: "🤖 2. IA vs. Retención",
+      tabHabitsTitle: "🧠 3. Hábitos y Energía",
+      tabInspectorTitle: "🗂️ 4. Temas y Notas",
+      chartEvoTitle: "📅 Evolución y Constancia de Estudio",
+      chartEvoSubtitle:
+        "Cuánto estudias por día, semana o mes y cómo evoluciona tu calidad de asimilación.",
+      evoBtnDay: "Día",
+      evoBtnWeek: "Semana",
+      evoBtnMonth: "Mes",
+      evoStreakBadgeText: "🔥 Racha: {streak}d (Mejor: {best}d)",
+      evoActiveDaysBadgeText: "📅 Días activos: {days}",
+      evoAvgDayBadgeText: "⏱️ Promedio / día activo: {min} min",
+      heatmapTitle: "🔥 Mapa de Calor de Ritmo Circadiano (Día × Franja)",
+      heatmapSubtitle:
+        "Descubre tu ventana dorada cruzando los días de la semana contra las 4 franjas biológicas.",
+      heatBtnMin: "⏱️ Minutos",
+      heatBtnQual: "⭐️ Asimilación",
+      heatBtnEnergy: "🔋 Energía",
+      heatmapCornerLabel: "Día \\ Franja",
+      heatmapGoldenText:
+        "🏆 Ventana dorada: {day} por la {slot} (⭐️ {quality}/5 · {min} min acumulados)",
+      heatmapGoldenEmpty: "🏆 Registra sesiones para descubrir tu ventana dorada de enfoque",
+      chart1ToggleSummary: "🕒 Ver desglose detallado hora por hora (00:00 - 23:00)",
+      chartQuadTitle: "🎯 Cuadrante de Rendimiento Cognitivo (% IA vs. Asimilación)",
+      chartQuadHint: "Tamaño de burbuja = Duración · Color = Modo de IA",
+      chartQuadSubtitle:
+        "Detecta si la IA potencia tu aprendizaje (arriba-derecha) o genera ilusión de fluidez con baja retención (abajo-derecha).",
+      quadSynergyText: "🚀 Sinergia IA (≥35% IA, ⭐️ 4-5): {count}",
+      quadAutonText: "🧠 Dominio Propio (<35% IA, ⭐️ 4-5): {count}",
+      quadMechText: "🤖 Ilusión Mecánica (≥35% IA, ⭐️ 1-2): {count}",
+      quadFatigueText: "🪫 Fricción / Fatiga (<35% IA, ⭐️ 1-2): {count}",
+      chartAxisAiPct: "Porcentaje de Uso de IA (%)",
       chart1Title: "🕒 Rendimiento y Asimilación por Hora del Día",
       chart1Hint: "Descubre tus picos biológicos de enfoque",
       chart1Subtitle:
         "Compara los minutos estudiados (barras) y tu calidad de asimilación promedio (línea) según la hora de inicio.",
       chart2Title: "📚 Impacto de IA y Aprendizaje por Materia",
       chart2Hint: "Aprendizaje real vs. Copy-Paste mecánico",
+      chart2ClickHint: "💡 Haz clic en una barra para filtrar por esa materia",
       chart2Subtitle:
         "Contrasta tus minutos de aprendizaje real (Autónomo, Diálogo o Copiloto) frente a las sesiones mecánicas (Copy-Paste) y tu asimilación (1-5).",
-      chart3Title: "🧠 Patrones de Hábito: Actividad y Energía Previa",
+      chart3Title: "🧠 Patrones de Hábito: 8 Actividades y Balance Cognitivo",
       chart3Hint: "Comportamiento por tipo de tarea y fatiga",
       chart3Subtitle:
-        "Minutos y asimilación promedio según los 8 tipos de actividad y cómo rinde tu aprendizaje según tu energía inicial.",
+        "Minutos y asimilación promedio según los 8 tipos de actividad y proporción entre preparación/teoría y práctica/producción.",
+      balanceConsumeLabel: "📖 Preparación / Clase / Teoría: {min} min ({pct}%)",
+      balanceProduceLabel: "💻 Apuntes / Código / Práctica: {min} min ({pct}%)",
+      habitMatrixTitle: "🔋 Impacto de la Energía Previa y Complejidad",
+      habitMatrixSubtitle:
+        "Compara cómo cambia tu retención promedio según tu energía al iniciar y la dificultad del reto.",
+      habitByEnergyTitle: "Por Energía Inicial",
+      habitByComplexityTitle: "Por Complejidad del Tema",
+      inspectorTopicsTitle: "🗂️ Radiografía por Subtemas (Tema específico)",
+      inspectorTopicsHint: "Haz clic en cualquier subtema para filtrar su materia",
+      inspectorTopicsSubtitle:
+        "Desglose de tiempo invertido, sesiones, asimilación promedio, uso de IA y XP por cada subtema o módulo.",
+      inspectorNotesTitle: "📝 Bitácora de Notas y Reflexiones",
+      inspectorNotesSubtitle:
+        "Tus observaciones, aprendizajes y bloqueos registrados en las sesiones filtradas.",
+      inspectorNoNotes: "No hay notas registradas en este filtro.",
       chartNoData: "Sin datos",
       chartAxisMinutes: "Minutos",
       chartAxisAssimilation: "Asimilación (1-5)",
@@ -319,9 +376,17 @@
       rpgMaxLevel: "MAX",
       rpgTotalXpLabel: "Total Accumulated XP",
 
-      // Filtro por Contexto
-      filterLabel: "🔍 Filter analytics & table by context:",
+      // Filtros Globales (Contexto, Periodo y Materia)
+      filterLabel: "🔍 Context:",
       filterAll: "🌐 All",
+      filterPeriodLabel: "📅 Period:",
+      periodAll: "All time",
+      period7d: "Last 7 days",
+      period30d: "Last 30 days",
+      periodToday: "Today",
+      filterSubjectLabel: "📚 Subject:",
+      filterAllSubjects: "All subjects",
+      btnResetFilters: "✖ Reset filters",
 
       // Tarjetas KPI
       kpiTotalTimeLabel: "Total Study Time",
@@ -465,19 +530,68 @@
       helpAiMech:
         "Mechanical delegation: direct automation or copy-pasting to deliver quickly without reading deeply (-15% XP).",
 
-      // Gráficos
+      // Pestañas y Gráficos Analíticos Interactivos
+      tabTimeTitle: "📈 1. Time & Rhythm",
+      tabAiTitle: "🤖 2. AI vs. Retention",
+      tabHabitsTitle: "🧠 3. Habits & Energy",
+      tabInspectorTitle: "🗂️ 4. Topics & Notes",
+      chartEvoTitle: "📅 Study Evolution & Consistency",
+      chartEvoSubtitle:
+        "How much you study per day, week, or month and how your assimilation quality evolves.",
+      evoBtnDay: "Day",
+      evoBtnWeek: "Week",
+      evoBtnMonth: "Month",
+      evoStreakBadgeText: "🔥 Streak: {streak}d (Best: {best}d)",
+      evoActiveDaysBadgeText: "📅 Active days: {days}",
+      evoAvgDayBadgeText: "⏱️ Avg / active day: {min} min",
+      heatmapTitle: "🔥 Circadian Rhythm Heatmap (Day × Time Slot)",
+      heatmapSubtitle:
+        "Discover your golden focus window by crossing weekdays against the 4 biological time slots.",
+      heatBtnMin: "⏱️ Minutes",
+      heatBtnQual: "⭐️ Assimilation",
+      heatBtnEnergy: "🔋 Energy",
+      heatmapCornerLabel: "Day \\ Slot",
+      heatmapGoldenText:
+        "🏆 Golden window: {day} {slot} (⭐️ {quality}/5 · {min} total min)",
+      heatmapGoldenEmpty: "🏆 Log sessions to discover your golden focus window",
+      chart1ToggleSummary: "🕒 View detailed hour-by-hour breakdown (00:00 - 23:00)",
+      chartQuadTitle: "🎯 Cognitive Performance Quadrant (% AI vs. Assimilation)",
+      chartQuadHint: "Bubble size = Duration · Color = AI Mode",
+      chartQuadSubtitle:
+        "Spot whether AI is boosting your learning (top-right) or creating an illusion of fluency with low retention (bottom-right).",
+      quadSynergyText: "🚀 AI Synergy (≥35% AI, ⭐️ 4-5): {count}",
+      quadAutonText: "🧠 Own Mastery (<35% AI, ⭐️ 4-5): {count}",
+      quadMechText: "🤖 Mechanical Illusion (≥35% AI, ⭐️ 1-2): {count}",
+      quadFatigueText: "🪫 Friction / Fatigue (<35% IA, ⭐️ 1-2): {count}",
+      chartAxisAiPct: "AI Usage Percentage (%)",
       chart1Title: "🕒 Performance & Assimilation by Time of Day",
       chart1Hint: "Discover your biological focus peaks",
       chart1Subtitle:
         "Compare minutes studied (bars) and your average assimilation quality (line) by start hour.",
       chart2Title: "📚 AI Impact & Learning by Subject",
       chart2Hint: "Real learning vs. Mechanical Copy-Paste",
+      chart2ClickHint: "💡 Click any bar to filter by that subject",
       chart2Subtitle:
         "Contrast your real learning minutes (Autonomous, Dialogue, or Copilot) against mechanical sessions (Copy-Paste) and your assimilation (1-5).",
-      chart3Title: "🧠 Habit Patterns: Activity & Prior Energy",
+      chart3Title: "🧠 Habit Patterns: 8 Activities & Cognitive Balance",
       chart3Hint: "Behavior by task type and fatigue",
       chart3Subtitle:
-        "Minutes and average assimilation across the 8 activity types and how your learning performs based on starting energy.",
+        "Minutes and average assimilation across the 8 activity types and balance between prep/theory and practice/production.",
+      balanceConsumeLabel: "📖 Prep / Class / Theory: {min} min ({pct}%)",
+      balanceProduceLabel: "💻 Notes / Code / Practice: {min} min ({pct}%)",
+      habitMatrixTitle: "🔋 Prior Energy & Complexity Impact",
+      habitMatrixSubtitle:
+        "Compare how your average retention changes based on starting energy and challenge level.",
+      habitByEnergyTitle: "By Starting Energy",
+      habitByComplexityTitle: "By Topic Complexity",
+      inspectorTopicsTitle: "🗂️ Subtopic Breakdown (Specific Topic)",
+      inspectorTopicsHint: "Click any subtopic to filter its subject",
+      inspectorTopicsSubtitle:
+        "Time invested, sessions, average assimilation, AI usage, and XP for each specific topic or module.",
+      inspectorNotesTitle: "📝 Notes & Reflections Log",
+      inspectorNotesSubtitle:
+        "Your observations, takeaways, and blockers recorded in the filtered sessions.",
+      inspectorNoNotes: "No notes recorded in this filter.",
       chartNoData: "No data",
       chartAxisMinutes: "Minutes",
       chartAxisAssimilation: "Assimilation (1-5)",

@@ -77,13 +77,84 @@
       });
     }
 
-    // Barra de filtro rápido por Contexto en el Dashboard
+    // Barra de filtros globales combinables (Contexto, Periodo, Materia y Reset)
     const filterBar = document.getElementById("contextFilterBar");
     if (filterBar) {
       filterBar.addEventListener("click", (e) => {
-        const pill = e.target.closest(".filter-pill");
-        if (!pill) return;
-        UI.cambiarFiltroContexto(pill.dataset.filter);
+        const pillCtx = e.target.closest(".filter-pill");
+        if (pillCtx) {
+          UI.cambiarFiltroContexto(pillCtx.dataset.filter);
+          UI.renderizarDashboard(store.getSesiones(), {
+            onEditarSesion: manejarEditarSesion,
+            onEliminarSesion: manejarEliminarSesion
+          });
+          return;
+        }
+
+        const pillPeriod = e.target.closest(".period-pill");
+        if (pillPeriod) {
+          UI.cambiarFiltroPeriodo(pillPeriod.dataset.period);
+          UI.renderizarDashboard(store.getSesiones(), {
+            onEditarSesion: manejarEditarSesion,
+            onEliminarSesion: manejarEliminarSesion
+          });
+        }
+      });
+    }
+
+    const selectMateria = document.getElementById("subjectFilterSelect");
+    if (selectMateria) {
+      selectMateria.addEventListener("change", () => {
+        UI.cambiarFiltroMateria(selectMateria.value);
+        UI.renderizarDashboard(store.getSesiones(), {
+          onEditarSesion: manejarEditarSesion,
+          onEliminarSesion: manejarEliminarSesion
+        });
+      });
+    }
+
+    const btnResetFilters = document.getElementById("btnResetFilters");
+    if (btnResetFilters) {
+      btnResetFilters.addEventListener("click", () => {
+        UI.resetearFiltros();
+        UI.renderizarDashboard(store.getSesiones(), {
+          onEditarSesion: manejarEditarSesion,
+          onEliminarSesion: manejarEliminarSesion
+        });
+      });
+    }
+
+    // Navegación por pestañas analíticas interactivas
+    const analyticsTabsBar = document.getElementById("analyticsTabsBar");
+    if (analyticsTabsBar) {
+      analyticsTabsBar.addEventListener("click", (e) => {
+        const tabBtn = e.target.closest(".analytics-tab-btn");
+        if (!tabBtn) return;
+        UI.cambiarPestanaAnalitica(tabBtn.dataset.tab);
+      });
+    }
+
+    // Selector de agrupación temporal (Día / Semana / Mes)
+    const evoGroupingBtns = document.getElementById("evoGroupingBtns");
+    if (evoGroupingBtns) {
+      evoGroupingBtns.addEventListener("click", (e) => {
+        const btn = e.target.closest(".seg-btn");
+        if (!btn) return;
+        UI.cambiarAgrupacionTemporal(btn.dataset.group);
+        UI.renderizarDashboard(store.getSesiones(), {
+          onEditarSesion: manejarEditarSesion,
+          onEliminarSesion: manejarEliminarSesion
+        });
+      });
+    }
+
+    // Selector de métrica del Mapa de Calor Circadiano (Minutos / Asimilación / Energía)
+    const heatmapMetricBtns = document.getElementById("heatmapMetricBtns");
+    if (heatmapMetricBtns) {
+      heatmapMetricBtns.addEventListener("click", (e) => {
+        const btn = e.target.closest(".seg-btn");
+        if (!btn) return;
+        UI.cambiarMetricaHeatmap(btn.dataset.metric);
         UI.renderizarDashboard(store.getSesiones(), {
           onEditarSesion: manejarEditarSesion,
           onEliminarSesion: manejarEliminarSesion

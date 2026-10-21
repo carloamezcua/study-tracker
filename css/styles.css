@@ -242,13 +242,11 @@ body {
   color: #34d399;
 }
 
-/* Barra de Filtro Rápido por Contexto */
+/* Barra de Filtro Multidimensional */
 .filter-bar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -256,8 +254,28 @@ body {
   margin-bottom: 16px;
 }
 
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.filter-row-secondary {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.filter-group-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
 .filter-label {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--muted);
 }
@@ -268,27 +286,50 @@ body {
   gap: 8px;
 }
 
-.filter-pill {
+.filter-pill,
+.period-pill {
   background: var(--bg);
   border: 1px solid var(--border);
   color: var(--muted);
   padding: 6px 12px;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.filter-pill:hover {
+.filter-pill:hover,
+.period-pill:hover {
   border-color: var(--accent);
   color: var(--text);
 }
 
-.filter-pill.active {
+.filter-pill.active,
+.period-pill.active {
   background: var(--accent);
   border-color: var(--accent);
   color: white;
+}
+
+.filter-select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  width: auto;
+  min-width: 190px;
+}
+
+.filter-reset-btn {
+  padding: 5px 12px;
+  font-size: 0.76rem;
+  border-radius: 999px;
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fcd34d;
 }
 
 /* Tarjetas KPI */
@@ -853,11 +894,132 @@ input[type="range"] {
   box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.35);
 }
 
-/* Gráficos y Resumen de Hábitos */
+/* Gráficos, Pestañas Analíticas y Resumen de Hábitos */
 .charts-col {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
+}
+
+/* Barra de Pestañas Analíticas */
+.analytics-tabs-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+}
+
+@media (max-width: 760px) {
+  .analytics-tabs-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.analytics-tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.analytics-tab-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.analytics-tab-btn.active {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: var(--accent);
+  color: #e0e7ff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.18);
+}
+
+.analytics-tab-panel {
+  display: none;
+}
+
+.analytics-tab-panel.active {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.panel-header-flex {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.panel-header-flex h2 {
+  margin-bottom: 0;
+}
+
+.mini-segmented {
+  display: inline-flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.seg-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.seg-btn:hover {
+  color: var(--text);
+}
+
+.seg-btn.active {
+  background: var(--accent);
+  color: white;
+}
+
+.mini-kpi-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mini-kpi-badge {
+  background: var(--card-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mini-kpi-badge span {
+  color: var(--muted);
+}
+
+.mini-kpi-badge strong {
+  color: #a5b4fc;
 }
 
 .chart-box {
@@ -866,18 +1028,180 @@ input[type="range"] {
   width: 100%;
 }
 
+.chart-box-tall {
+  height: 255px;
+}
+
 .chart-hint {
   font-size: 0.75rem;
   color: var(--muted);
   font-weight: normal;
 }
 
+/* Mapa de Calor Circadiano */
+.golden-window-pill {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #a7f3d0;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.heatmap-wrapper {
+  overflow-x: auto;
+}
+
+.heatmap-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 5px;
+  font-size: 0.76rem;
+}
+
+.heatmap-table th {
+  background: transparent;
+  border: none;
+  text-align: center;
+  padding: 4px 6px;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.heatmap-day-cell {
+  font-weight: 700;
+  color: var(--muted);
+  width: 44px;
+  border: none;
+  padding: 6px 4px;
+}
+
+.heatmap-val-cell {
+  text-align: center;
+  border-radius: 8px;
+  padding: 8px 6px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.12s ease;
+}
+
+.heatmap-val-cell:hover {
+  transform: scale(1.03);
+  border-color: var(--accent);
+}
+
+.heatmap-empty {
+  background: rgba(15, 23, 42, 0.45);
+  color: rgba(148, 163, 184, 0.35);
+  font-weight: 400;
+}
+
+.chart-collapsible {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.chart-collapsible summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* Cuadrante Cognitivo IA */
+.quadrant-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.quad-badge {
+  background: var(--card-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+}
+
+.quad-badge-sinergia {
+  border-left: 3px solid #10b981;
+}
+
+.quad-badge-artesanal {
+  border-left: 3px solid #6366f1;
+}
+
+.quad-badge-piloto {
+  border-left: 3px solid #ef4444;
+}
+
+.quad-badge-friccion {
+  border-left: 3px solid #f59e0b;
+}
+
+/* Balance Cognitivo (Consumo vs Producción) */
+.balance-cognitivo-box {
+  background: var(--card-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.balance-header {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.76rem;
+  margin-bottom: 7px;
+  color: var(--muted);
+}
+
+.balance-track {
+  height: 10px;
+  background: var(--bg);
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+}
+
+.balance-fill-consume {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.balance-fill-produce {
+  background: linear-gradient(90deg, #10b981, #f59e0b);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.sub-section-title {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 700;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .habit-summary-bar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 10px;
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px solid var(--border);
 }
 
@@ -894,6 +1218,99 @@ input[type="range"] {
 
 .habit-stat-title {
   color: var(--muted);
+}
+
+/* Inspector de Subtemas y Bitácora de Notas */
+.inspector-topics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 290px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.topic-inspector-card {
+  background: var(--card-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.topic-inspector-card:hover {
+  border-color: var(--accent);
+}
+
+.topic-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.82rem;
+  margin-bottom: 4px;
+}
+
+.topic-card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.74rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.topic-progress-bg {
+  height: 5px;
+  background: var(--bg);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.topic-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--success));
+  border-radius: 999px;
+}
+
+.inspector-notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.note-log-card {
+  background: var(--card-alt);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+
+.note-log-meta {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.73rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.note-log-text {
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.inspector-empty {
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 18px 10px;
 }
 
 /* Tabla de Historial */

@@ -526,13 +526,375 @@
       };
     });
 
+    // 5. Calidad y bloqueos según Complejidad
+    const resumenComplejidad = NIVELES_COMPLEJIDAD.map((comp) => {
+      const filtradas = lista.filter((s) => s.complejidad === comp.valor);
+      const conteo = filtradas.length;
+      const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
+      const calidadProm = conteo
+        ? +(filtradas.reduce((acc, s) => acc + (Number(s.calidad) || 0), 0) / conteo).toFixed(1)
+        : 0;
+      const bloqueos = filtradas.filter((s) => s.objetivoCumplido === "No").length;
+      return {
+        ...comp,
+        conteo,
+        minutos,
+        calidadProm,
+        bloqueos
+      };
+    });
+
+    // 6. Balance Cognitivo: Consumir/Preparar vs. Producir/Practicar
+    const actividadesConsumo = new Set([
+      "Preparación / Contexto",
+      "Clase / Cátedra",
+      "Teoría / Docs",
+      "Investigación / Diálogo"
+    ]);
+    let minConsumo = 0;
+    let minProduccion = 0;
+    lista.forEach((s) => {
+      const dur = Number(s.duracion) || 0;
+      if (actividadesConsumo.has(s.tipoActividad)) {
+        minConsumo += dur;
+      } else {
+        minProduccion += dur;
+      }
+    });
+    const totalMinBalance = minConsumo + minProduccion;
+    const pctProduccion = totalMinBalance ? Math.round((minProduccion / totalMinBalance) * 100) : 0;
+    const pctConsumo = totalMinBalance ? 100 - pctProduccion : 0;
+
     return {
       actividadesLabels,
       minutosPorActividad,
       calidadPorActividad,
       resumenEnergia,
       resumenContextos,
-      resumenObjetivos
+      resumenObjetivos,
+      resumenComplejidad,
+      balanceCognitivo: {
+        minConsumo,
+        minProduccion,
+        pctConsumo,
+        pctProduccion
+      }
+    };
+  }
+
+  /**
+   * Filtra una lista de sesiones combinando Contexto, Periodo temporal y Materia.
+   */
+  function filtrarSesionesAvanzado(
+    sesiones,
+    { contexto = "Todos", periodo = "todo", materia = "Todas" } = {}
+  ) {
+    const lista = Array.isArray(sesiones) ? sesiones : [];
+    const ahora = new Date();
+    const hoyISO = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-${String(
+      ahora.getDate()
+    ).padStart(2, "0")}`;
+
+    let fechaCorteStr = null;
+    if (periodo === "hoy") {
+      fechaCorteStr = hoyISO;
+    } else if (periodo === "7d" || periodo === "30d") {
+      const dias = periodo === "7d" ? 6 : 29;
+      const corte = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() - dias);
+      fechaCorteStr = `${corte.getFullYear()}-${String(corte.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(corte.getDate()).padStart(2, "0")}`;
+    }
+
+    return lista.filter((s) => {
+      if (contexto !== "Todos" && (s.contexto || "Académico") !== contexto) {
+        return false;
+      }
+      if (materia !== "Todas" && (s.materia || "General").trim() !== materia) {
+        return false;
+      }
+      if (fechaCorteStr && s.fecha) {
+        const f = String(s.fecha).slice(0, 10);
+        if (periodo === "hoy" && f !== fechaCorteStr) return false;
+        if ((periodo === "7d" || periodo === "30d") && f < fechaCorteStr) return false;
+      }
+      return true;
+    });
+  }
+
+  /**
+   * Obtiene el lunes de la semana correspondiente a una fecha YYYY-MM-DD.
+   */
+  function obtenerInicioSemanaISO(fechaStr) {
+    const partes = String(fechaStr || "").slice(0, 10).split("-").map(Number);
+    if (partes.length !== 3 || partes.some(Number.isNaN)) return "Sin fecha";
+    const d = new Date(partes[0], partes[1] - 1, partes[2]);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Lunes como inicio
+    const lunes = new Date(d.setDate(diff));
+    return `${lunes.getFullYear()}-${String(lunes.getMonth() + 1).padStart(2, "0")}-${String(
+      lunes.getDate()
+    ).padStart(2, "0")}`;
+  }
+
+  /**
+   * Analiza la evolución temporal del estudio por Día, Semana o Mes, y calcula la racha de días activos.
+   */
+  function analizarEvolucionTemporal(sesiones, agrupacion = "dia") {
+    const lista = Array.isArray(sesiones) ? sesiones : [];
+    const mapa = {};
+    const diasUnicosSet = new Set();
+
+    lista.forEach((s) => {
+      const f = String(s.fecha || "").slice(0, 10);
+      if (!f) return;
+      diasUnicosSet.add(f);
+
+      let clave = f;
+      if (agrupacion === "semana") {
+        clave = obtenerInicioSemanaISO(f);
+      } else if (agrupacion === "mes") {
+        clave = f.slice(0, 7);
+      }
+
+      if (!mapa[clave]) {
+        mapa[clave] = { minutos: 0, sumaCalidad: 0, conteo: 0, xp: 0 };
+      }
+      mapa[clave].minutos += Number(s.duracion) || 0;
+      mapa[clave].sumaCalidad += Number(s.calidad) || 0;
+      mapa[clave].conteo += 1;
+      mapa[clave].xp += Number(s.xp) || 0;
+    });
+
+    const clavesOrdenadas = Object.keys(mapa).sort();
+    const minutos = clavesOrdenadas.map((k) => mapa[k].minutos);
+    const calidadPromedio = clavesOrdenadas.map(
+      (k) => +(mapa[k].sumaCalidad / mapa[k].conteo).toFixed(2)
+    );
+    const conteoSesiones = clavesOrdenadas.map((k) => mapa[k].conteo);
+
+    // Calcular racha de días consecutivos (desde el último día registrado o día actual)
+    const diasOrdenados = Array.from(diasUnicosSet).sort();
+    let rachaActual = 0;
+    let mejorRacha = 0;
+    let rachaTemp = 0;
+
+    for (let i = 0; i < diasOrdenados.length; i++) {
+      if (i === 0) {
+        rachaTemp = 1;
+      } else {
+        const p1 = diasOrdenados[i - 1].split("-").map(Number);
+        const p2 = diasOrdenados[i].split("-").map(Number);
+        const d1 = new Date(p1[0], p1[1] - 1, p1[2]);
+        const d2 = new Date(p2[0], p2[1] - 1, p2[2]);
+        const diffDias = Math.round((d2 - d1) / 86400000);
+        rachaTemp = diffDias === 1 ? rachaTemp + 1 : 1;
+      }
+      if (rachaTemp > mejorRacha) mejorRacha = rachaTemp;
+    }
+    rachaActual = rachaTemp;
+
+    const totalMin = lista.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
+    const diasActivos = diasOrdenados.length;
+    const promedioMinPorDiaActivo = diasActivos ? Math.round(totalMin / diasActivos) : 0;
+
+    return {
+      clavesOrdenadas,
+      minutos,
+      calidadPromedio,
+      conteoSesiones,
+      diasActivos,
+      rachaActual,
+      mejorRacha,
+      promedioMinPorDiaActivo
+    };
+  }
+
+  /**
+   * Construye la matriz 7x4 para el Mapa de Calor Circadiano (Día de la semana x Franja horaria).
+   */
+  function analizarMapaCalorCircadiano(sesiones) {
+    const lista = Array.isArray(sesiones) ? sesiones : [];
+    const ordenDias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+    const ordenFranjas = ["Madrugada", "Mañana", "Tarde", "Noche"];
+    const pesoEnergia = { Alta: 3, Media: 2, Baja: 1 };
+
+    const matriz = {};
+    ordenDias.forEach((d) => {
+      matriz[d] = {};
+      ordenFranjas.forEach((f) => {
+        matriz[d][f] = {
+          minutos: 0,
+          sesiones: 0,
+          sumaCalidad: 0,
+          sumaEnergia: 0,
+          calidadProm: 0,
+          energiaProm: 0
+        };
+      });
+    });
+
+    let maxMinutosCelda = 0;
+    let mejorCelda = null;
+
+    lista.forEach((s) => {
+      const dia = s.diaSemana || calcularDiaSemana(s.fecha);
+      const franja = s.franjaHoraria || calcularFranjaHoraria(s.horaInicio);
+      if (!matriz[dia] || !matriz[dia][franja]) return;
+
+      const celda = matriz[dia][franja];
+      celda.minutos += Number(s.duracion) || 0;
+      celda.sesiones += 1;
+      celda.sumaCalidad += Number(s.calidad) || 0;
+      celda.sumaEnergia += pesoEnergia[s.energiaPrevia] || 2;
+      celda.calidadProm = +(celda.sumaCalidad / celda.sesiones).toFixed(1);
+      celda.energiaProm = +(celda.sumaEnergia / celda.sesiones).toFixed(1);
+
+      if (celda.minutos > maxMinutosCelda) {
+        maxMinutosCelda = celda.minutos;
+      }
+    });
+
+    ordenDias.forEach((d) => {
+      ordenFranjas.forEach((f) => {
+        const c = matriz[d][f];
+        if (c.sesiones > 0) {
+          if (
+            !mejorCelda ||
+            c.calidadProm > mejorCelda.calidadProm ||
+            (c.calidadProm === mejorCelda.calidadProm && c.minutos > mejorCelda.minutos)
+          ) {
+            mejorCelda = { dia: d, franja: f, ...c };
+          }
+        }
+      });
+    });
+
+    return {
+      ordenDias,
+      ordenFranjas,
+      matriz,
+      maxMinutosCelda,
+      mejorCelda
+    };
+  }
+
+  /**
+   * Analiza el Cuadrante de Rendimiento Cognitivo (% Uso IA vs. Asimilación 1-5),
+   * agrupando o desplazando ligeramente puntos superpuestos para visualización en burbujas.
+   */
+  function analizarCuadranteIA(sesiones) {
+    const lista = Array.isArray(sesiones) ? sesiones : [];
+    const conteoCoordenadas = {};
+    const puntos = [];
+
+    let qSinergia = 0; // IA >= 35% y Calidad >= 4
+    let qAutonomo = 0; // IA < 35% y Calidad >= 4
+    let qMecanico = 0; // IA >= 35% y Calidad <= 2
+    let qFatiga = 0; // IA < 35% y Calidad <= 2
+
+    lista.forEach((s) => {
+      const ia = Math.min(100, Math.max(0, Number(s.usoIA) || 0));
+      const cal = Math.min(5, Math.max(1, Number(s.calidad) || 3));
+      const dur = Math.max(5, Number(s.duracion) || 15);
+      const modo = s.modoIA || (ia === 0 ? "Autónomo" : "Copiloto / Apoyo");
+
+      if (cal >= 4 && ia >= 35) qSinergia += 1;
+      else if (cal >= 4 && ia < 35) qAutonomo += 1;
+      else if (cal <= 2 && ia >= 35) qMecanico += 1;
+      else if (cal <= 2 && ia < 35) qFatiga += 1;
+
+      const key = `${ia}_${cal}`;
+      const indiceRepetido = conteoCoordenadas[key] || 0;
+      conteoCoordenadas[key] = indiceRepetido + 1;
+
+      // Pequeño desplazamiento en espiral cuando hay múltiples sesiones en la misma coordenada exacta
+      const angulo = indiceRepetido * 1.9;
+      const offsetRadio = indiceRepetido === 0 ? 0 : Math.min(3.5, 1.3 + indiceRepetido * 0.45);
+      const xJitter = Math.min(100, Math.max(0, +(ia + Math.cos(angulo) * offsetRadio).toFixed(1)));
+      const yJitter = Math.min(
+        5.25,
+        Math.max(0.75, +(cal + Math.sin(angulo) * (offsetRadio * 0.06)).toFixed(2))
+      );
+
+      puntos.push({
+        x: xJitter,
+        y: yJitter,
+        r: Math.min(22, Math.max(6, Math.round(Math.sqrt(dur) * 1.85))),
+        iaReal: ia,
+        calidadReal: cal,
+        duracion: Number(s.duracion) || 0,
+        materia: s.materia || "General",
+        tema: s.tema || "General",
+        modoIA: modo,
+        tipoActividad: s.tipoActividad || "Desarrollo / Código",
+        fecha: s.fecha || ""
+      });
+    });
+
+    return {
+      puntos,
+      cuadrantes: {
+        qSinergia,
+        qAutonomo,
+        qMecanico,
+        qFatiga
+      }
+    };
+  }
+
+  /**
+   * Desglosa las sesiones por Subtema (Tema específico) y recopila la bitácora de notas.
+   */
+  function analizarInspectorMateria(sesiones) {
+    const lista = Array.isArray(sesiones) ? sesiones : [];
+    const mapaTemas = {};
+
+    lista.forEach((s) => {
+      const mat = (s.materia || "General").trim() || "General";
+      const tem = (s.tema || "General").trim() || "General";
+      const key = `${mat}|||${tem}`;
+
+      if (!mapaTemas[key]) {
+        mapaTemas[key] = {
+          materia: mat,
+          tema: tem,
+          minutos: 0,
+          sesiones: 0,
+          sumaCalidad: 0,
+          sumaIA: 0,
+          xp: 0,
+          ultimaFecha: s.fecha || ""
+        };
+      }
+
+      const item = mapaTemas[key];
+      item.minutos += Number(s.duracion) || 0;
+      item.sesiones += 1;
+      item.sumaCalidad += Number(s.calidad) || 0;
+      item.sumaIA += Number(s.usoIA) || 0;
+      item.xp += Number(s.xp) || 0;
+      if ((s.fecha || "") >= item.ultimaFecha) {
+        item.ultimaFecha = s.fecha || "";
+      }
+    });
+
+    const subtemas = Object.values(mapaTemas)
+      .map((item) => ({
+        ...item,
+        calidadProm: +(item.sumaCalidad / item.sesiones).toFixed(1),
+        iaProm: Math.round(item.sumaIA / item.sesiones)
+      }))
+      .sort((a, b) => b.minutos - a.minutos);
+
+    const bitacoraNotas = [...lista]
+      .reverse()
+      .filter((s) => s.notas && String(s.notas).trim().length > 0);
+
+    return {
+      subtemas,
+      bitacoraNotas
     };
   }
 
@@ -609,6 +971,11 @@
     analizarPorHora,
     analizarPorMateria,
     analizarHabitos,
+    filtrarSesionesAvanzado,
+    analizarEvolucionTemporal,
+    analizarMapaCalorCircadiano,
+    analizarCuadranteIA,
+    analizarInspectorMateria,
     obtenerTextoAyudaActividad,
     obtenerTextoAyudaObjetivo,
     obtenerTextoAyudaCalidad,

@@ -28,7 +28,7 @@ Hoy solo hay **XP → Nivel → Rango**. Esto es lo que añadiría profundidad. 
 
 ## 🧠 Analítica y reflexión
 
-- [ ] ¿Cuánto se estudia al día, semana, mes?
+- [x] ¿Cuánto se estudia al día, semana, mes? *(Implementado en Pestaña 1 del Dashboard Analítico)*
 
 ---
 
@@ -78,3 +78,4 @@ _Anota también lo que decidiste NO hacer y por qué. Evita volver a discutirlo.
 | Actividad `🗂️ Preparación / Contexto` para medir el tiempo preparando el ambiente y recopilando info con LLMs | 2026-10-20 | Tanda 1 |
 | Actividad `👨‍🏫 Clase / Cátedra` con ajuste automático de IA a 0% y escala enfocada en concentración e interés | 2026-10-20 | Tanda 1 |
 | Migrar persistencia de `.xlsx` (SheetJS + fórmulas de Excel duplicadas) a `.csv` puro (`data/study-tracker.csv`) con fórmulas 100% en JS | 2026-10-20 | CSV Refactor |
+| Dashboard Analítico Interactivo en 4 pestañas (Evolución Día/Semana/Mes + Racha, Mapa de Calor Circadiano 7×4, Cuadrante Cognitivo IA en burbujas, Balance Consumo/Producción e Inspector de Subtemas/Notas con filtros cruzados) | 2026-10-20 | Analytics v2 |
