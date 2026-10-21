@@ -125,11 +125,13 @@
       btnNowStart: "⏱️ Poner hora actual",
       btnNowEnd: "🏁 Poner hora actual",
       labelActivity: "Tipo de Actividad",
+      labelMedium: "Medio de Trabajo",
+      labelFamiliarity: "Familiaridad del Tema",
       labelEnergy: "Energía Previa",
       labelComplexity: "Complejidad",
       labelComplexityHint: "(+XP)",
-      labelGoal: "¿Avance del Bloque / Meta?",
-      labelGoalHint: "(+10% Buen avance · +5% Con tropiezos)",
+      labelGoal: "¿Fluidez y Avance del Bloque?",
+      labelGoalHint: "(Evalúa este bloque, no si terminaste todo el entregable)",
       labelAiMode: "Modo de Uso de IA",
       labelAiModeHint: "(+5% Autónomo/Diálogo · -15% Mecánico)",
       labelAiSlider: "Porcentaje de apoyo IA:",
@@ -147,28 +149,26 @@
       btnCancelEdit: "✖ Cancelar edición",
 
       // Textos dinámicos de ayuda en el formulario
-      helpActPrep:
-        "🗂️ Antes de estudiar/programar: armar el ambiente, recopilar fuentes o 'masticar' contexto en un LLM para reutilizarlo en varias sesiones.",
       helpActClass:
         "👨‍🏫 En vivo con profesor: mide tu atención e interés. Por defecto pone IA en 0%, pero si usaste IA en clase (para resolver dudas o para acabar rápido una actividad), selecciona abajo el Modo de IA correspondiente.",
       helpActTheory:
-        "📖 Estudio estructurado por tu cuenta: leer documentación oficial, libros, artículos técnicos o ver un curso grabado.",
+        "📖 Estudio estructurado por tu cuenta: leer documentación oficial, libros, artículos técnicos o ver un curso grabado sin escribir aún apuntes propios.",
       helpActResearch:
         "💬 Explorar dudas abiertas: investigar cómo/por qué funciona algo, comparar opciones o debatir conceptos a fondo (ej. tutoría socrática con IA).",
       helpActDesign:
-        "✍️ Sintetizar y estructurar: redactar apuntes propios (en cuaderno o compu), hacer resúmenes, diagramas o planear una arquitectura.",
+        "✍️ Sintetizar y estructurar con tus palabras: redactar apuntes o cheatsheets (a mano o en PC), hacer resúmenes, diagramas o planear una arquitectura.",
       helpActDev:
-        "💻 Construir e implementar: escribir código, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea.",
+        "💻 Construir e implementar: escribir código, notebooks, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea.",
       helpActPractice:
-        "🧪 Ejercitar o destrabar: resolver problemas prácticos, laboratorios o depurar errores (debugging) hasta corregir la causa.",
+        "🧪 Ejercitar o destrabar: resolver problemas prácticos, laboratorios o depurar errores (debugging) hasta aislar y corregir la causa raíz.",
       helpActReview:
         "🔁 Consolidar memoria: repasar apuntes previos, flashcards, explicar un tema sin mirar o hacer exámenes de simulacro.",
       helpGoalYes:
-        "Buen avance del bloque (+10% XP): completaste la meta o avanzaste a buen ritmo en una tarea larga que seguirá en otra sesión.",
+        "✅ Flujo limpio (+10% XP): Evalúa ESTE bloque, no si acabaste toda la tarea/proyecto. Úsalo si avanzaste a buen ritmo en lo planeado para esta sesión sin quedarte estancado.",
       helpGoalPartial:
-        "Avance con tropiezos (+5% XP): hubo progreso, pero fue menor o más lento de lo esperado por dudas o distracciones.",
+        "⚠️ Con tropiezos / Fricción (+5% XP): Sí avanzaste, pero perdiste parte importante del bloque atorado en un bug, distracción, cansancio o confusión y el ritmo fue accidentado.",
       helpGoalNo:
-        "Bloqueo o sin avance (0% bono): te trabaste en un error, hubo distracción total o interrupción (alerta de bloqueo).",
+        "❌ Bloqueo real (0% bono): Te quedaste trabado casi toda la sesión en un obstáculo técnico/conceptual sin lograr destrabarlo, o tuviste que abortar la sesión sin avance efectivo.",
       helpQualityClassNote:
         " 👨‍🏫 En Clase: evalúa aquí tu nivel de concentración, interés y retención de la cátedra.",
       helpQualityClassAiDialogue:
@@ -240,17 +240,27 @@
       chart2ClickHint: "💡 Haz clic en una barra para filtrar por esa materia",
       chart2Subtitle:
         "Contrasta tus minutos de aprendizaje real (Autónomo, Diálogo o Copiloto) frente a las sesiones mecánicas (Copy-Paste) y tu asimilación (1-5).",
-      chart3Title: "🧠 Patrones de Hábito: 8 Actividades y Balance Cognitivo",
-      chart3Hint: "Comportamiento por tipo de tarea y fatiga",
+      chart3Title: "🧠 Patrones de Hábito: 7 Actividades y Balance Cognitivo",
+      chart3Hint: "Comportamiento por tipo de tarea y método",
       chart3Subtitle:
-        "Minutos y asimilación promedio según los 8 tipos de actividad y proporción entre preparación/teoría y práctica/producción.",
-      balanceConsumeLabel: "📖 Preparación / Clase / Teoría: {min} min ({pct}%)",
-      balanceProduceLabel: "💻 Apuntes / Código / Práctica: {min} min ({pct}%)",
-      habitMatrixTitle: "🔋 Impacto de la Energía Previa y Complejidad",
+        "Minutos y asimilación promedio según las 7 actividades de estudio y proporción entre consumo receptivo (Clase, Teoría, Investigación) y producción activa (Apuntes, Código, Práctica, Repaso).",
+      balanceConsumeLabel: "📖 Consumo (Clase / Teoría / Inv.): {min} min ({pct}%)",
+      balanceProduceLabel: "💻 Producción (Apuntes / Código / Práctica): {min} min ({pct}%)",
+      frictionChartTitle: "🧱 Matriz de Fricción: Fluidez vs. Tropiezos y Bloqueos",
+      frictionChartHint: "Por Complejidad y Familiaridad del tema",
+      frictionChartSubtitle:
+        "Proporción de bloques con flujo limpio (✅ Sí), con tropiezos (⚠️ Parcial) o bloqueos (❌ No) según el nivel de reto y si el tema es nuevo o ya tenías base.",
+      frictionDsYes: "✅ Sí (Flujo limpio)",
+      frictionDsPartial: "⚠️ Parcial (Con tropiezos)",
+      frictionDsNo: "❌ No (Bloqueo)",
+      frictionAxisSessions: "Sesiones",
+      habitMatrixTitle: "📝 Impacto de Medio (Papel vs. Digital), Familiaridad, Energía y Reto",
       habitMatrixSubtitle:
-        "Compara cómo cambia tu retención promedio según tu energía al iniciar y la dificultad del reto.",
-      habitByEnergyTitle: "Por Energía Inicial",
-      habitByComplexityTitle: "Por Complejidad del Tema",
+        "Descubre cómo cambia tu retención promedio y el uso de IA cuando escribes a mano vs. digital, cuando abordas un tema nuevo vs. con base, y según tu energía inicial.",
+      habitByMediumTitle: "📝 Por Medio de Trabajo (Papel vs. Digital)",
+      habitByFamiliarityTitle: "🌱 Por Familiaridad del Tema (Nuevo vs. Con Base)",
+      habitByEnergyTitle: "🔋 Por Energía Inicial",
+      habitByComplexityTitle: "🎯 Por Complejidad del Tema",
       inspectorTopicsTitle: "🗂️ Radiografía por Subtemas (Tema específico)",
       inspectorTopicsHint: "Haz clic en cualquier subtema para filtrar su materia",
       inspectorTopicsSubtitle:
@@ -294,46 +304,68 @@
       btnEditSessionTitle: "Editar esta sesión",
       btnDeleteSessionTitle: "Eliminar esta sesión",
 
-      // Guía de Referencia inferior
-      guideMainTitle: "📖 Guía de Referencia y Escalas del Sistema",
+      // Guía de Referencia inferior (6 tarjetas)
+      guideMainTitle: "📖 Guía de Referencia y Criterios del Sistema",
       guideMainSubtitle:
-        "Documentación integrada para evaluar el impacto cognitivo de cada bloque y cómo se calculan las métricas en JavaScript y CSV.",
-      guideCard1Title: "⭐️ Calidad de Aprendizaje / Asimilación (1 al 5)",
+        "Manual rápido para elegir la actividad correcta, calificar el avance de tu bloque sin ambigüedades e interpretar los gráficos analíticos.",
+      guideCard1Title: "🧭 1. Las 7 Actividades y Cómo Distinguirlas",
       guideCard1Li1:
-        "<strong>1 (Mecánico / Sin retención):</strong> Solo copié/pegué respuestas o estuve distraído; no asimilé el tema.",
+        "<strong>👨‍🏫 Clase / Cátedra:</strong> Sesión en vivo con profesor. <em>Tip:</em> Si en clase haces un ejercicio con IA solo por salir del paso, regístralo aparte o baja la asimilación.",
       guideCard1Li2:
-        "<strong>2 (Superficial / Pasivo):</strong> Seguí pasos o código generado entendiendo solo por encima; poca retención.",
+        '<strong>📖 Teoría / Docs vs. 💬 Investigación:</strong> Usa <code>Teoría / Docs</code> cuando consumes material estructurado (documentación, libro, video). Usa <code>Investigación / Diálogo</code> cuando haces preguntas abiertas o debates el <em>"¿por qué?"</em> con una IA.',
       guideCard1Li3:
-        "<strong>3 (Comprensión estándar):</strong> Entendí la lógica general de lo realizado y resolví partes por mi cuenta.",
+        "<strong>✍️ Diseño / Apuntes:</strong> Cuando traduces ideas a tus propias palabras (cheatsheets a mano, resúmenes, diagramas).",
       guideCard1Li4:
-        "<strong>4 (Aprendizaje sólido):</strong> Razoné activamente el problema, comprendí el porqué y puedo replicarlo.",
+        "<strong>💻 Código vs. 🧪 Debugging:</strong> <code>Desarrollo / Código</code> es construir funcionalidades; <code>Práctica / Debugging</code> es resolver ejercicios o cazar un bug específico.",
       guideCard1Li5:
-        "<strong>5 (Asimilación profunda):</strong> Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda.",
-      guideCard2Title: "🧠 Contexto y 8 Tipos de Actividad",
+        "<strong>🔁 Repaso / Simulacro:</strong> Estudiar de tus propios apuntes previos, flashcards o exámenes de prueba antes de una evaluación.",
+      guideCard2Title: "🎯 2. ¿Cuándo elegir Sí, Parcial o Bloqueo?",
       guideCard2Li1:
-        "<strong>Contexto:</strong> <code>🎓 Académico</code>, <code>🏅 Certificación</code>, <code>🚀 Proyecto Propio</code>, <code>🤝 Externo</code>.",
+        "<strong>Regla de Oro:</strong> Evalúa <strong>la fluidez de este bloque de tiempo</strong>, nunca si ya terminaste el proyecto o entregable completo.",
       guideCard2Li2:
-        "<strong>Actividades:</strong> <code>🗂️ Preparación / Contexto</code>, <code>👨‍🏫 Clase / Cátedra</code>, <code>📖 Teoría / Docs</code>, <code>💬 Investigación / Diálogo</code>, <code>✍️ Diseño / Apuntes</code>, <code>💻 Desarrollo / Código</code>, <code>🧪 Práctica / Debugging</code>, <code>🔁 Repaso / Simulacro</code>.",
+        "<strong>✅ Sí — Flujo limpio (+10% XP):</strong> Avanzaste a buen ritmo en la parte que tocabas hoy (ej. escribir 1 página de tu Cheatsheet o programar un módulo), aunque la tarea total continúe mañana.",
       guideCard2Li3:
-        "<strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code>.",
+        "<strong>⚠️ Parcial — Con tropiezos (+5% XP):</strong> Sí hubo progreso, pero perdiste buena parte del bloque atorado en un bug, con distracciones, cansancio o yendo a la mitad de velocidad.",
       guideCard2Li4:
-        "<strong>Avance del Bloque:</strong> <code>✅ Sí (+10% XP: buen avance)</code>, <code>⚠️ Parcial (+5% XP: con tropiezos)</code>, <code>❌ No (0% / Bloqueo)</code>.",
-      guideCard3Title: "🤖 Modo de Uso de IA (Impacto Cognitivo)",
+        "<strong>❌ No — Bloqueo real (0% bono):</strong> Te quedaste estancado casi toda la sesión en un obstáculo técnico/conceptual sin destrabarlo, o abortaste la sesión sin avance efectivo.",
+      guideCard3Title: "📝 3. Medio, Familiaridad, Energía y Reto",
       guideCard3Li1:
-        "<strong>🧠 Autónomo (+5% XP):</strong> 100% por tu cuenta (0% IA).",
+        "<strong>Medio de Trabajo:</strong> <code>💻 Digital</code> (teclado/IDE), <code>📝 Papel / A mano</code> (fuerza a sintetizar sin copy-paste y suele elevar la retención) o <code>🔀 Híbrido</code> (pantalla + cuaderno).",
       guideCard3Li2:
-        '<strong>💬 Diálogo / Tutoría (+5% XP):</strong> Debate conceptual, preguntas de <em>"¿por qué?"</em> y refuerzo activo con IA.',
+        "<strong>Familiaridad:</strong> <code>🌱 Tema Nuevo</code> (1ª vez que ves el concepto; mayor carga cognitiva) vs. <code>🧱 Con base</code> (tema ya visto en clase o repaso; flujo más constante).",
       guideCard3Li3:
-        "<strong>🛠️ Copiloto / Apoyo (0% ajuste):</strong> Consulta puntual de sintaxis o desbloqueo de bugs entendiendo la solución.",
+        "<strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code> o <code>🪫 Baja</code> al sentarte a estudiar (alimenta el Mapa de Calor Circadiano).",
       guideCard3Li4:
-        "<strong>🤖 Mecánico / Copy-Paste (-15% XP):</strong> Automatización directa para entregar rápido sin leer a fondo.",
-      guideCard4Title: "🧮 Curva Exponencial y Fórmulas en JavaScript",
+        "<strong>Complejidad del Reto:</strong> <code>🟢 Fácil (0%)</code>, <code>🟡 Desafiante (+10% XP)</code>, <code>🔴 Muy difícil (+20% XP)</code>.",
+      guideCard4Title: "⭐️ 4. Escala de Asimilación (1 al 5)",
       guideCard4Li1:
-        "<strong>Curva RPG (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code> (El XP necesario se duplica cada 7 niveles).",
+        "<strong>1 (Mecánico / Sin retención):</strong> Solo copié/pegué respuestas por prisa o estuve distraído; no asimilé el tema.",
       guideCard4Li2:
-        "<strong>Duración (Minutos):</strong> Calculada automáticamente en JS a partir de <code>Hora_Inicio</code> y <code>Hora_Fin</code> (soporta cruce de medianoche).",
+        "<strong>2 (Superficial / Pasivo):</strong> Seguí pasos o código generado entendiendo solo por encima; poca retención a largo plazo.",
       guideCard4Li3:
-        "<strong>XP con Bonos y Modo IA:</strong> <code>ROUND(Duracion * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoMeta + BonoModoIA))</code>.",
+        "<strong>3 (Comprensión estándar):</strong> Entendí la lógica general de lo realizado y resolví partes por mi cuenta.",
+      guideCard4Li4:
+        "<strong>4 (Aprendizaje sólido):</strong> Razoné activamente el problema, sinteticé los conceptos y puedo replicarlo.",
+      guideCard4Li5:
+        "<strong>5 (Asimilación profunda):</strong> Dominio total; puedo explicar el tema o escribir la solución desde cero sin ayuda.",
+      guideCard5Title: "🤖 5. Modos de Uso de IA vs. Porcentaje",
+      guideCard5Li1:
+        "<strong>🧠 Autónomo (+5% XP):</strong> 100% por tu cuenta sin asistencia de IA (fija automáticamente el slider en <code>0%</code>).",
+      guideCard5Li2:
+        '<strong>💬 Diálogo / Tutoría (+5% XP):</strong> Usas la IA como tutor socrático (preguntas de <em>"¿por qué?"</em>, analogías y validación de tus ideas).',
+      guideCard5Li3:
+        "<strong>🛠️ Copiloto / Apoyo (0% ajuste):</strong> La IA te ayuda a sintetizar, consultar sintaxis o destrabar un error puntual, pero tú procesas y escribes el resultado.",
+      guideCard5Li4:
+        "<strong>🤖 Mecánico / Copy-Paste (-15% XP):</strong> Delegación directa para acabar y entregar rápido sin profundizar.",
+      guideCard6Title: "📊 6. Lectura del Dashboard y Fórmulas RPG",
+      guideCard6Li1:
+        "<strong>Cuadrante IA (Pestaña 2):</strong> <code>🚀 Sinergia IA</code> (IA &ge; 35% y Calidad &ge; 4), <code>🧠 Dominio Propio</code> (IA &lt; 35% y Calidad &ge; 4), <code>🤖 Ilusión Mecánica</code> (IA &ge; 35% y Calidad &le; 2), <code>🪫 Fricción</code> (IA &lt; 35% y Calidad &le; 2).",
+      guideCard6Li2:
+        "<strong>Balance Cognitivo (Pestaña 3):</strong> Compara minutos de <em>Consumo receptivo</em> (Clase, Teoría, Investigación) vs. <em>Producción activa</em> (Apuntes, Código, Debugging, Repaso).",
+      guideCard6Li3:
+        "<strong>Fórmula XP:</strong> <code>ROUND(Minutos * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoAvance + BonoModoIA))</code>.",
+      guideCard6Li4:
+        "<strong>Curva Exponencial (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code>.",
 
       // Alertas y confirmaciones
       alertServerOffline:
@@ -458,11 +490,13 @@
       btnNowStart: "⏱️ Set current time",
       btnNowEnd: "🏁 Set current time",
       labelActivity: "Activity Type",
+      labelMedium: "Work Medium",
+      labelFamiliarity: "Topic Familiarity",
       labelEnergy: "Prior Energy",
       labelComplexity: "Complexity",
       labelComplexityHint: "(+XP)",
-      labelGoal: "Block Progress / Goal?",
-      labelGoalHint: "(+10% Solid progress · +5% Rough progress)",
+      labelGoal: "Block Fluency & Progress?",
+      labelGoalHint: "(Evaluate this block, not whether the whole project is finished)",
       labelAiMode: "AI Interaction Mode",
       labelAiModeHint: "(+5% Auton/Dialogue · -15% Mechanical)",
       labelAiSlider: "AI assistance percentage:",
@@ -480,28 +514,26 @@
       btnCancelEdit: "✖ Cancel edit",
 
       // Textos dinámicos de ayuda en el formulario
-      helpActPrep:
-        "🗂️ Before studying/coding: setting up the environment, gathering sources, or 'digesting' context in an LLM to reuse across multiple sessions.",
       helpActClass:
         "👨‍🏫 Live with professor: measures your focus and interest. Defaults to 0% AI, but if you used AI in class (to clarify questions or rush an in-class activity), select the matching AI Mode below.",
       helpActTheory:
-        "📖 Self-paced structured study: reading official documentation, books, technical articles, or watching a recorded course.",
+        "📖 Self-paced structured study: reading official documentation, books, technical articles, or watching a recorded course without writing your own notes yet.",
       helpActResearch:
         "💬 Exploring open questions: investigating how/why something works, comparing options, or debating concepts deeply (e.g., Socratic AI tutoring).",
       helpActDesign:
-        "✍️ Synthesizing & structuring: writing your own notes (notebook or PC), summaries, diagrams, or planning software architecture.",
+        "✍️ Synthesizing & structuring in your own words: writing notes or cheatsheets (by hand or PC), summaries, diagrams, or planning architecture.",
       helpActDev:
-        "💻 Building & implementing: writing code, SQL queries, scripts, or developing project/assignment features.",
+        "💻 Building & implementing: writing code, notebooks, SQL queries, scripts, or developing project/assignment features.",
       helpActPractice:
-        "🧪 Practicing or unblocking: solving hands-on exercises, labs, or debugging errors until finding and fixing the root cause.",
+        "🧪 Practicing or unblocking: solving hands-on exercises, labs, or debugging errors until isolating and fixing the root cause.",
       helpActReview:
         "🔁 Consolidating memory: reviewing past notes, flashcards, explaining a topic from memory, or taking mock exams.",
       helpGoalYes:
-        "Solid block progress (+10% XP): you finished the goal or made steady progress on a long multi-session task.",
+        "✅ Clean flow (+10% XP): Evaluate THIS block, not whether the entire deliverable is finished. Use it if you progressed smoothly on what you planned for this session.",
       helpGoalPartial:
-        "Progress with hurdles (+5% XP): you moved forward, but slower than expected due to doubts or partial distractions.",
+        "⚠️ With hurdles / Friction (+5% XP): You made progress, but lost significant time stuck on a bug, distraction, fatigue, or confusion.",
       helpGoalNo:
-        "Blocked or no progress (0% bonus): stuck on an error, total distraction, or interruption (blocker alert).",
+        "❌ Real blocker (0% bonus): Stuck for almost the entire session on a technical/conceptual obstacle without unblocking it, or aborted with no effective progress.",
       helpQualityClassNote:
         " 👨‍🏫 In Class: use this scale to rate your focus, interest, and retention during the lecture.",
       helpQualityClassAiDialogue:
@@ -573,17 +605,27 @@
       chart2ClickHint: "💡 Click any bar to filter by that subject",
       chart2Subtitle:
         "Contrast your real learning minutes (Autonomous, Dialogue, or Copilot) against mechanical sessions (Copy-Paste) and your assimilation (1-5).",
-      chart3Title: "🧠 Habit Patterns: 8 Activities & Cognitive Balance",
-      chart3Hint: "Behavior by task type and fatigue",
+      chart3Title: "🧠 Habit Patterns: 7 Activities & Cognitive Balance",
+      chart3Hint: "Behavior by task type and method",
       chart3Subtitle:
-        "Minutes and average assimilation across the 8 activity types and balance between prep/theory and practice/production.",
-      balanceConsumeLabel: "📖 Prep / Class / Theory: {min} min ({pct}%)",
-      balanceProduceLabel: "💻 Notes / Code / Practice: {min} min ({pct}%)",
-      habitMatrixTitle: "🔋 Prior Energy & Complexity Impact",
+        "Minutes and average assimilation across the 7 study activities and ratio between receptive consumption (Class, Theory, Research) and active production (Notes, Code, Practice, Review).",
+      balanceConsumeLabel: "📖 Consumption (Class / Theory / Research): {min} min ({pct}%)",
+      balanceProduceLabel: "💻 Production (Notes / Code / Practice): {min} min ({pct}%)",
+      frictionChartTitle: "🧱 Friction Matrix: Fluency vs. Hurdles & Blockers",
+      frictionChartHint: "By Topic Complexity and Familiarity",
+      frictionChartSubtitle:
+        "Proportion of blocks with clean flow (✅ Yes), hurdles (⚠️ Partial), or blockers (❌ No) by challenge level and whether the topic is new or familiar.",
+      frictionDsYes: "✅ Yes (Clean flow)",
+      frictionDsPartial: "⚠️ Partial (With hurdles)",
+      frictionDsNo: "❌ No (Blocker)",
+      frictionAxisSessions: "Sessions",
+      habitMatrixTitle: "📝 Medium (Paper vs. Digital), Familiarity, Energy & Challenge Impact",
       habitMatrixSubtitle:
-        "Compare how your average retention changes based on starting energy and challenge level.",
-      habitByEnergyTitle: "By Starting Energy",
-      habitByComplexityTitle: "By Topic Complexity",
+        "See how your average retention and AI usage change when writing by hand vs. digital, studying a new vs. familiar topic, and by starting energy.",
+      habitByMediumTitle: "📝 By Work Medium (Paper vs. Digital)",
+      habitByFamiliarityTitle: "🌱 By Topic Familiarity (New vs. Familiar)",
+      habitByEnergyTitle: "🔋 By Starting Energy",
+      habitByComplexityTitle: "🎯 By Topic Complexity",
       inspectorTopicsTitle: "🗂️ Subtopic Breakdown (Specific Topic)",
       inspectorTopicsHint: "Click any subtopic to filter its subject",
       inspectorTopicsSubtitle:
@@ -627,46 +669,68 @@
       btnEditSessionTitle: "Edit this session",
       btnDeleteSessionTitle: "Delete this session",
 
-      // Guía de Referencia inferior
-      guideMainTitle: "📖 System Reference Guide & Scales",
+      // Guía de Referencia inferior (6 tarjetas)
+      guideMainTitle: "📖 System Reference Guide & Criteria",
       guideMainSubtitle:
-        "Built-in documentation to evaluate the cognitive impact of each block and how metrics are calculated in JavaScript and CSV.",
-      guideCard1Title: "⭐️ Learning Quality / Assimilation (1 to 5)",
+        "Quick pocket manual to pick the right activity, rate block progress unambiguously, and read the analytics charts.",
+      guideCard1Title: "🧭 1. The 7 Activities & How to Tell Them Apart",
       guideCard1Li1:
-        "<strong>1 (Mechanical / No retention):</strong> Only copied/pasted answers or was distracted; did not assimilate.",
+        "<strong>👨‍🏫 Class / Lecture:</strong> Live session with a professor. <em>Tip:</em> If you rush an in-class exercise with AI, log it separately or lower assimilation.",
       guideCard1Li2:
-        "<strong>2 (Superficial / Passive):</strong> Followed steps or generated code with surface understanding; low retention.",
+        '<strong>📖 Theory / Docs vs. 💬 Research:</strong> Use <code>Theory / Docs</code> when consuming structured material (docs, book, video). Use <code>Research / Dialogue</code> when asking open questions or debating <em>"why?"</em> with AI.',
       guideCard1Li3:
-        "<strong>3 (Standard comprehension):</strong> Understood the general logic and solved parts on my own.",
+        "<strong>✍️ Design / Notes:</strong> Translating concepts into your own words (handwritten cheatsheets, summaries, diagrams).",
       guideCard1Li4:
-        "<strong>4 (Solid learning):</strong> Actively reasoned through the problem, understood the 'why', and can replicate it.",
+        "<strong>💻 Code vs. 🧪 Debugging:</strong> <code>Dev / Code</code> is building features; <code>Practice / Debug</code> is solving exercises or hunting down a specific bug.",
       guideCard1Li5:
-        "<strong>5 (Deep assimilation):</strong> Maximum mental effort; mastered the concept and can explain it unaided.",
-      guideCard2Title: "🧠 Context & 8 Activity Types",
+        "<strong>🔁 Review / Mock:</strong> Studying from your own prior notes, flashcards, or mock exams before an assessment.",
+      guideCard2Title: "🎯 2. When to Pick Yes, Partial, or Blocked?",
       guideCard2Li1:
-        "<strong>Context:</strong> <code>🎓 Academic</code>, <code>🏅 Certification</code>, <code>🚀 Own Project</code>, <code>🤝 External</code>.",
+        "<strong>Golden Rule:</strong> Evaluate <strong>the fluency of this time block</strong>, never whether the entire project/deliverable is finished.",
       guideCard2Li2:
-        "<strong>Activities:</strong> <code>🗂️ Prep / Context</code>, <code>👨‍🏫 Class / Lecture</code>, <code>📖 Theory / Docs</code>, <code>💬 Research / Dialogue</code>, <code>✍️ Design / Notes</code>, <code>💻 Dev / Code</code>, <code>🧪 Practice / Debugging</code>, <code>🔁 Review / Mock Exam</code>.",
+        "<strong>✅ Yes — Clean flow (+10% XP):</strong> You progressed at a good pace on today's slice (e.g., 1 page of your Cheatsheet or 1 module), even if the overall assignment continues tomorrow.",
       guideCard2Li3:
-        "<strong>Prior Energy:</strong> <code>🔋 High</code>, <code>⚡ Medium</code>, <code>🪫 Low</code>.",
+        "<strong>⚠️ Partial — With hurdles (+5% XP):</strong> You made progress, but lost significant time stuck on a bug, distraction, fatigue, or moving at half speed.",
       guideCard2Li4:
-        "<strong>Block Progress:</strong> <code>✅ Yes (+10% XP: solid progress)</code>, <code>⚠️ Partial (+5% XP: with hurdles)</code>, <code>❌ No (0% / Blocked)</code>.",
-      guideCard3Title: "🤖 AI Usage Mode (Cognitive Impact)",
+        "<strong>❌ No — Real blocker (0% bonus):</strong> Stuck for almost the whole session on a technical/conceptual obstacle without unblocking it, or aborted with no effective progress.",
+      guideCard3Title: "📝 3. Medium, Familiarity, Energy & Challenge",
       guideCard3Li1:
-        "<strong>🧠 Autonomous (+5% XP):</strong> 100% on your own (0% AI).",
+        "<strong>Work Medium:</strong> <code>💻 Digital</code> (keyboard/IDE), <code>📝 Paper / Handwritten</code> (forces synthesis without copy-pasting and boosts retention), or <code>🔀 Hybrid</code> (screen + notebook).",
       guideCard3Li2:
-        '<strong>💬 Dialogue / Tutoring (+5% XP):</strong> Conceptual debate, <em>"why?"</em> questions, and active reinforcement with AI.',
+        "<strong>Familiarity:</strong> <code>🌱 New Topic</code> (1st contact with the concept; higher cognitive load) vs. <code>🧱 Familiar</code> (already seen in class or review; steadier flow).",
       guideCard3Li3:
-        "<strong>🛠️ Copilot / Support (0% adj.):</strong> Targeted syntax lookup or bug unblocking while understanding the fix.",
+        "<strong>Prior Energy:</strong> <code>🔋 High</code>, <code>⚡ Medium</code>, or <code>🪫 Low</code> when sitting down to study (feeds the Circadian Heatmap).",
       guideCard3Li4:
-        "<strong>🤖 Mechanical / Copy-Paste (-15% XP):</strong> Direct automation to deliver quickly without reading deeply.",
-      guideCard4Title: "🧮 Exponential Curve & JavaScript Formulas",
+        "<strong>Challenge Complexity:</strong> <code>🟢 Easy (0%)</code>, <code>🟡 Challenging (+10% XP)</code>, <code>🔴 Very Hard (+20% XP)</code>.",
+      guideCard4Title: "⭐️ 4. Assimilation Scale (1 to 5)",
       guideCard4Li1:
-        "<strong>RPG Curve (Lv. 92 = 50% of 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code> (Required XP doubles every 7 levels).",
+        "<strong>1 (Mechanical / No retention):</strong> Only copied/pasted answers in a rush or was distracted; did not assimilate.",
       guideCard4Li2:
-        "<strong>Duration (Minutes):</strong> Automatically calculated in JS from <code>Hora_Inicio</code> and <code>Hora_Fin</code> (supports midnight crossover).",
+        "<strong>2 (Superficial / Passive):</strong> Followed steps or generated code with surface understanding; low long-term retention.",
       guideCard4Li3:
-        "<strong>XP with Bonuses & AI Mode:</strong> <code>ROUND(Duration * MAX(0.5, 1 + Quality*0.2 + ChallengeBonus + GoalBonus + AiModeBonus))</code>.",
+        "<strong>3 (Standard comprehension):</strong> Understood the general logic and solved parts on my own.",
+      guideCard4Li4:
+        "<strong>4 (Solid learning):</strong> Actively reasoned through the problem, synthesized concepts, and can replicate it.",
+      guideCard4Li5:
+        "<strong>5 (Deep assimilation):</strong> Full mastery; can explain the topic or write the solution from scratch unaided.",
+      guideCard5Title: "🤖 5. AI Usage Modes vs. Percentage",
+      guideCard5Li1:
+        "<strong>🧠 Autonomous (+5% XP):</strong> 100% on your own without AI assistance (automatically locks slider to <code>0%</code>).",
+      guideCard5Li2:
+        '<strong>💬 Dialogue / Tutoring (+5% XP):</strong> Using AI as a Socratic tutor (<em>"why?"</em> questions, analogies, and validating your ideas).',
+      guideCard5Li3:
+        "<strong>🛠️ Copilot / Support (0% adj.):</strong> AI helps synthesize, check syntax, or unblock a specific bug, while you process and write the result.",
+      guideCard5Li4:
+        "<strong>🤖 Mechanical / Copy-Paste (-15% XP):</strong> Direct delegation to finish and deliver quickly without deep processing.",
+      guideCard6Title: "📊 6. Reading the Dashboard & RPG Formulas",
+      guideCard6Li1:
+        "<strong>AI Quadrant (Tab 2):</strong> <code>🚀 AI Synergy</code> (AI &ge; 35% &amp; Quality &ge; 4), <code>🧠 Own Mastery</code> (AI &lt; 35% &amp; Quality &ge; 4), <code>🤖 Mechanical Illusion</code> (AI &ge; 35% &amp; Quality &le; 2), <code>🪫 Friction</code> (AI &lt; 35% &amp; Quality &le; 2).",
+      guideCard6Li2:
+        "<strong>Cognitive Balance (Tab 3):</strong> Compares minutes of <em>Receptive Consumption</em> (Class, Theory, Research) vs. <em>Active Production</em> (Notes, Code, Debugging, Review).",
+      guideCard6Li3:
+        "<strong>XP Formula:</strong> <code>ROUND(Minutes * MAX(0.5, 1 + Quality*0.2 + ChallengeBonus + ProgressBonus + AiModeBonus))</code>.",
+      guideCard6Li4:
+        "<strong>Exponential Curve (Lv. 92 = 50% of 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code>.",
 
       // Alertas y confirmaciones
       alertServerOffline:
@@ -698,7 +762,6 @@
     },
     tipoActividad: {
       es: {
-        "Preparación / Contexto": "Preparación / Contexto",
         "Clase / Cátedra": "Clase / Cátedra",
         "Teoría / Docs": "Teoría / Docs",
         "Investigación / Diálogo": "Investigación / Diálogo",
@@ -708,7 +771,6 @@
         "Repaso / Simulacro": "Repaso / Simulacro"
       },
       en: {
-        "Preparación / Contexto": "Prep / Context",
         "Clase / Cátedra": "Class / Lecture",
         "Teoría / Docs": "Theory / Docs",
         "Investigación / Diálogo": "Research / Dialogue",
@@ -716,6 +778,50 @@
         "Desarrollo / Código": "Dev / Code",
         "Práctica / Debugging": "Practice / Debug",
         "Repaso / Simulacro": "Review / Mock"
+      }
+    },
+    medio: {
+      es: {
+        Digital: "Digital",
+        "Analógico / Papel": "Papel / A mano",
+        Híbrido: "Híbrido"
+      },
+      en: {
+        Digital: "Digital",
+        "Analógico / Papel": "Paper / Handwritten",
+        Híbrido: "Hybrid"
+      }
+    },
+    medioChip: {
+      es: {
+        Digital: "💻 Digital",
+        "Analógico / Papel": "📝 Papel / A mano",
+        Híbrido: "🔀 Híbrido"
+      },
+      en: {
+        Digital: "💻 Digital",
+        "Analógico / Papel": "📝 Paper / Hand",
+        Híbrido: "🔀 Hybrid"
+      }
+    },
+    familiaridad: {
+      es: {
+        Nuevo: "Tema Nuevo",
+        "Con base": "Con base"
+      },
+      en: {
+        Nuevo: "New Topic",
+        "Con base": "Familiar"
+      }
+    },
+    familiaridadChip: {
+      es: {
+        Nuevo: "🌱 Tema Nuevo",
+        "Con base": "🧱 Con base"
+      },
+      en: {
+        Nuevo: "🌱 New Topic",
+        "Con base": "🧱 Familiar"
       }
     },
     modoIA: {
@@ -764,12 +870,12 @@
     },
     objetivoChip: {
       es: {
-        Sí: "✅ Sí (Buen avance +10%)",
+        Sí: "✅ Sí (Flujo limpio +10%)",
         Parcial: "⚠️ Parcial (Con tropiezos +5%)",
         No: "❌ No (Bloqueo)"
       },
       en: {
-        Sí: "✅ Yes (Solid progress +10%)",
+        Sí: "✅ Yes (Clean flow +10%)",
         Parcial: "⚠️ Partial (With hurdles +5%)",
         No: "❌ No (Blocked)"
       }
@@ -907,7 +1013,6 @@
     });
 
     const iconosActividad = {
-      "Preparación / Contexto": "🗂️",
       "Clase / Cátedra": "👨‍🏫",
       "Teoría / Docs": "📖",
       "Investigación / Diálogo": "💬",
@@ -921,6 +1026,20 @@
       .forEach((btn) => {
         const val = btn.dataset.value;
         btn.textContent = `${iconosActividad[val] || ""} ${traducirValor("tipoActividad", val)}`;
+      });
+
+    document
+      .querySelectorAll('.chip-group[data-group="medio"] .chip-btn')
+      .forEach((btn) => {
+        const val = btn.dataset.value;
+        btn.textContent = traducirValor("medioChip", val);
+      });
+
+    document
+      .querySelectorAll('.chip-group[data-group="familiaridad"] .chip-btn')
+      .forEach((btn) => {
+        const val = btn.dataset.value;
+        btn.textContent = traducirValor("familiaridadChip", val);
       });
 
     const iconosEnergia = { Alta: "🔋", Media: "⚡", Baja: "🪫" };

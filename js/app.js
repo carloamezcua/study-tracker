@@ -191,6 +191,8 @@
           materia: document.getElementById("materia").value.trim(),
           tema: document.getElementById("tema").value.trim(),
           tipoActividad: chips.tipoActividad,
+          medio: chips.medio,
+          familiaridad: chips.familiaridad,
           energiaPrevia: chips.energiaPrevia,
           complejidad: chips.complejidad,
           objetivoCumplido: chips.objetivoCumplido,

@@ -22,6 +22,8 @@
   const estadoChips = {
     contexto: "Académico",
     tipoActividad: "Desarrollo / Código",
+    medio: "Digital",
+    familiaridad: "Con base",
     energiaPrevia: "Media",
     complejidad: "Desafiante",
     objetivoCumplido: "Sí",
@@ -53,7 +55,6 @@
   };
 
   const ICONOS_ACTIVIDAD = {
-    "Preparación / Contexto": "🗂️",
     "Clase / Cátedra": "👨‍🏫",
     "Teoría / Docs": "📖",
     "Investigación / Diálogo": "💬",
@@ -61,6 +62,17 @@
     "Desarrollo / Código": "💻",
     "Práctica / Debugging": "🧪",
     "Repaso / Simulacro": "🔁"
+  };
+
+  const ICONOS_MEDIO = {
+    Digital: "💻",
+    "Analógico / Papel": "📝",
+    Híbrido: "🔀"
+  };
+
+  const ICONOS_FAMILIARIDAD = {
+    Nuevo: "🌱",
+    "Con base": "🧱"
   };
 
   const ICONOS_MODO_IA = {
@@ -326,6 +338,8 @@
 
     seleccionarChip("contexto", sesion.contexto || "Académico");
     seleccionarChip("tipoActividad", sesion.tipoActividad || "Desarrollo / Código");
+    seleccionarChip("medio", sesion.medio || "Digital");
+    seleccionarChip("familiaridad", sesion.familiaridad || "Con base");
     seleccionarChip("energiaPrevia", sesion.energiaPrevia || "Media");
     seleccionarChip("complejidad", sesion.complejidad || "Desafiante");
     seleccionarChip("objetivoCumplido", sesion.objetivoCumplido || "Sí");
@@ -460,7 +474,6 @@
     if (!boxAyuda) return;
     if (StudyTracker.I18n) {
       const mapaKey = {
-        "Preparación / Contexto": "helpActPrep",
         "Clase / Cátedra": "helpActClass",
         "Teoría / Docs": "helpActTheory",
         "Investigación / Diálogo": "helpActResearch",
@@ -879,6 +892,52 @@
       boxBalance.append(header, barTrack);
     }
 
+    // 1B. Resumen por Medio de Trabajo (Digital vs. Analógico / Papel vs. Híbrido)
+    const contenedorMedio = document.getElementById("resumenMedioBar");
+    if (contenedorMedio && Array.isArray(datosHabitos.resumenMedio)) {
+      contenedorMedio.replaceChildren();
+      datosHabitos.resumenMedio.forEach((item) => {
+        const pill = document.createElement("div");
+        pill.className = "habit-stat-pill";
+
+        const title = document.createElement("span");
+        title.className = "habit-stat-title";
+        const medioTrad = trVal("medio", item.valor);
+        title.textContent = `${item.icono} ${medioTrad}:`;
+
+        const val = document.createElement("strong");
+        val.textContent = item.conteo
+          ? `⭐️ ${item.calidadProm} · 🤖 ${item.iaProm}% · ${item.minutos}m (${item.conteo} ${t("habitSessionsShort")})`
+          : t("habitNoRecords");
+
+        pill.append(title, val);
+        contenedorMedio.appendChild(pill);
+      });
+    }
+
+    // 1C. Resumen por Familiaridad del Tema (Nuevo vs. Con base)
+    const contenedorFam = document.getElementById("resumenFamiliaridadBar");
+    if (contenedorFam && Array.isArray(datosHabitos.resumenFamiliaridad)) {
+      contenedorFam.replaceChildren();
+      datosHabitos.resumenFamiliaridad.forEach((item) => {
+        const pill = document.createElement("div");
+        pill.className = "habit-stat-pill";
+
+        const title = document.createElement("span");
+        title.className = "habit-stat-title";
+        const famTrad = trVal("familiaridad", item.valor);
+        title.textContent = `${item.icono} ${famTrad}:`;
+
+        const val = document.createElement("strong");
+        val.textContent = item.conteo
+          ? `⭐️ ${item.calidadProm} · 🤖 ${item.iaProm}% · ✅ ${item.pctFluidez}% (${item.conteo} ${t("habitSessionsShort")})`
+          : t("habitNoRecords");
+
+        pill.append(title, val);
+        contenedorFam.appendChild(pill);
+      });
+    }
+
     // 2. Resumen por Energía Previa
     const contenedorEnergia = document.getElementById("resumenHabitosBar");
     if (contenedorEnergia) {
@@ -1051,11 +1110,23 @@
     subTema.textContent = `${icCtx} ${trVal("contexto", ctxVal)} · ${sesion.tema || "General"}`;
     tdMateriaTema.append(strongMateria, subTema);
 
-    // Actividad
+    // Actividad + Medio y Familiaridad
     const tdActividad = document.createElement("td");
     const actVal = sesion.tipoActividad || "Desarrollo / Código";
     const iconoAct = ICONOS_ACTIVIDAD[actVal] || "💻";
-    tdActividad.textContent = `${iconoAct} ${trVal("tipoActividad", actVal)}`;
+    const divAct = document.createElement("div");
+    divAct.textContent = `${iconoAct} ${trVal("tipoActividad", actVal)}`;
+    const subMedioFam = document.createElement("small");
+    subMedioFam.className = "cell-sub";
+    const medVal = sesion.medio || "Digital";
+    const famVal = sesion.familiaridad || "Con base";
+    const icMed = ICONOS_MEDIO[medVal] || "💻";
+    const icFam = ICONOS_FAMILIARIDAD[famVal] || "🧱";
+    subMedioFam.textContent = `${icMed} ${trVal("medio", medVal)} · ${icFam} ${trVal(
+      "familiaridad",
+      famVal
+    )}`;
+    tdActividad.append(divAct, subMedioFam);
 
     // Contexto Operativo (Energía + Complejidad + Objetivo)
     const tdContexto = document.createElement("td");

@@ -28,7 +28,7 @@ Hoy solo hay **XP → Nivel → Rango**. Esto es lo que añadiría profundidad. 
 
 ## 🧠 Analítica y reflexión
 
-- [x] ¿Cuánto se estudia al día, semana, mes? *(Implementado en Pestaña 1 del Dashboard Analítico)*
+- [X] ¿Cuánto se estudia al día, semana, mes? *(Implementado en Pestaña 1 del Dashboard Analítico)*
 
 ---
 
@@ -54,9 +54,6 @@ Hoy solo hay **XP → Nivel → Rango**. Esto es lo que añadiría profundidad. 
 
 _Pega aquí cualquier cosa sin pensar demasiado._
 
-- **Tanda 2 — Medio analógico vs. digital (`S` · ⭐⭐):** Diferenciar cuando escribo en el cuaderno a mano vs. en la computadora (incluso con el mismo % de IA, escribir en papel obliga a sintetizar y retener más sin copy-paste).
-- **Tanda 2 — Familiaridad / Conocimientos previos (`S` · ⭐⭐):** Agregar si un tema es totalmente nuevo (`🌱 Nuevo`) o si ya tenía base previa (`🧱 Con base`), ya que cuando repaso o tengo base el flujo es más constante y el apoyo de IA rinde distinto.
-
 ---
 
 ## ❌ Descartadas
@@ -65,17 +62,19 @@ _Anota también lo que decidiste NO hacer y por qué. Evita volver a discutirlo.
 
 | Idea | Fecha | Motivo |
 | ---- | ----- | ------ |
-|      |       |        |
+| Actividad `🗂️ Preparación / Contexto` | 2026-10-20 | No es estudio real sino logística previa; se eliminó del sistema para no ensuciar las métricas cognitivas ni inflar minutos/XP. |
 
 ---
 
 ## ✅ Hechas
 
-| Idea | Fecha | Commit/PR |
-| ---- | ----- | --------- |
-| Mostrar solo los últimos 5 registros en el historial (con botón *Ver todos*) | 2026-10-20 | Tanda 1 |
-| Redefinir *Objetivo Cumplido* a *Avance del Bloque* (`Sí = Buen avance +10%`, `Parcial = Con tropiezos +5%`) para no castigar tareas largas | 2026-10-20 | Tanda 1 |
-| Actividad `🗂️ Preparación / Contexto` para medir el tiempo preparando el ambiente y recopilando info con LLMs | 2026-10-20 | Tanda 1 |
-| Actividad `👨‍🏫 Clase / Cátedra` con ajuste automático de IA a 0% y escala enfocada en concentración e interés | 2026-10-20 | Tanda 1 |
-| Migrar persistencia de `.xlsx` (SheetJS + fórmulas de Excel duplicadas) a `.csv` puro (`data/study-tracker.csv`) con fórmulas 100% en JS | 2026-10-20 | CSV Refactor |
+| Idea                                                                                                                                                                                                                                    | Fecha      | Commit/PR    |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------ |
+| Mostrar solo los últimos 5 registros en el historial (con botón *Ver todos*)                                                                                                                                                        | 2026-10-20 | Tanda 1      |
+| Redefinir *Objetivo Cumplido* a *Fluidez y Avance del Bloque* (`Sí = Flujo limpio +10%`, `Parcial = Con tropiezos +5%`, `No = Bloqueo`) con Regla de Oro para evitar malinterpretaciones                                              | 2026-10-20 | Tanda 1 / 2  |
+| Actividad `👨‍🏫 Clase / Cátedra` con ajuste automático de IA a 0% y escala enfocada en concentración e interés                                                                                                                  | 2026-10-20 | Tanda 1      |
+| Migrar persistencia de `.xlsx` (SheetJS + fórmulas de Excel duplicadas) a `.csv` puro (`data/study-tracker.csv`) con fórmulas 100% en JS                                                                                        | 2026-10-20 | CSV Refactor |
 | Dashboard Analítico Interactivo en 4 pestañas (Evolución Día/Semana/Mes + Racha, Mapa de Calor Circadiano 7×4, Cuadrante Cognitivo IA en burbujas, Balance Consumo/Producción e Inspector de Subtemas/Notas con filtros cruzados) | 2026-10-20 | Analytics v2 |
+| **Tanda 2 — Medio analógico vs. digital (`💻 Digital`, `📝 Papel / A mano`, `🔀 Híbrido`)** en formulario, CSV (20 columnas), tabla y Dashboard Analítico                                                                           | 2026-10-20 | Tanda 2      |
+| **Tanda 2 — Familiaridad del tema (`🌱 Tema Nuevo` vs. `🧱 Con base`)** + nuevo gráfico de **Matriz de Fricción** (`Sí / Parcial / No` por Complejidad y Familiaridad)                                                             | 2026-10-20 | Tanda 2      |
+| Rediseño completo de la **Guía de Referencia del Sistema** en 6 tarjetas temáticas dentro del Dashboard y en `README.md`                                                                                                               | 2026-10-20 | Tanda 2      |

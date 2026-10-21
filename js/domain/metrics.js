@@ -33,13 +33,6 @@
 
   const TIPOS_ACTIVIDAD = [
     {
-      valor: "Preparación / Contexto",
-      icono: "🗂️",
-      etiqueta: "Preparación / Contexto",
-      ayuda:
-        "Antes de estudiar/programar: armar el ambiente, recopilar fuentes o 'masticar' contexto en un LLM para reutilizarlo en varias sesiones."
-    },
-    {
       valor: "Clase / Cátedra",
       icono: "👨‍🏫",
       etiqueta: "Clase / Cátedra",
@@ -51,7 +44,7 @@
       icono: "📖",
       etiqueta: "Teoría / Docs",
       ayuda:
-        "Estudio por tu cuenta de fuentes estructuradas: leer documentación oficial, libros, artículos o ver un curso grabado."
+        "Estudio por tu cuenta de fuentes estructuradas: leer documentación oficial, libros, artículos o ver un curso grabado sin escribir aún apuntes propios."
     },
     {
       valor: "Investigación / Diálogo",
@@ -65,21 +58,21 @@
       icono: "✍️",
       etiqueta: "Diseño / Apuntes",
       ayuda:
-        "Sintetizar y estructurar: redactar apuntes propios (en cuaderno o compu), hacer resúmenes, diagramas o planear una arquitectura."
+        "Sintetizar y estructurar con tus palabras: redactar apuntes o cheatsheets (a mano o en PC), hacer resúmenes, diagramas o planear una arquitectura."
     },
     {
       valor: "Desarrollo / Código",
       icono: "💻",
       etiqueta: "Desarrollo / Código",
       ayuda:
-        "Construir e implementar: escribir código, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea."
+        "Construir e implementar: escribir código, notebooks, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea."
     },
     {
       valor: "Práctica / Debugging",
       icono: "🧪",
       etiqueta: "Práctica / Debugging",
       ayuda:
-        "Resolver ejercicios prácticos, laboratorios o depurar errores (debugging) hasta encontrar y corregir la causa."
+        "Resolver ejercicios prácticos, laboratorios o depurar errores (debugging) hasta aislar y corregir la causa raíz."
     },
     {
       valor: "Repaso / Simulacro",
@@ -87,6 +80,42 @@
       etiqueta: "Repaso / Simulacro",
       ayuda:
         "Consolidar lo ya visto: repasar apuntes previos, flashcards, explicar el tema de memoria o resolver exámenes de prueba."
+    }
+  ];
+
+  const MEDIOS_TRABAJO = [
+    {
+      valor: "Digital",
+      icono: "💻",
+      etiqueta: "💻 Digital (PC / Teclado)",
+      ayuda: "Trabajo en computadora, IDE o notas digitales."
+    },
+    {
+      valor: "Analógico / Papel",
+      icono: "📝",
+      etiqueta: "📝 Analógico / Papel (A mano)",
+      ayuda: "Escritura a mano en cuaderno, hojas o pizarrón: fuerza a sintetizar sin copy-paste y eleva la retención."
+    },
+    {
+      valor: "Híbrido",
+      icono: "🔀",
+      etiqueta: "🔀 Híbrido (PC + Papel)",
+      ayuda: "Combinación de lectura/código en pantalla con esquemas, fórmulas o apuntes escritos a mano."
+    }
+  ];
+
+  const NIVELES_FAMILIARIDAD = [
+    {
+      valor: "Nuevo",
+      icono: "🌱",
+      etiqueta: "🌱 Tema Nuevo (1ª vez)",
+      ayuda: "Primer acercamiento al concepto: normal que tome más tiempo y requiera mayor carga cognitiva."
+    },
+    {
+      valor: "Con base",
+      icono: "🧱",
+      etiqueta: "🧱 Con base previa / Ya visto",
+      ayuda: "Ya conocías los fundamentos o habías visto el tema antes: el flujo suele ser más constante y ágil."
     }
   ];
 
@@ -140,10 +169,10 @@
     {
       valor: "Sí",
       icono: "✅",
-      etiqueta: "Sí (Buen avance +10%)",
+      etiqueta: "Sí (Flujo limpio +10%)",
       bonoXP: 0.1,
       ayuda:
-        "Buen avance del bloque (+10% XP): completaste la meta o avanzaste a buen ritmo en una tarea larga que seguirá en otra sesión."
+        "✅ Flujo limpio (+10% XP): Evalúa ESTE bloque, no si acabaste toda la tarea/proyecto. Úsalo si avanzaste a buen ritmo en lo planeado para esta sesión sin quedarte estancado."
     },
     {
       valor: "Parcial",
@@ -151,15 +180,15 @@
       etiqueta: "Parcial (Con tropiezos +5%)",
       bonoXP: 0.05,
       ayuda:
-        "Avance con tropiezos (+5% XP): hubo progreso, pero fue menor o más lento de lo esperado por dudas o distracciones."
+        "⚠️ Con tropiezos / Fricción (+5% XP): Sí avanzaste, pero perdiste parte importante del bloque atorado en un bug, distracción, cansancio o confusión y el ritmo fue accidentado."
     },
     {
       valor: "No",
       icono: "❌",
-      etiqueta: "No (Bloqueo)",
+      etiqueta: "No (Bloqueo / Sin avance)",
       bonoXP: 0,
       ayuda:
-        "Bloqueo o sin avance (0% bono): te trabaste en un error, hubo distracción total o interrupción (alerta de bloqueo)."
+        "❌ Bloqueo real (0% bono): Te quedaste trabado casi toda la sesión en un obstáculo técnico/conceptual sin lograr destrabarlo, o tuviste que abortar la sesión sin avance efectivo."
     }
   ];
 
@@ -544,9 +573,8 @@
       };
     });
 
-    // 6. Balance Cognitivo: Consumir/Preparar vs. Producir/Practicar
+    // 6. Balance Cognitivo: Consumir/Ingesta vs. Producir/Práctica
     const actividadesConsumo = new Set([
-      "Preparación / Contexto",
       "Clase / Cátedra",
       "Teoría / Docs",
       "Investigación / Diálogo"
@@ -565,6 +593,80 @@
     const pctProduccion = totalMinBalance ? Math.round((minProduccion / totalMinBalance) * 100) : 0;
     const pctConsumo = totalMinBalance ? 100 - pctProduccion : 0;
 
+    // 7. Rendimiento según Medio de Trabajo (Digital vs. Analógico / Papel vs. Híbrido)
+    const resumenMedio = MEDIOS_TRABAJO.map((med) => {
+      const filtradas = lista.filter((s) => (s.medio || "Digital") === med.valor);
+      const conteo = filtradas.length;
+      const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
+      const calidadProm = conteo
+        ? +(filtradas.reduce((acc, s) => acc + (Number(s.calidad) || 0), 0) / conteo).toFixed(1)
+        : 0;
+      const iaProm = conteo
+        ? Math.round(filtradas.reduce((acc, s) => acc + (Number(s.usoIA) || 0), 0) / conteo)
+        : 0;
+      return {
+        ...med,
+        conteo,
+        minutos,
+        calidadProm,
+        iaProm
+      };
+    });
+
+    // 8. Rendimiento según Familiaridad del Tema (Nuevo vs. Con base)
+    const resumenFamiliaridad = NIVELES_FAMILIARIDAD.map((fam) => {
+      const filtradas = lista.filter((s) => (s.familiaridad || "Con base") === fam.valor);
+      const conteo = filtradas.length;
+      const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
+      const calidadProm = conteo
+        ? +(filtradas.reduce((acc, s) => acc + (Number(s.calidad) || 0), 0) / conteo).toFixed(1)
+        : 0;
+      const iaProm = conteo
+        ? Math.round(filtradas.reduce((acc, s) => acc + (Number(s.usoIA) || 0), 0) / conteo)
+        : 0;
+      const fluidos = filtradas.filter((s) => s.objetivoCumplido === "Sí").length;
+      const pctFluidez = conteo ? Math.round((fluidos / conteo) * 100) : 0;
+      return {
+        ...fam,
+        conteo,
+        minutos,
+        calidadProm,
+        iaProm,
+        pctFluidez
+      };
+    });
+
+    // 9. Matriz de Fricción: distribución Sí / Parcial / No por Complejidad y Familiaridad
+    const categoriasFriccion = [
+      { clave: "Fácil", tipo: "complejidad", etiqueta: "🟢 Fácil" },
+      { clave: "Desafiante", tipo: "complejidad", etiqueta: "🟡 Desafiante" },
+      { clave: "Muy difícil", tipo: "complejidad", etiqueta: "🔴 Muy difícil" },
+      { clave: "Nuevo", tipo: "familiaridad", etiqueta: "🌱 Tema Nuevo" },
+      { clave: "Con base", tipo: "familiaridad", etiqueta: "🧱 Con base" }
+    ];
+
+    const matrizFriccion = categoriasFriccion.map((cat) => {
+      const sub = lista.filter((s) =>
+        cat.tipo === "complejidad"
+          ? (s.complejidad || "Desafiante") === cat.clave
+          : (s.familiaridad || "Con base") === cat.clave
+      );
+      const total = sub.length;
+      const si = sub.filter((s) => s.objetivoCumplido === "Sí").length;
+      const parcial = sub.filter((s) => s.objetivoCumplido === "Parcial").length;
+      const no = sub.filter((s) => s.objetivoCumplido === "No").length;
+      return {
+        ...cat,
+        total,
+        si,
+        parcial,
+        no,
+        pctSi: total ? Math.round((si / total) * 100) : 0,
+        pctParcial: total ? Math.round((parcial / total) * 100) : 0,
+        pctNo: total ? Math.round((no / total) * 100) : 0
+      };
+    });
+
     return {
       actividadesLabels,
       minutosPorActividad,
@@ -573,6 +675,9 @@
       resumenContextos,
       resumenObjetivos,
       resumenComplejidad,
+      resumenMedio,
+      resumenFamiliaridad,
+      matrizFriccion,
       balanceCognitivo: {
         minConsumo,
         minProduccion,
@@ -829,6 +934,8 @@
         tema: s.tema || "General",
         modoIA: modo,
         tipoActividad: s.tipoActividad || "Desarrollo / Código",
+        medio: s.medio || "Digital",
+        familiaridad: s.familiaridad || "Con base",
         fecha: s.fecha || ""
       });
     });
@@ -903,7 +1010,7 @@
    */
   function obtenerTextoAyudaActividad(tipoActividad) {
     const item = TIPOS_ACTIVIDAD.find((a) => a.valor === tipoActividad);
-    return item ? item.ayuda : TIPOS_ACTIVIDAD[5].ayuda;
+    return item ? item.ayuda : TIPOS_ACTIVIDAD[4].ayuda;
   }
 
   /**
@@ -954,6 +1061,8 @@
     TRAMOS_RANGO,
     CONTEXTOS,
     TIPOS_ACTIVIDAD,
+    MEDIOS_TRABAJO,
+    NIVELES_FAMILIARIDAD,
     MODOS_IA,
     NIVELES_ENERGIA,
     NIVELES_COMPLEJIDAD,

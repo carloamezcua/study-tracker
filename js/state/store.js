@@ -8,6 +8,8 @@
   const {
     CONTEXTOS,
     TIPOS_ACTIVIDAD,
+    MEDIOS_TRABAJO,
+    NIVELES_FAMILIARIDAD,
     MODOS_IA,
     NIVELES_ENERGIA,
     NIVELES_COMPLEJIDAD,
@@ -22,6 +24,8 @@
 
   const VALORES_CONTEXTO = new Set(CONTEXTOS.map((c) => c.valor));
   const VALORES_ACTIVIDAD = new Set(TIPOS_ACTIVIDAD.map((t) => t.valor));
+  const VALORES_MEDIO = new Set((MEDIOS_TRABAJO || []).map((m) => m.valor));
+  const VALORES_FAMILIARIDAD = new Set((NIVELES_FAMILIARIDAD || []).map((f) => f.valor));
   const VALORES_MODO_IA = new Set(MODOS_IA.map((m) => m.valor));
   const VALORES_ENERGIA = new Set(NIVELES_ENERGIA.map((e) => e.valor));
   const VALORES_COMPLEJIDAD = new Set(NIVELES_COMPLEJIDAD.map((c) => c.valor));
@@ -33,6 +37,7 @@
   };
 
   const MAPA_MIGRACION_ACTIVIDAD = {
+    "Preparación / Contexto": "Teoría / Docs",
     "Lectura / Teoría": "Teoría / Docs",
     "Papel / A mano": "Diseño / Apuntes",
     "Papel / Diseño": "Diseño / Apuntes",
@@ -140,6 +145,30 @@
       ? actCandidata
       : "Desarrollo / Código";
 
+    const notasStr = String(raw.notas || "").trim();
+    const notasLower = notasStr.toLowerCase();
+
+    let medio = raw.medio;
+    if (!VALORES_MEDIO.has(medio)) {
+      medio =
+        notasLower.includes("a mano") ||
+        notasLower.includes("papel") ||
+        notasLower.includes("cuaderno") ||
+        notasLower.includes("escrito")
+          ? "Analógico / Papel"
+          : "Digital";
+    }
+
+    let familiaridad = raw.familiaridad;
+    if (!VALORES_FAMILIARIDAD.has(familiaridad)) {
+      familiaridad =
+        tipoActividad === "Repaso / Simulacro" ||
+        notasLower.includes("ya vistos") ||
+        notasLower.includes("cheatsheet")
+          ? "Con base"
+          : "Nuevo";
+    }
+
     const energiaPrevia = VALORES_ENERGIA.has(raw.energiaPrevia)
       ? raw.energiaPrevia
       : "Media";
@@ -180,6 +209,8 @@
       materia,
       tema,
       tipoActividad,
+      medio,
+      familiaridad,
       energiaPrevia,
       complejidad,
       objetivoCumplido,
@@ -188,7 +219,7 @@
       modoIA,
       usoIA,
       xp,
-      notas: String(raw.notas || "").trim()
+      notas: notasStr
     };
   }
 

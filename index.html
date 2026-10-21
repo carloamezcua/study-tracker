@@ -245,11 +245,10 @@
             </div>
           </div>
 
-          <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (8 CHIPS EN GRID 2x4) -->
+          <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (7 CHIPS) -->
           <div class="form-group">
             <label data-i18n="labelActivity">Tipo de Actividad</label>
             <div class="chip-group chip-grid-6" data-group="tipoActividad">
-              <button type="button" class="chip-btn" data-value="Preparación / Contexto">🗂️ Preparación / Contexto</button>
               <button type="button" class="chip-btn" data-value="Clase / Cátedra">👨‍🏫 Clase / Cátedra</button>
               <button type="button" class="chip-btn" data-value="Teoría / Docs">📖 Teoría / Docs</button>
               <button type="button" class="chip-btn" data-value="Investigación / Diálogo">💬 Investigación / Diálogo</button>
@@ -259,7 +258,26 @@
               <button type="button" class="chip-btn" data-value="Repaso / Simulacro">🔁 Repaso / Simulacro</button>
             </div>
             <div id="ayudaActividad" class="helper-box">
-              Construir e implementar: escribir código, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea.
+              Construir e implementar: escribir código, notebooks, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea.
+            </div>
+          </div>
+
+          <!-- 1B. MEDIO DE TRABAJO (DIGITAL VS. PAPEL) Y FAMILIARIDAD DEL TEMA -->
+          <div class="row">
+            <div class="form-group">
+              <label data-i18n="labelMedium">Medio de Trabajo</label>
+              <div class="chip-group" data-group="medio">
+                <button type="button" class="chip-btn active" data-value="Digital">💻 Digital</button>
+                <button type="button" class="chip-btn" data-value="Analógico / Papel">📝 Papel / A mano</button>
+                <button type="button" class="chip-btn" data-value="Híbrido">🔀 Híbrido</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label data-i18n="labelFamiliarity">Familiaridad del Tema</label>
+              <div class="chip-group" data-group="familiaridad">
+                <button type="button" class="chip-btn" data-value="Nuevo">🌱 Tema Nuevo</button>
+                <button type="button" class="chip-btn active" data-value="Con base">🧱 Con base</button>
+              </div>
             </div>
           </div>
 
@@ -285,14 +303,14 @@
 
           <!-- 3. OBJETIVO CUMPLIDO / AVANCE DEL BLOQUE -->
           <div class="form-group">
-            <label><span data-i18n="labelGoal">¿Avance del Bloque / Meta?</span> <span class="label-hint" data-i18n="labelGoalHint">(+10% Buen avance · +5% Con tropiezos)</span></label>
+            <label><span data-i18n="labelGoal">¿Fluidez y Avance del Bloque?</span> <span class="label-hint" data-i18n="labelGoalHint">(Evalúa este bloque, no si terminaste todo el entregable)</span></label>
             <div class="chip-group" data-group="objetivoCumplido">
-              <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Buen avance +10%)</button>
+              <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Flujo limpio +10%)</button>
               <button type="button" class="chip-btn" data-value="Parcial">⚠️ Parcial (Con tropiezos +5%)</button>
               <button type="button" class="chip-btn" data-value="No">❌ No (Bloqueo)</button>
             </div>
             <div id="ayudaObjetivo" class="helper-box">
-              Buen avance del bloque (+10% XP): completaste la meta o avanzaste a buen ritmo en una tarea larga que seguirá en otra sesión.
+              ✅ Flujo limpio (+10% XP): Evalúa ESTE bloque, no si acabaste toda la tarea/proyecto. Úsalo si avanzaste a buen ritmo en lo planeado para esta sesión sin quedarte estancado.
             </div>
           </div>
 
@@ -445,14 +463,14 @@
           </div>
         </div>
 
-        <!-- PESTAÑA 3: HÁBITOS, BALANCE COGNITIVO, ACTIVIDAD Y ENERGÍA -->
+        <!-- PESTAÑA 3: HÁBITOS, BALANCE COGNITIVO, MEDIO, FAMILIARIDAD Y FRICCIÓN -->
         <div class="analytics-tab-panel" id="tabPanel-habitos">
           <div class="panel">
             <h2>
-              <span data-i18n="chart3Title">🧠 Patrones de Hábito: 8 Actividades y Balance Cognitivo</span>
-              <small class="chart-hint" data-i18n="chart3Hint">Comportamiento por tipo de tarea y fatiga</small>
+              <span data-i18n="chart3Title">🧠 Patrones de Hábito: 7 Actividades y Balance Cognitivo</span>
+              <small class="chart-hint" data-i18n="chart3Hint">Comportamiento por tipo de tarea y método</small>
             </h2>
-            <div class="subtitle" data-i18n="chart3Subtitle">Minutos y asimilación promedio según los 8 tipos de actividad y proporción entre preparación/teoría y práctica/producción.</div>
+            <div class="subtitle" data-i18n="chart3Subtitle">Minutos y asimilación promedio según las 7 actividades de estudio y proporción entre consumo receptivo (Clase, Teoría, Investigación) y producción activa (Apuntes, Código, Práctica, Repaso).</div>
             <div id="balanceCognitivoBox" class="balance-cognitivo-box"></div>
             <div class="chart-box">
               <canvas id="chartPorActividad"></canvas>
@@ -461,12 +479,27 @@
 
           <div class="panel">
             <h2>
-              <span data-i18n="habitMatrixTitle">🔋 Impacto de la Energía Previa y Complejidad</span>
+              <span data-i18n="frictionChartTitle">🧱 Matriz de Fricción: Fluidez vs. Tropiezos y Bloqueos</span>
+              <small class="chart-hint" data-i18n="frictionChartHint">Por Complejidad y Familiaridad del tema</small>
             </h2>
-            <div class="subtitle" data-i18n="habitMatrixSubtitle">Compara cómo cambia tu retención promedio según tu energía al iniciar y la dificultad del reto.</div>
-            <h4 class="sub-section-title" data-i18n="habitByEnergyTitle">Por Energía Inicial</h4>
+            <div class="subtitle" data-i18n="frictionChartSubtitle">Proporción de bloques con flujo limpio (✅ Sí), con tropiezos (⚠️ Parcial) o bloqueos (❌ No) según el nivel de reto y si el tema es nuevo o ya tenías base.</div>
+            <div class="chart-box">
+              <canvas id="chartMatrizFriccion"></canvas>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>
+              <span data-i18n="habitMatrixTitle">📝 Impacto de Medio (Papel vs. Digital), Familiaridad, Energía y Reto</span>
+            </h2>
+            <div class="subtitle" data-i18n="habitMatrixSubtitle">Descubre cómo cambia tu retención promedio y el uso de IA cuando escribes a mano vs. digital, cuando abordas un tema nuevo vs. con base, y según tu energía inicial.</div>
+            <h4 class="sub-section-title" data-i18n="habitByMediumTitle">📝 Por Medio de Trabajo (Papel vs. Digital)</h4>
+            <div id="resumenMedioBar" class="habit-summary-bar"></div>
+            <h4 class="sub-section-title" data-i18n="habitByFamiliarityTitle">🌱 Por Familiaridad del Tema (Nuevo vs. Con Base)</h4>
+            <div id="resumenFamiliaridadBar" class="habit-summary-bar"></div>
+            <h4 class="sub-section-title" data-i18n="habitByEnergyTitle">🔋 Por Energía Inicial</h4>
             <div id="resumenHabitosBar" class="habit-summary-bar"></div>
-            <h4 class="sub-section-title" data-i18n="habitByComplexityTitle">Por Complejidad del Tema</h4>
+            <h4 class="sub-section-title" data-i18n="habitByComplexityTitle">🎯 Por Complejidad del Tema</h4>
             <div id="resumenComplejidadBar" class="habit-summary-bar"></div>
           </div>
         </div>
@@ -527,45 +560,76 @@
       </div>
     </div>
 
-    <!-- GUÍA Y ESCALAS DE REFERENCIA PARA CUALQUIER USUARIO -->
+    <!-- GUÍA Y ESCALAS DE REFERENCIA DEL SISTEMA (MANUAL DE BOLSILLO EN 6 TARJETAS) -->
     <div class="panel">
-      <h2 data-i18n="guideMainTitle">📖 Guía de Referencia y Escalas del Sistema</h2>
-      <div class="subtitle" data-i18n="guideMainSubtitle">Documentación integrada para evaluar el impacto cognitivo de cada bloque y cómo se calculan las fórmulas en Excel.</div>
+      <h2 data-i18n="guideMainTitle">📖 Guía de Referencia y Criterios del Sistema</h2>
+      <div class="subtitle" data-i18n="guideMainSubtitle">Manual rápido para elegir la actividad correcta, calificar el avance de tu bloque sin ambigüedades e interpretar los gráficos analíticos.</div>
       <div class="guide-grid">
+        <!-- TARJETA 1: LAS 7 ACTIVIDADES Y CASOS GRISES -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard1Title">⭐️ Calidad de Aprendizaje / Asimilación (1 al 5)</h4>
+          <h4 data-i18n="guideCard1Title">🧭 1. Las 7 Actividades y Cómo Distinguirlas</h4>
           <ul>
-            <li data-i18n-html="guideCard1Li1"><strong>1 (Mecánico / Sin retención):</strong> Solo copié/pegué respuestas o estuve distraído; no asimilé el tema.</li>
-            <li data-i18n-html="guideCard1Li2"><strong>2 (Superficial / Pasivo):</strong> Seguí pasos o código generado entendiendo solo por encima; poca retención.</li>
-            <li data-i18n-html="guideCard1Li3"><strong>3 (Comprensión estándar):</strong> Entendí la lógica general de lo realizado y resolví partes por mi cuenta.</li>
-            <li data-i18n-html="guideCard1Li4"><strong>4 (Aprendizaje sólido):</strong> Razoné activamente el problema, comprendí el porqué y puedo replicarlo.</li>
-            <li data-i18n-html="guideCard1Li5"><strong>5 (Asimilación profunda):</strong> Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda.</li>
+            <li data-i18n-html="guideCard1Li1"><strong>👨‍🏫 Clase / Cátedra:</strong> Sesión en vivo con profesor. <em>Tip:</em> Si en clase haces un ejercicio con IA solo por salir del paso, regístralo aparte o baja la asimilación.</li>
+            <li data-i18n-html="guideCard1Li2"><strong>📖 Teoría / Docs vs. 💬 Investigación:</strong> Usa <code>Teoría / Docs</code> cuando consumes material estructurado (documentación, libro, video). Usa <code>Investigación / Diálogo</code> cuando haces preguntas abiertas o debates el <em>"¿por qué?"</em> con una IA.</li>
+            <li data-i18n-html="guideCard1Li3"><strong>✍️ Diseño / Apuntes:</strong> Cuando traduces ideas a tus propias palabras (cheatsheets a mano, resúmenes, diagramas).</li>
+            <li data-i18n-html="guideCard1Li4"><strong>💻 Código vs. 🧪 Debugging:</strong> <code>Desarrollo / Código</code> es construir funcionalidades; <code>Práctica / Debugging</code> es resolver ejercicios o cazar un bug específico.</li>
+            <li data-i18n-html="guideCard1Li5"><strong>🔁 Repaso / Simulacro:</strong> Estudiar de tus propios apuntes previos, flashcards o exámenes de prueba antes de una evaluación.</li>
           </ul>
         </div>
+
+        <!-- TARJETA 2: SÍ VS PARCIAL VS NO (REGLA DE ORO DEL AVANCE) -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard2Title">🧠 Contexto y 8 Tipos de Actividad</h4>
+          <h4 data-i18n="guideCard2Title">🎯 2. ¿Cuándo elegir Sí, Parcial o Bloqueo?</h4>
           <ul>
-            <li data-i18n-html="guideCard2Li1"><strong>Contexto:</strong> <code>🎓 Académico</code>, <code>🏅 Certificación</code>, <code>🚀 Proyecto Propio</code>, <code>🤝 Externo</code>.</li>
-            <li data-i18n-html="guideCard2Li2"><strong>Actividades:</strong> <code>🗂️ Preparación / Contexto</code>, <code>👨‍🏫 Clase / Cátedra</code>, <code>📖 Teoría / Docs</code>, <code>💬 Investigación / Diálogo</code>, <code>✍️ Diseño / Apuntes</code>, <code>💻 Desarrollo / Código</code>, <code>🧪 Práctica / Debugging</code>, <code>🔁 Repaso / Simulacro</code>.</li>
-            <li data-i18n-html="guideCard2Li3"><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code>, <code>🪫 Baja</code>.</li>
-            <li data-i18n-html="guideCard2Li4"><strong>Avance del Bloque:</strong> <code>✅ Sí (+10% XP: buen avance)</code>, <code>⚠️ Parcial (+5% XP: con tropiezos)</code>, <code>❌ No (0% / Bloqueo)</code>.</li>
+            <li data-i18n-html="guideCard2Li1"><strong>Regla de Oro:</strong> Evalúa <strong>la fluidez de este bloque de tiempo</strong>, nunca si ya terminaste el proyecto o entregable completo.</li>
+            <li data-i18n-html="guideCard2Li2"><strong>✅ Sí — Flujo limpio (+10% XP):</strong> Avanzaste a buen ritmo en la parte que tocabas hoy (ej. escribir 1 página de tu Cheatsheet o programar un módulo), aunque la tarea total continúe mañana.</li>
+            <li data-i18n-html="guideCard2Li3"><strong>⚠️ Parcial — Con tropiezos (+5% XP):</strong> Sí hubo progreso, pero perdiste buena parte del bloque atorado en un bug, con distracciones, cansancio o yendo a la mitad de velocidad.</li>
+            <li data-i18n-html="guideCard2Li4"><strong>❌ No — Bloqueo real (0% bono):</strong> Te quedaste estancado casi toda la sesión en un obstáculo técnico/conceptual sin destrabarlo, o abortaste la sesión sin avance efectivo.</li>
           </ul>
         </div>
+
+        <!-- TARJETA 3: MEDIO (PAPEL VS DIGITAL), FAMILIARIDAD Y ENERGÍA -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard3Title">🤖 Modo de Uso de IA (Impacto Cognitivo)</h4>
+          <h4 data-i18n="guideCard3Title">📝 3. Medio, Familiaridad, Energía y Reto</h4>
           <ul>
-            <li data-i18n-html="guideCard3Li1"><strong>🧠 Autónomo (+5% XP):</strong> 100% por tu cuenta (0% IA).</li>
-            <li data-i18n-html="guideCard3Li2"><strong>💬 Diálogo / Tutoría (+5% XP):</strong> Debate conceptual, preguntas de <em>"¿por qué?"</em> y refuerzo activo con IA.</li>
-            <li data-i18n-html="guideCard3Li3"><strong>🛠️ Copiloto / Apoyo (0% ajuste):</strong> Consulta puntual de sintaxis o desbloqueo de bugs entendiendo la solución.</li>
-            <li data-i18n-html="guideCard3Li4"><strong>🤖 Mecánico / Copy-Paste (-15% XP):</strong> Automatización directa para entregar rápido sin leer a fondo.</li>
+            <li data-i18n-html="guideCard3Li1"><strong>Medio de Trabajo:</strong> <code>💻 Digital</code> (teclado/IDE), <code>📝 Papel / A mano</code> (fuerza a sintetizar sin copy-paste y suele elevar la retención) o <code>🔀 Híbrido</code> (pantalla + cuaderno).</li>
+            <li data-i18n-html="guideCard3Li2"><strong>Familiaridad:</strong> <code>🌱 Tema Nuevo</code> (1ª vez que ves el concepto; mayor carga cognitiva) vs. <code>🧱 Con base</code> (tema ya visto en clase o repaso; flujo más constante).</li>
+            <li data-i18n-html="guideCard3Li3"><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code> o <code>🪫 Baja</code> al sentarte a estudiar (alimenta el Mapa de Calor Circadiano).</li>
+            <li data-i18n-html="guideCard3Li4"><strong>Complejidad del Reto:</strong> <code>🟢 Fácil (0%)</code>, <code>🟡 Desafiante (+10% XP)</code>, <code>🔴 Muy difícil (+20% XP)</code>.</li>
           </ul>
         </div>
+
+        <!-- TARJETA 4: ESCALA DE ASIMILACIÓN (1 AL 5) -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard4Title">🧮 Curva Exponencial y Fórmulas en JavaScript</h4>
+          <h4 data-i18n="guideCard4Title">⭐️ 4. Escala de Asimilación (1 al 5)</h4>
           <ul>
-            <li data-i18n-html="guideCard4Li1"><strong>Curva RPG (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code> (El XP necesario se duplica cada 7 niveles).</li>
-            <li data-i18n-html="guideCard4Li2"><strong>Duración (Minutos):</strong> Calculada en JS a partir de <code>Hora_Inicio</code> y <code>Hora_Fin</code> (soporta cruce de medianoche).</li>
-            <li data-i18n-html="guideCard4Li3"><strong>XP con Bonos y Modo IA:</strong> <code>ROUND(Duracion * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoMeta + BonoModoIA))</code>.</li>
+            <li data-i18n-html="guideCard4Li1"><strong>1 (Mecánico / Sin retención):</strong> Solo copié/pegué respuestas por prisa o estuve distraído; no asimilé el tema.</li>
+            <li data-i18n-html="guideCard4Li2"><strong>2 (Superficial / Pasivo):</strong> Seguí pasos o código generado entendiendo solo por encima; poca retención a largo plazo.</li>
+            <li data-i18n-html="guideCard4Li3"><strong>3 (Comprensión estándar):</strong> Entendí la lógica general de lo realizado y resolví partes por mi cuenta.</li>
+            <li data-i18n-html="guideCard4Li4"><strong>4 (Aprendizaje sólido):</strong> Razoné activamente el problema, sinteticé los conceptos y puedo replicarlo.</li>
+            <li data-i18n-html="guideCard4Li5"><strong>5 (Asimilación profunda):</strong> Dominio total; puedo explicar el tema o escribir la solución desde cero sin ayuda.</li>
+          </ul>
+        </div>
+
+        <!-- TARJETA 5: MODOS DE USO DE IA Y MULTIPLICADORES -->
+        <div class="guide-card">
+          <h4 data-i18n="guideCard5Title">🤖 5. Modos de Uso de IA vs. Porcentaje</h4>
+          <ul>
+            <li data-i18n-html="guideCard5Li1"><strong>🧠 Autónomo (+5% XP):</strong> 100% por tu cuenta sin asistencia de IA (fija automáticamente el slider en <code>0%</code>).</li>
+            <li data-i18n-html="guideCard5Li2"><strong>💬 Diálogo / Tutoría (+5% XP):</strong> Usas la IA como tutor socrático (preguntas de <em>"¿por qué?"</em>, analogías y validación de tus ideas).</li>
+            <li data-i18n-html="guideCard5Li3"><strong>🛠️ Copiloto / Apoyo (0% ajuste):</strong> La IA te ayuda a sintetizar, consultar sintaxis o destrabar un error puntual, pero tú procesas y escribes el resultado.</li>
+            <li data-i18n-html="guideCard5Li4"><strong>🤖 Mecánico / Copy-Paste (-15% XP):</strong> Delegación directa para acabar y entregar rápido sin profundizar.</li>
+          </ul>
+        </div>
+
+        <!-- TARJETA 6: CÓMO LEER EL DASHBOARD Y FÓRMULAS RPG -->
+        <div class="guide-card">
+          <h4 data-i18n="guideCard6Title">📊 6. Lectura del Dashboard y Fórmulas RPG</h4>
+          <ul>
+            <li data-i18n-html="guideCard6Li1"><strong>Cuadrante IA (Pestaña 2):</strong> <code>🚀 Sinergia IA</code> (IA &ge; 35% y Calidad &ge; 4), <code>🧠 Dominio Propio</code> (IA &lt; 35% y Calidad &ge; 4), <code>🤖 Ilusión Mecánica</code> (IA &ge; 35% y Calidad &le; 2), <code>🪫 Fricción</code> (IA &lt; 35% y Calidad &le; 2).</li>
+            <li data-i18n-html="guideCard6Li2"><strong>Balance Cognitivo (Pestaña 3):</strong> Compara minutos de <em>Consumo receptivo</em> (Clase, Teoría, Investigación) vs. <em>Producción activa</em> (Apuntes, Código, Debugging, Repaso).</li>
+            <li data-i18n-html="guideCard6Li3"><strong>Fórmula XP:</strong> <code>ROUND(Minutos * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoAvance + BonoModoIA))</code>.</li>
+            <li data-i18n-html="guideCard6Li4"><strong>Curva Exponencial (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code>.</li>
           </ul>
         </div>
       </div>

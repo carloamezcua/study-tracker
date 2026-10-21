@@ -23,6 +23,7 @@
   let chartHoraInstance = null;
   let chartMateriaInstance = null;
   let chartActividadInstance = null;
+  let chartFriccionInstance = null;
   let callbackSeleccionMateria = null;
 
   function t(key, params) {
@@ -203,9 +204,12 @@
               label(context) {
                 const raw = context.raw || {};
                 const modoTrad = trVal("modoIA", raw.modoIA || "");
+                const medioTrad = trVal("medio", raw.medio || "Digital");
+                const famTrad = trVal("familiaridad", raw.familiaridad || "Con base");
                 return [
                   `📚 ${raw.materia || ""} — ${raw.tema || ""}`,
                   `⭐️ ${t("thAssimilation")}: ${raw.calidadReal}/5 | 🤖 IA: ${raw.iaReal}% (${modoTrad})`,
+                  `📝 ${medioTrad} | 🌱 ${famTrad}`,
                   `⏱️ ${t("thDuration")}: ${raw.duracion} min (${raw.fecha || ""})`
                 ];
               }
@@ -508,6 +512,87 @@
   }
 
   /**
+   * 6. Gráfico de Matriz de Fricción (Barras Apiladas Sí / Parcial / No por Complejidad y Familiaridad).
+   */
+  function actualizarGraficoMatrizFriccion(datosHabitos) {
+    const canvas = document.getElementById("chartMatrizFriccion");
+    if (!canvas) return;
+
+    const filas = Array.isArray(datosHabitos.matrizFriccion) ? datosHabitos.matrizFriccion : [];
+    const labels = filas.map((f) =>
+      f.tipo === "complejidad"
+        ? trVal("complejidad", f.clave)
+        : trVal("familiaridad", f.clave)
+    );
+    const dataSi = filas.map((f) => f.si);
+    const dataParcial = filas.map((f) => f.parcial);
+    const dataNo = filas.map((f) => f.no);
+
+    if (chartFriccionInstance) {
+      chartFriccionInstance.data.labels = labels;
+      chartFriccionInstance.data.datasets[0].label = t("frictionDsYes");
+      chartFriccionInstance.data.datasets[0].data = dataSi;
+      chartFriccionInstance.data.datasets[1].label = t("frictionDsPartial");
+      chartFriccionInstance.data.datasets[1].data = dataParcial;
+      chartFriccionInstance.data.datasets[2].label = t("frictionDsNo");
+      chartFriccionInstance.data.datasets[2].data = dataNo;
+      chartFriccionInstance.options.scales.y.title.text = t("frictionAxisSessions");
+      chartFriccionInstance.update();
+      return;
+    }
+
+    const ctxFric = canvas.getContext("2d");
+    chartFriccionInstance = new Chart(ctxFric, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: t("frictionDsYes"),
+            data: dataSi,
+            backgroundColor: "rgba(16, 185, 129, 0.78)",
+            borderRadius: 5,
+            stack: "friccion"
+          },
+          {
+            label: t("frictionDsPartial"),
+            data: dataParcial,
+            backgroundColor: "rgba(245, 158, 11, 0.82)",
+            borderRadius: 5,
+            stack: "friccion"
+          },
+          {
+            label: t("frictionDsNo"),
+            data: dataNo,
+            backgroundColor: "rgba(239, 68, 68, 0.82)",
+            borderRadius: 5,
+            stack: "friccion"
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: "#cbd5e1" } } },
+        scales: {
+          x: {
+            stacked: true,
+            ticks: { color: "#94a3b8" },
+            grid: { color: "rgba(51,65,85,0.4)" }
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            title: { display: true, text: t("frictionAxisSessions"), color: "#94a3b8" },
+            ticks: { color: "#94a3b8", stepSize: 1 },
+            grid: { color: "rgba(51,65,85,0.4)" }
+          }
+        }
+      }
+    });
+  }
+
+  /**
    * Renderiza todos los gráficos y devuelve los objetos analíticos procesados.
    */
   function renderizarGraficos(
@@ -529,6 +614,7 @@
     actualizarGraficoPorHora(datosHora);
     actualizarGraficoPorMateria(datosMateria);
     actualizarGraficoPorActividad(datosHabitos);
+    actualizarGraficoMatrizFriccion(datosHabitos);
 
     return {
       datosEvolucion,
@@ -550,7 +636,8 @@
       chartCuadranteInstance,
       chartHoraInstance,
       chartMateriaInstance,
-      chartActividadInstance
+      chartActividadInstance,
+      chartFriccionInstance
     ].forEach((inst) => {
       if (inst && typeof inst.resize === "function") {
         inst.resize();

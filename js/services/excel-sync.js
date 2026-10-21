@@ -30,6 +30,8 @@
     "Materia",
     "Tema",
     "Tipo_Actividad",
+    "Medio_Trabajo",
+    "Familiaridad",
     "Energia_Previa",
     "Complejidad",
     "Objetivo_Cumplido",
@@ -85,6 +87,8 @@
         s.materia || "General",
         s.tema || "General",
         s.tipoActividad || "Desarrollo / Código",
+        s.medio || "Digital",
+        s.familiaridad || "Con base",
         s.energiaPrevia || "Media",
         complejidad,
         objetivoCumplido,
@@ -193,6 +197,8 @@
       const contexto = r.Contexto || r.contexto || "Académico";
       const tema = r.Tema || r.tema || "General";
       const tipoActividad = r.Tipo_Actividad || r.tipoActividad || "Desarrollo / Código";
+      const medio = r.Medio_Trabajo || r.medio || "";
+      const familiaridad = r.Familiaridad || r.familiaridad || "";
       const energiaPrevia = r.Energia_Previa || r.energiaPrevia || "Media";
       const complejidad = r.Complejidad || r.complejidad || "Desafiante";
       const objetivoCumplido = r.Objetivo_Cumplido || r.objetivoCumplido || "Sí";
@@ -220,6 +226,8 @@
         materia,
         tema,
         tipoActividad,
+        medio: medio || undefined,
+        familiaridad: familiaridad || undefined,
         energiaPrevia,
         complejidad,
         objetivoCumplido,

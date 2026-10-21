@@ -14,21 +14,23 @@ Aplicación web **Local-First** gamificada (estilo RPG) ultra-ligera con **micro
   - Inspirada en *Old School RuneScape*, la experiencia requerida **se duplica cada 7 niveles**:
     $$\text{XP}(\text{Nivel } L) = \text{REDONDEAR}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
   - Subida rápida en los primeros niveles para motivar la constancia, progresión creciente (+10.4% por nivel) y propiedad matemática exacta donde el **Nivel 92 representa el 50% del XP total hacia el Nivel 99**.
-- **Taxonomía Ortogonal de 1 Clic (`4 Contextos` × `8 Actividades`):**
+- **Taxonomía Ortogonal de 1 Clic (`4 Contextos` × `7 Actividades` × `Medio` × `Familiaridad`):**
   - **Contexto / Propósito (4 chips):**
     - `🎓 Académico`: Materias universitarias/escolares, tareas y exámenes de carrera.
     - `🏅 Certificación`: Certificaciones profesionales (ej. *Snowflake*) y cursos técnicos estructurados.
     - `🚀 Proyecto Propio`: Desarrollo de software personal, portafolio o proyectos en pareja.
     - `🤝 Externo`: Proyectos de amigos/terceros (ej. *Ruby on Rails*), incluyendo el estudio requerido para ellos.
-  - **Tipo de Actividad (8 chips con ayuda dinámica en vivo):**
+  - **Medio de Trabajo y Familiaridad del Tema:**
+    - **Medio (`Medio_Trabajo`):** `💻 Digital` (teclado/IDE), `📝 Papel / A mano` (escritura manual en cuaderno/hojas que obliga a sintetizar sin copy-paste y eleva la retención) o `🔀 Híbrido` (pantalla + apuntes en papel).
+    - **Familiaridad (`Familiaridad`):** `🌱 Tema Nuevo` (primer acercamiento al concepto; mayor carga cognitiva) vs. `🧱 Con base` (tema ya visto en clase o repaso; flujo más constante).
+  - **Tipo de Actividad (7 chips con ayuda dinámica en vivo):**
 
 | Actividad | ¿Qué significa y cuándo usarla? | ¿Cómo no confundirla con otras? |
 | :--- | :--- | :--- |
-| **`🗂️ Preparación / Contexto`** | **Antes de estudiar o programar:** armar el entorno, instalar paquetes, recopilar PDFs/links o *"masticar"* información en un LLM para dejar listo el contexto de un proyecto multi-sesión. | No estás leyendo teoría a fondo ni programando todavía; estás **preparando la mesa y las fuentes** para ahorrar tiempo en futuras sesiones. |
 | **`👨‍🏫 Clase / Cátedra`** | **En vivo con un profesor o ponente:** asistir a una clase escolar, cátedra universitaria o taller guiado. Evalúa tu **concentración, interés y retención**. | Aquí el ritmo lo lleva un **profesor en vivo**. Si estudias un curso pregrabado o lees por tu cuenta a tu ritmo, usa `📖 Teoría / Docs`. |
 | **`📖 Teoría / Docs`** | **Consumo estructurado a tu propio ritmo:** leer documentación oficial (ej. *Snowflake Docs*), libros, artículos técnicos o ver videocursos grabados. | Sigue una **fuente lineal o guía oficial**. Si en cambio estás saltando entre fuentes para responder una duda abierta o debatiendo un *"¿por qué?"*, es `💬 Investigación / Diálogo`. |
 | **`💬 Investigación / Diálogo`** | **Explorar dudas abiertas o debatir conceptos:** buscar cómo/por qué funciona algo, comparar tecnologías o tener una sesión socrática de preguntas y respuestas con IA. | No sigues un manual de principio a fin (`📖 Teoría / Docs`); estás **investigando una incógnita puntual o dialogando** para destrabar tu comprensión. |
-| **`✍️ Diseño / Apuntes`** | **Sintetizar y estructurar con tus palabras:** pasar en limpio apuntes (en cuaderno o compu), hacer resúmenes propios, mapas mentales o diagramas (ER, arquitectura). | Mientras que en `📖 Teoría` consumes información, aquí **produces síntesis o diseño** sin escribir código todavía. |
+| **`✍️ Diseño / Apuntes`** | **Sintetizar y estructurar con tus palabras:** pasar en limpio apuntes o *cheatsheets* (en cuaderno o compu), hacer resúmenes propios, mapas mentales o diagramas (ER, arquitectura). | Mientras que en `📖 Teoría` consumes información, aquí **produces síntesis o diseño** sin escribir código todavía. |
 | **`💻 Desarrollo / Código`** | **Construir e implementar:** escribir código nuevo, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o entregable. | Es **creación de software/entregables**. Si el código ya existe y estás cazando un error o resolviendo ejercicios aislados, usa `🧪 Práctica / Debugging`. |
 | **`🧪 Práctica / Debugging`** | **Ejercitar o destrabar errores:** hacer laboratorios prácticos, ejercicios tipo kata/algoritmos o depurar (*debugging*) un bug hasta encontrar la causa. | Se enfoca en **entrenar destreza o arreglar fallos**, no en levantar funcionalidades nuevas desde cero (`💻 Desarrollo`). |
 | **`🔁 Repaso / Simulacro`** | **Consolidar memoria sobre algo ya visto:** repasar tus propios apuntes previos, flashcards, explicar un tema sin mirar o hacer exámenes de simulacro (*mock exams*). | Solo aplica a temas que **ya estudiaste antes** y estás reforzando para no olvidarlos o para medirte antes de un examen. |
@@ -49,12 +51,12 @@ Aplicación web **Local-First** gamificada (estilo RPG) ultra-ligera con **micro
 - **Filtro Rápido por Contexto e Historial Compacto:**
   - Barra de pestañas interactiva (`🌐 Todos`, `🎓 Académico`, `🏅 Certificación`, `🚀 Proyecto Propio`, `🤝 Externo`) que filtra al instante las tarjetas KPI, los 3 gráficos y la tabla de historial manteniendo tu nivel global de personaje en la barra superior.
   - **Vista compacta de últimos 5 registros:** La tabla muestra por defecto solo las **5 sesiones más recientes** para evitar que el Dashboard crezca sin límite, con un botón **`📂 Ver todos (X)` / `⬆️ Mostrar solo últimos 5`** para expandir o contraer en 1 clic sin afectar los cálculos globales.
-- **Detector de Bloqueos y Avance del Bloque (sin castigar tareas largas):**
+- **Detector de Bloqueos y Fluidez del Bloque (Regla de Oro sin malinterpretaciones):**
   - **Complejidad:** `🟢 Fácil (+0% XP)` · `🟡 Desafiante (+10% XP)` · `🔴 Muy difícil (+20% XP)`.
-  - **¿Avance del Bloque / Meta? (con guía dinámica en vivo):**
-    - `✅ Sí (Buen avance +10% XP)`: Completaste la meta planeada **o** avanzaste a muy buen ritmo en una tarea larga que continuará en otra sesión (así los proyectos largos no te penalizan el XP).
-    - `⚠️ Parcial (Con tropiezos +5% XP)`: Hubo progreso, pero fue menor o más lento de lo esperado por dudas o distracciones parciales.
-    - `❌ No (Bloqueo / 0% XP)`: Bloqueo técnico, distracción total o interrupción sin lograr avance (contabilizado en el indicador de bloqueos).
+  - **¿Fluidez y Avance del Bloque? (evalúa este bloque de tiempo, nunca si ya terminaste el entregable entero):**
+    - `✅ Sí (Flujo limpio +10% XP)`: Avanzaste a buen ritmo en la parte que planeaste para esta sesión (ej. escribir 1 página de tu *Cheatsheet* o programar un módulo), aunque la tarea total continúe mañana.
+    - `⚠️ Parcial (Con tropiezos +5% XP)`: Sí hubo progreso, pero perdiste una parte importante del bloque atorado en un bug, distracción, cansancio o confusión y el ritmo fue accidentado.
+    - `❌ No (Bloqueo / 0% XP)`: Te quedaste estancado casi toda la sesión en un obstáculo técnico/conceptual sin lograr destrabarlo, o tuviste que abortar la sesión sin avance efectivo.
 - **Cronómetro y Temporizador Pomodoro Integrado:**
   - **Modo Cronómetro (`⏱️`):** Cuenta progresiva con captura automática de la **Fecha**, **Hora de Inicio** al pulsar *Iniciar* y **Hora de Fin** al pulsar *Terminar* (o al guardar directamente la sesión).
   - **Modo Pomodoro (`🍅`):** Cuenta regresiva por bloques de enfoque (`25m`, `50m` o personalizado) y bloques de descanso (`5m`, `15m`) con aviso acústico vía *Web Audio API*.
@@ -118,11 +120,11 @@ flowchart TD
     SYNC --> METRICS
 ```
 
-### 🧮 Esquema de 18 Columnas en CSV (`data/study-tracker.csv`) y Fórmulas en JavaScript
+### 🧮 Esquema de 20 Columnas en CSV (`data/study-tracker.csv`) y Fórmulas en JavaScript
 
-El archivo `data/study-tracker.csv` se guarda en texto plano `UTF-8 con BOM` (estándar RFC 4180, listo para Python, Pandas, Snowflake, SQLite o Excel) con las siguientes 18 columnas:
+El archivo `data/study-tracker.csv` se guarda en texto plano `UTF-8 con BOM` (estándar RFC 4180, listo para Python, Pandas, Snowflake, SQLite o Excel) con las siguientes 20 columnas:
 
-`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tema,Tipo_Actividad,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,Modo_IA,Uso_IA_Porcentaje,XP_Ganados,Notas`
+`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tema,Tipo_Actividad,Medio_Trabajo,Familiaridad,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,Modo_IA,Uso_IA_Porcentaje,XP_Ganados,Notas`
 
 | Métrica | Regla / Fórmula en JavaScript (`js/domain/metrics.js`) |
 | :--- | :--- |
@@ -153,21 +155,23 @@ An ultra-lightweight gamified **Local-First** web application (RPG-style) powere
   - Inspired by *Old School RuneScape*, required experience **doubles every 7 levels**:
     $$\text{XP}(\text{Level } L) = \text{ROUND}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
   - Fast early leveling to reward consistency, progressive scaling (+10.4% per level), and the exact mathematical property where **Level 92 equals 50% of the total XP required for Level 99**.
-- **Orthogonal 1-Click Taxonomy (`4 Contexts` × `8 Activities`):**
+- **Orthogonal 1-Click Taxonomy (`4 Contexts` × `7 Activities` × `Medium` × `Familiarity`):**
   - **Context / Purpose (4 chips):**
     - `🎓 Academic` (`Académico`): University/school courses, assignments, and degree exams.
     - `🏅 Certification` (`Certificación`): Professional certifications (e.g., *Snowflake*) and structured technical courses.
     - `🚀 Own Project` (`Proyecto Propio`): Personal software engineering, portfolio, or duo projects.
     - `🤝 External` (`Externo`): Third-party or friends' projects (e.g., *Ruby on Rails*), including the research required for them.
-  - **Activity Type (8 chips with live dynamic helper):**
+  - **Work Medium & Topic Familiarity:**
+    - **Medium (`Medio_Trabajo`):** `💻 Digital` (keyboard/IDE), `📝 Paper / Handwritten` (writing by hand forces synthesis without copy-pasting and boosts retention), or `🔀 Hybrid` (screen + notebook).
+    - **Familiarity (`Familiaridad`):** `🌱 New Topic` (first contact with the concept; higher cognitive load) vs. `🧱 Familiar` (already seen in class or review; steadier flow).
+  - **Activity Type (7 chips with live dynamic helper):**
 
 | Activity | What it means & when to use it | How to distinguish it from similar ones |
 | :--- | :--- | :--- |
-| **`🗂️ Prep / Context`** (`Preparación / Contexto`) | **Before studying or coding:** setting up the environment, gathering sources, or *"digesting"* information in an LLM to prepare context for a multi-session project. | You aren't reading theory deeply or coding yet; you are **setting the stage and curating context** to save time in future sessions. |
 | **`👨‍🏫 Class / Lecture`** (`Clase / Cátedra`) | **Live with a professor or speaker:** attending a school/university lecture or guided workshop. Measures your **focus, interest, and live retention**. | Paced by a **live instructor**. If you are studying a recorded course or reading on your own schedule, use `📖 Theory / Docs`. |
 | **`📖 Theory / Docs`** (`Teoría / Docs`) | **Self-paced structured consumption:** reading official documentation (e.g., *Snowflake Docs*), books, articles, or watching recorded courses. | Follows a **linear source or official guide**. If you are jumping across sources to answer an open question or debating *"why?"*, use `💬 Research / Dialogue`. |
 | **`💬 Research / Dialogue`** (`Investigación / Diálogo`) | **Exploring open questions or debating concepts:** investigating how/why something works, comparing tools, or having a Socratic Q&A session with AI. | Not following a manual from start to finish (`📖 Theory / Docs`); you are **investigating a specific question or dialoguing** to unlock understanding. |
-| **`✍️ Design / Notes`** (`Diseño / Apuntes`) | **Synthesizing & structuring in your own words:** writing clean notes (notebook or PC), summaries, mind maps, or architecture/ER diagrams. | While `📖 Theory` is consuming information, here you **produce synthesis or design** without writing code yet. |
+| **`✍️ Design / Notes`** (`Diseño / Apuntes`) | **Synthesizing & structuring in your own words:** writing clean notes or cheatsheets (notebook or PC), summaries, mind maps, or architecture/ER diagrams. | While `📖 Theory` is consuming information, here you **produce synthesis or design** without writing code yet. |
 | **`💻 Dev / Code`** (`Desarrollo / Código`) | **Building & implementing:** writing new code, SQL queries, scripts, or developing project/assignment features. | Focused on **building deliverables/features**. If you are hunting down a bug or solving isolated practice problems, use `🧪 Practice / Debugging`. |
 | **`🧪 Practice / Debugging`** (`Práctica / Debugging`) | **Practicing or unblocking errors:** hands-on labs, coding katas, or debugging an issue until finding and fixing the root cause. | Focused on **training skill or fixing bugs**, rather than building new features from scratch (`💻 Dev / Code`). |
 | **`🔁 Review / Mock Exam`** (`Repaso / Simulacro`) | **Consolidating memory on previously studied material:** reviewing your own notes, flashcards, explaining from memory, or taking mock exams. | Only applies to topics you **already studied before** and are reinforcing for retention or exam readiness. |
@@ -207,11 +211,11 @@ An ultra-lightweight gamified **Local-First** web application (RPG-style) powere
   - Quick `ES` | `EN` toggle in the top bar persisted in `localStorage` (`study_tracker_lang`).
   - Instantly translates the entire UI, stopwatch/Pomodoro, dynamic helper boxes, Chart.js labels, and history table while preserving canonical data values in the `Store` and `data/study-tracker.csv`.
 
-### 🧮 18-Column CSV Schema (`data/study-tracker.csv`) & JavaScript Formulas
+### 🧮 20-Column CSV Schema (`data/study-tracker.csv`) & JavaScript Formulas
 
-The generated `data/study-tracker.csv` file is stored in plain-text `UTF-8 with BOM` (RFC 4180 standard, ready for Python, Pandas, Snowflake, SQLite, or Excel) with the following 18 columns:
+The generated `data/study-tracker.csv` file is stored in plain-text `UTF-8 with BOM` (RFC 4180 standard, ready for Python, Pandas, Snowflake, SQLite, or Excel) with the following 20 columns:
 
-`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tema,Tipo_Actividad,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,Modo_IA,Uso_IA_Porcentaje,XP_Ganados,Notas`
+`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tema,Tipo_Actividad,Medio_Trabajo,Familiaridad,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,Modo_IA,Uso_IA_Porcentaje,XP_Ganados,Notas`
 
 | Metric | Rule / Formula in JavaScript (`js/domain/metrics.js`) |
 | :--- | :--- |
