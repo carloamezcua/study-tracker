@@ -1030,6 +1030,35 @@ tr.row-editing td {
   color: var(--danger);
 }
 
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.table-footer-info {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.btn-toggle-history {
+  font-size: 0.78rem;
+  padding: 5px 12px;
+  border-color: var(--accent);
+  color: #c7d2fe;
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.btn-toggle-history:hover {
+  background: var(--accent);
+  color: white;
+}
+
 /* Guía y Escalas inferior */
 .guide-grid {
   display: grid;

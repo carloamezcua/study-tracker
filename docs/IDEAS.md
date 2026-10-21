@@ -54,7 +54,8 @@ Hoy solo hay **XP → Nivel → Rango**. Esto es lo que añadiría profundidad. 
 
 _Pega aquí cualquier cosa sin pensar demasiado._
 
-- Agregar alguna opción para medir el tiempo cuando estoy preparando el ambiente para estudiar, muchas veces cuando uso IA hago una recopilación previa de información y la paso por modelos LLM para "masticar" la información y poder resolver proyectos (que tomarían más de una sesión) con el mismo chat o agente cosa que me ahorra mucho tiempo y no tengo que preparar el ambiente cada que regreso a trabajar en ese proyecto, a menos que lo necesite.
+- **Tanda 2 — Medio analógico vs. digital (`S` · ⭐⭐):** Diferenciar cuando escribo en el cuaderno a mano vs. en la computadora (incluso con el mismo % de IA, escribir en papel obliga a sintetizar y retener más sin copy-paste).
+- **Tanda 2 — Familiaridad / Conocimientos previos (`S` · ⭐⭐):** Agregar si un tema es totalmente nuevo (`🌱 Nuevo`) o si ya tenía base previa (`🧱 Con base`), ya que cuando repaso o tengo base el flujo es más constante y el apoyo de IA rinde distinto.
 
 ---
 
@@ -72,4 +73,8 @@ _Anota también lo que decidiste NO hacer y por qué. Evita volver a discutirlo.
 
 | Idea | Fecha | Commit/PR |
 | ---- | ----- | --------- |
-|      |       |           |
+| Mostrar solo los últimos 5 registros en el historial (con botón *Ver todos*) | 2026-10-20 | Tanda 1 |
+| Redefinir *Objetivo Cumplido* a *Avance del Bloque* (`Sí = Buen avance +10%`, `Parcial = Con tropiezos +5%`) para no castigar tareas largas | 2026-10-20 | Tanda 1 |
+| Actividad `🗂️ Preparación / Contexto` para medir el tiempo preparando el ambiente y recopilando info con LLMs | 2026-10-20 | Tanda 1 |
+| Actividad `👨‍🏫 Clase / Cátedra` con ajuste automático de IA a 0% y escala enfocada en concentración e interés | 2026-10-20 | Tanda 1 |
+| Migrar persistencia de `.xlsx` (SheetJS + fórmulas de Excel duplicadas) a `.csv` puro (`data/study-tracker.csv`) con fórmulas 100% en JS | 2026-10-20 | CSV Refactor |

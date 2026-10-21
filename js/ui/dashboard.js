@@ -11,6 +11,7 @@
     calcularXP,
     calcularProgresoRPG,
     calcularKPIs,
+    obtenerTextoAyudaActividad,
     obtenerTextoAyudaObjetivo,
     obtenerTextoAyudaCalidad,
     obtenerTextoAyudaIA
@@ -32,6 +33,10 @@
   // Filtro activo en el Dashboard ("Todos" o uno de los 4 contextos)
   let filtroContextoActual = "Todos";
 
+  // Control de vista compacta de la tabla (por defecto muestra solo los últimos 5 registros)
+  const LIMITE_HISTORIAL_RECIENTE = 5;
+  let mostrarTodoHistorial = false;
+
   const ICONOS_CONTEXTO = {
     Académico: "🎓",
     Certificación: "🏅",
@@ -40,6 +45,8 @@
   };
 
   const ICONOS_ACTIVIDAD = {
+    "Preparación / Contexto": "🗂️",
+    "Clase / Cátedra": "👨‍🏫",
     "Teoría / Docs": "📖",
     "Investigación / Diálogo": "💬",
     "Diseño / Apuntes": "✍️",
@@ -119,12 +126,32 @@
   }
 
   /**
+   * Alterna entre mostrar solo los últimos 5 registros o el historial completo.
+   */
+  function alternarVistaHistorial() {
+    mostrarTodoHistorial = !mostrarTodoHistorial;
+    return mostrarTodoHistorial;
+  }
+
+  /**
    * Selecciona un chip dentro de su grupo y actualiza la vista previa de XP y ayudas.
    */
   function seleccionarChip(grupo, valor) {
     if (!(grupo in estadoChips)) return;
     estadoChips[grupo] = valor;
     pintarGrupoChip(grupo, valor);
+
+    if (grupo === "tipoActividad") {
+      if (valor === "Clase / Cátedra") {
+        estadoChips.modoIA = "Autónomo";
+        pintarGrupoChip("modoIA", "Autónomo");
+        const inputIA = document.getElementById("usoIA");
+        if (inputIA) inputIA.value = "0";
+        actualizarAyudaIA({ desdeChip: true });
+      }
+      actualizarAyudaActividad();
+      actualizarAyudaCalidad();
+    }
 
     if (grupo === "objetivoCumplido") {
       actualizarAyudaObjetivo();
@@ -221,6 +248,7 @@
     );
     document.getElementById("usoIA").value = String(sesion.usoIA);
 
+    actualizarAyudaActividad();
     actualizarAyudaObjetivo();
     actualizarAyudaIA({ desdeChip: true });
     actualizarAyudaCalidad();
@@ -285,6 +313,7 @@
       if (formTitle) formTitle.textContent = t("formTitleNew");
       if (btnSubmit) btnSubmit.textContent = t("btnSubmitNew");
     }
+    actualizarAyudaActividad();
     actualizarAyudaObjetivo();
     actualizarAyudaIA({ desdeChip: true });
     actualizarAyudaCalidad();
@@ -319,6 +348,7 @@
       pintarGrupoChip(grupo, estadoChips[grupo]);
     });
 
+    actualizarAyudaActividad();
     actualizarAyudaObjetivo();
     actualizarAyudaIA({ desdeChip: true });
     actualizarAyudaCalidad();
@@ -333,6 +363,29 @@
     if (!el) return;
     el.value = new Date().toTimeString().slice(0, 5);
     actualizarPreview();
+  }
+
+  /**
+   * Actualiza la caja de ayuda según el Tipo de Actividad seleccionado.
+   */
+  function actualizarAyudaActividad() {
+    const boxAyuda = document.getElementById("ayudaActividad");
+    if (!boxAyuda) return;
+    if (StudyTracker.I18n) {
+      const mapaKey = {
+        "Preparación / Contexto": "helpActPrep",
+        "Clase / Cátedra": "helpActClass",
+        "Teoría / Docs": "helpActTheory",
+        "Investigación / Diálogo": "helpActResearch",
+        "Diseño / Apuntes": "helpActDesign",
+        "Desarrollo / Código": "helpActDev",
+        "Práctica / Debugging": "helpActPractice",
+        "Repaso / Simulacro": "helpActReview"
+      };
+      boxAyuda.textContent = t(mapaKey[estadoChips.tipoActividad] || "helpActDev");
+    } else if (typeof obtenerTextoAyudaActividad === "function") {
+      boxAyuda.textContent = obtenerTextoAyudaActividad(estadoChips.tipoActividad);
+    }
   }
 
   /**
@@ -354,19 +407,33 @@
   }
 
   /**
-   * Actualiza la caja de ayuda según la calidad de asimilación seleccionada y el modo de IA.
+   * Actualiza la caja de ayuda según la calidad de asimilación seleccionada, la actividad y el modo de IA.
    */
   function actualizarAyudaCalidad() {
     const selectCalidad = document.getElementById("calidad");
     const boxAyuda = document.getElementById("ayudaCalidad");
     const inputIA = document.getElementById("usoIA");
+    const labelCalidad = document.querySelector('label[for="calidad"]');
     if (!selectCalidad || !boxAyuda) return;
     const valIA = inputIA ? Number(inputIA.value) : 0;
+    const esModoClase = estadoChips.tipoActividad === "Clase / Cátedra";
+
+    if (labelCalidad && StudyTracker.I18n) {
+      labelCalidad.textContent = t(esModoClase ? "labelQualityClass" : "labelQuality");
+    }
 
     if (StudyTracker.I18n) {
       const nivel = Math.min(5, Math.max(1, Number(selectCalidad.value) || 3));
       let base = t(`helpQuality${nivel}`);
-      if (estadoChips.modoIA === "Mecánico / Copy-Paste" && nivel >= 4) {
+      if (esModoClase) {
+        if (estadoChips.modoIA === "Mecánico / Copy-Paste") {
+          base += t("helpQualityClassAiMech");
+        } else if (valIA > 0 || estadoChips.modoIA !== "Autónomo") {
+          base += t("helpQualityClassAiDialogue");
+        } else {
+          base += t("helpQualityClassNote");
+        }
+      } else if (estadoChips.modoIA === "Mecánico / Copy-Paste" && nivel >= 4) {
         base += t("helpQualityWarnMech");
       } else if (
         valIA >= 70 &&
@@ -723,12 +790,20 @@
       });
     }
 
-    // 3. Tabla de Historial (usando nodos seguros e IDs únicos)
+    // 3. Tabla de Historial (ordenada de más reciente a más antigua y limitada a los últimos 5 por defecto)
+    const sesionesOrdenadas = [...sesionesFiltradas].reverse();
+    const totalFiltradas = sesionesOrdenadas.length;
+    const hayMasDelLimite = totalFiltradas > LIMITE_HISTORIAL_RECIENTE;
+    const sesionesVisibles =
+      !mostrarTodoHistorial && hayMasDelLimite
+        ? sesionesOrdenadas.slice(0, LIMITE_HISTORIAL_RECIENTE)
+        : sesionesOrdenadas;
+
     const tbody = document.getElementById("tablaBody");
     if (tbody) {
       tbody.replaceChildren();
       const fragment = document.createDocumentFragment();
-      sesionesFiltradas.forEach((s) => {
+      sesionesVisibles.forEach((s) => {
         fragment.appendChild(
           crearFilaSesion(s, {
             onEditar: (sesionSeleccionada) => {
@@ -745,6 +820,32 @@
         );
       });
       tbody.appendChild(fragment);
+    }
+
+    const elFooter = document.getElementById("tableFooter");
+    const elFooterInfo = document.getElementById("tableFooterInfo");
+    const btnToggleHistorial = document.getElementById("btnToggleHistorial");
+    if (elFooter && elFooterInfo && btnToggleHistorial) {
+      if (totalFiltradas === 0) {
+        elFooter.style.display = "none";
+      } else {
+        elFooter.style.display = "flex";
+        if (hayMasDelLimite) {
+          elFooterInfo.textContent = mostrarTodoHistorial
+            ? t("historyShowingAll", { total: totalFiltradas })
+            : t("historyShowingRecent", {
+                shown: sesionesVisibles.length,
+                total: totalFiltradas
+              });
+          btnToggleHistorial.style.display = "inline-flex";
+          btnToggleHistorial.textContent = mostrarTodoHistorial
+            ? t("btnShowRecentHistory")
+            : t("btnShowAllHistory", { total: totalFiltradas });
+        } else {
+          elFooterInfo.textContent = t("historyShowingAll", { total: totalFiltradas });
+          btnToggleHistorial.style.display = "none";
+        }
+      }
     }
 
     // 4. Gráficos, resumen de hábitos y mejor hora de enfoque
@@ -768,12 +869,14 @@
     obtenerValoresChips,
     obtenerIdSesionEditando,
     cambiarFiltroContexto,
+    alternarVistaHistorial,
     seleccionarChip,
     cargarSesionEnFormulario,
     salirModoEdicion,
     refrescarTextosFormulario,
     inicializarFormulario,
     ponerHoraActual,
+    actualizarAyudaActividad,
     actualizarAyudaObjetivo,
     actualizarAyudaCalidad,
     actualizarAyudaIA,

@@ -8,3 +8,4 @@
 - [ ] ¿Qué elementos de gamificación debería implementar para mantener a la audiencia atrapada?
 - [ ] ¿Cómo podría automatizar el proceso de ingesta de datos? ¿"monitoreando" la actividad del usuario para rellenar?
 - [ ] ¿Cómo me enfrento a la deuda técnica de hacer todo con agentes de IA y LLMs?
+- [ ] ¿Qué hacer cuando tenga una idea nueva que implique agregar una columna nueva con nueva información? ¿Qué pasaría con los datos que ya tenía? ¿Cómo imputo esa nueva información?

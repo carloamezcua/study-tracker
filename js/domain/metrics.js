@@ -32,12 +32,62 @@
   ];
 
   const TIPOS_ACTIVIDAD = [
-    { valor: "Teoría / Docs", icono: "📖", etiqueta: "Teoría / Docs" },
-    { valor: "Investigación / Diálogo", icono: "💬", etiqueta: "Investigación / Diálogo" },
-    { valor: "Diseño / Apuntes", icono: "✍️", etiqueta: "Diseño / Apuntes" },
-    { valor: "Desarrollo / Código", icono: "💻", etiqueta: "Desarrollo / Código" },
-    { valor: "Práctica / Debugging", icono: "🧪", etiqueta: "Práctica / Debugging" },
-    { valor: "Repaso / Simulacro", icono: "🔁", etiqueta: "Repaso / Simulacro" }
+    {
+      valor: "Preparación / Contexto",
+      icono: "🗂️",
+      etiqueta: "Preparación / Contexto",
+      ayuda:
+        "Antes de estudiar/programar: armar el ambiente, recopilar fuentes o 'masticar' contexto en un LLM para reutilizarlo en varias sesiones."
+    },
+    {
+      valor: "Clase / Cátedra",
+      icono: "👨‍🏫",
+      etiqueta: "Clase / Cátedra",
+      ayuda:
+        "Sesión guiada por un profesor o ponente. Por defecto pone IA en 0%, pero puedes cambiar el Modo de IA si la usaste en clase para dudas o actividades."
+    },
+    {
+      valor: "Teoría / Docs",
+      icono: "📖",
+      etiqueta: "Teoría / Docs",
+      ayuda:
+        "Estudio por tu cuenta de fuentes estructuradas: leer documentación oficial, libros, artículos o ver un curso grabado."
+    },
+    {
+      valor: "Investigación / Diálogo",
+      icono: "💬",
+      etiqueta: "Investigación / Diálogo",
+      ayuda:
+        "Explorar dudas abiertas: investigar cómo/por qué funciona algo, comparar alternativas o debatir conceptos a fondo (ej. tutoría socrática con IA)."
+    },
+    {
+      valor: "Diseño / Apuntes",
+      icono: "✍️",
+      etiqueta: "Diseño / Apuntes",
+      ayuda:
+        "Sintetizar y estructurar: redactar apuntes propios (en cuaderno o compu), hacer resúmenes, diagramas o planear una arquitectura."
+    },
+    {
+      valor: "Desarrollo / Código",
+      icono: "💻",
+      etiqueta: "Desarrollo / Código",
+      ayuda:
+        "Construir e implementar: escribir código, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea."
+    },
+    {
+      valor: "Práctica / Debugging",
+      icono: "🧪",
+      etiqueta: "Práctica / Debugging",
+      ayuda:
+        "Resolver ejercicios prácticos, laboratorios o depurar errores (debugging) hasta encontrar y corregir la causa."
+    },
+    {
+      valor: "Repaso / Simulacro",
+      icono: "🔁",
+      etiqueta: "Repaso / Simulacro",
+      ayuda:
+        "Consolidar lo ya visto: repasar apuntes previos, flashcards, explicar el tema de memoria o resolver exámenes de prueba."
+    }
   ];
 
   const MODOS_IA = [
@@ -90,17 +140,18 @@
     {
       valor: "Sí",
       icono: "✅",
-      etiqueta: "Sí (+10%)",
+      etiqueta: "Sí (Buen avance +10%)",
       bonoXP: 0.1,
-      ayuda: "Meta lograda: completaste lo planeado para este bloque (+10% XP)."
+      ayuda:
+        "Buen avance del bloque (+10% XP): completaste la meta o avanzaste a buen ritmo en una tarea larga que seguirá en otra sesión."
     },
     {
       valor: "Parcial",
       icono: "⚠️",
-      etiqueta: "Parcial (+5%)",
+      etiqueta: "Parcial (Con tropiezos +5%)",
       bonoXP: 0.05,
       ayuda:
-        "En progreso: hubo avance real y aprendizaje, pero continuará en otra sesión (+5% XP)."
+        "Avance con tropiezos (+5% XP): hubo progreso, pero fue menor o más lento de lo esperado por dudas o distracciones."
     },
     {
       valor: "No",
@@ -108,7 +159,7 @@
       etiqueta: "No (Bloqueo)",
       bonoXP: 0,
       ayuda:
-        "Bloqueo o sin avance: te trabaste en un error, hubo distracción total o interrupción (0% bono, alerta de bloqueo)."
+        "Bloqueo o sin avance (0% bono): te trabaste en un error, hubo distracción total o interrupción (alerta de bloqueo)."
     }
   ];
 
@@ -486,6 +537,14 @@
   }
 
   /**
+   * Devuelve el texto explicativo para un Tipo de Actividad.
+   */
+  function obtenerTextoAyudaActividad(tipoActividad) {
+    const item = TIPOS_ACTIVIDAD.find((a) => a.valor === tipoActividad);
+    return item ? item.ayuda : TIPOS_ACTIVIDAD[5].ayuda;
+  }
+
+  /**
    * Devuelve el texto explicativo para un estado de Objetivo Cumplido (Sí, Parcial, No).
    */
   function obtenerTextoAyudaObjetivo(objetivoCumplido) {
@@ -550,6 +609,7 @@
     analizarPorHora,
     analizarPorMateria,
     analizarHabitos,
+    obtenerTextoAyudaActividad,
     obtenerTextoAyudaObjetivo,
     obtenerTextoAyudaCalidad,
     obtenerTextoAyudaIA
