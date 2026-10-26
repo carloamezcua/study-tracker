@@ -189,15 +189,13 @@
           horaFin: document.getElementById("horaFin").value,
           contexto: chips.contexto,
           materia: document.getElementById("materia").value.trim(),
-          tema: document.getElementById("tema").value.trim(),
           tipoActividad: chips.tipoActividad,
-          produccion: chips.produccion,
+          dinamicaCognitiva: chips.dinamicaCognitiva,
           dominioPrevio: chips.dominioPrevio,
           energiaPrevia: chips.energiaPrevia,
           complejidad: chips.complejidad,
           objetivoCumplido: chips.objetivoCumplido,
           calidad: Number(document.getElementById("calidad").value),
-          modoIA: chips.modoIA,
           usoIA: Number(document.getElementById("usoIA").value),
           notas: document.getElementById("notas").value.trim()
         };
@@ -206,9 +204,9 @@
           store.actualizarSesionPorId(idEditando, datosFormulario);
           UI.salirModoEdicion();
         } else {
-          store.agregarSesion(datosFormulario);
-          document.getElementById("tema").value = "";
+          const nuevaSesion = store.agregarSesion(datosFormulario);
           document.getElementById("notas").value = "";
+          UI.aplicarValoresPorDefectoInteligentes(nuevaSesion);
           if (StudyTracker.Timer) {
             StudyTracker.Timer.limpiarDespuesDeGuardarFormulario();
           }
@@ -396,7 +394,7 @@
     // 1. Inicializar Store local
     store.init();
 
-    // 2. Conectar automáticamente con el servidor local (server.js -> data/study-tracker.xlsx)
+    // 2. Conectar automáticamente con el servidor local (server.js -> data/study-tracker.csv)
     const conexion = await ExcelService.inicializarConexionServidor(store.getSesiones());
     if (conexion.conectado) {
       if (conexion.origen === "leido_de_disco" && conexion.sesiones.length > 0) {
@@ -405,6 +403,11 @@
       fijarEstadoArchivo("statusLiveSynced", { path: conexion.excelPath }, "connected");
     } else {
       fijarEstadoArchivo("statusBrowserMode", {}, "default");
+    }
+
+    const actuales = store.getSesiones();
+    if (actuales.length > 0) {
+      UI.aplicarValoresPorDefectoInteligentes(actuales[actuales.length - 1]);
     }
   });
 })(window);

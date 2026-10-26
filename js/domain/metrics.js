@@ -1,6 +1,6 @@
 /**
  * Capa de Dominio: Reglas de negocio puras del sistema RPG (curva exponencial de niveles
- * donde el Nivel 92 es la mitad del 99) y analítica de hábitos de estudio.
+ * donde el Nivel 92 es la mitad del 99), taxonomía cognitiva v3 y analítica de hábitos de estudio.
  * No tiene dependencias del DOM ni de almacenamiento externo.
  */
 (function (global) {
@@ -31,137 +31,110 @@
     { valor: "Externo", icono: "🤝", etiqueta: "Externo" }
   ];
 
+  // 6 Tipos de Actividad limpios (fusión de Teoría + Investigación en Estudio Teórico / Conceptual)
   const TIPOS_ACTIVIDAD = [
     {
       valor: "Clase / Cátedra",
       icono: "👨‍🏫",
       etiqueta: "Clase / Cátedra",
       ayuda:
-        "Sesión guiada por un profesor o ponente. Por defecto pone IA en 0%, pero puedes cambiar el Modo de IA si la usaste en clase para dudas o actividades."
+        "👨‍🏫 Clase / Cátedra: Sesión en vivo guiada por un profesor o ponente. Por defecto preselecciona Recepción Pasiva y 0% IA, pero puedes cambiarlo si interactuaste o hiciste ejercicios."
     },
     {
-      valor: "Teoría / Docs",
+      valor: "Estudio Teórico / Conceptual",
       icono: "📖",
-      etiqueta: "Teoría / Docs",
+      etiqueta: "Estudio Teórico / Conceptual",
       ayuda:
-        "Estudio por tu cuenta de fuentes estructuradas: leer documentación oficial, libros, artículos o ver un curso grabado sin escribir aún apuntes propios."
+        "📖 Estudio Teórico / Conceptual: Comprender un tema o artículo (leer documentación, papers, libros, ver cursos grabados o investigar dudas conceptuales y debatir el '¿por qué?' con IA)."
     },
     {
-      valor: "Investigación / Diálogo",
-      icono: "💬",
-      etiqueta: "Investigación / Diálogo",
-      ayuda:
-        "Explorar dudas abiertas: investigar cómo/por qué funciona algo, comparar alternativas o debatir conceptos a fondo (ej. tutoría socrática con IA)."
-    },
-    {
-      valor: "Diseño / Apuntes",
+      valor: "Síntesis / Documentación",
       icono: "✍️",
-      etiqueta: "Diseño / Apuntes",
+      etiqueta: "Síntesis / Documentación",
       ayuda:
-        "Sintetizar y estructurar con tus palabras: redactar apuntes o cheatsheets (a mano o en PC), hacer resúmenes, diagramas o planear una arquitectura."
+        "✍️ Síntesis / Documentación: Estructurar y destilar conocimiento (redactar apuntes, cheatsheets a mano o en PC, hacer resúmenes, mapas conceptuales o diagramas de arquitectura)."
     },
     {
       valor: "Desarrollo / Código",
       icono: "💻",
       etiqueta: "Desarrollo / Código",
       ayuda:
-        "Construir e implementar: escribir código, notebooks, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea."
+        "💻 Desarrollo / Código: Construir e implementar (escribir código, notebooks, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o entregable)."
     },
     {
       valor: "Práctica / Debugging",
       icono: "🧪",
       etiqueta: "Práctica / Debugging",
       ayuda:
-        "Resolver ejercicios prácticos, laboratorios o depurar errores (debugging) hasta aislar y corregir la causa raíz."
+        "🧪 Práctica / Debugging: Resolver ejercicios prácticos, laboratorios o depurar errores (debugging) hasta aislar y corregir la causa raíz."
     },
     {
       valor: "Repaso / Simulacro",
       icono: "🔁",
       etiqueta: "Repaso / Simulacro",
       ayuda:
-        "Consolidar lo ya visto: repasar apuntes previos, flashcards, explicar el tema de memoria o resolver exámenes de prueba."
+        "🔁 Repaso / Simulacro: Consolidar memoria sobre lo ya visto (repasar tus propios apuntes, flashcards, explicar en voz alta sin apoyo o resolver exámenes de práctica)."
     }
   ];
 
-  // Nivel de Producción Propia: mide QUIÉN generó el contenido (tu cabeza vs. una fuente / IA),
-  // sin importar el soporte físico (papel o pantalla).
-  const NIVELES_PRODUCCION = [
+  // Dinámica Cognitiva (Unifica el antiguo Nivel de Producción Propia y Modo de Uso de IA en 4 chips claros)
+  const DINAMICAS_COGNITIVAS = [
     {
-      valor: "Consumo",
+      valor: "Recepción Pasiva",
       icono: "👀",
-      etiqueta: "👀 Consumo",
+      etiqueta: "👀 Recepción Pasiva",
+      bonoXP: 0,
       ayuda:
-        "👀 Consumo: leíste, viste o escuchaste sin producir nada propio (PDF, video, documentación, clase)."
+        "👀 Recepción Pasiva (0% ajuste XP): Leíste, viste o escuchaste explicaciones (clase, video, documentación o resumen generado por IA) sin redactar ni producir material propio aún."
     },
     {
-      valor: "Reproducción",
-      icono: "📋",
-      etiqueta: "📋 Reproducción",
+      valor: "Delegación / Reproducción",
+      icono: "🤖",
+      etiqueta: "🤖 Delegación / Reproducción",
+      bonoXP: -0.15,
       ayuda:
-        "📋 Reproducción: escribiste o programaste, pero copiando o siguiendo algo ya masticado por una fuente o la IA (a mano o en teclado). Hay algo de retención, pero te saltas los obstáculos que obligan a pensar."
+        "🤖 Delegación / Reproducción (-15% XP si IA ≥ 50%, 0% si < 50%): Escribiste o programaste transcribiendo, copiando o siguiendo soluciones ya masticadas por una fuente o la IA para salir del paso."
     },
     {
-      valor: "Generación propia",
+      valor: "Andamiaje / Co-creación",
+      icono: "🔄",
+      etiqueta: "🔄 Andamiaje / Co-creación",
+      bonoXP: 0.05,
+      ayuda:
+        "🔄 Andamiaje / Co-creación (+5% XP): Diálogo e iteración activa con la IA (tú propones tus ideas o código, la IA corrige tus conceptos o desbloquea dudas y aprendes de tus errores)."
+    },
+    {
+      valor: "Generación Propia",
       icono: "🧠",
-      etiqueta: "🧠 Generación propia",
+      etiqueta: "🧠 Generación Propia",
+      bonoXP: 0.1,
       ayuda:
-        "🧠 Generación propia: lo escribiste o programaste con TUS palabras y TU lógica, enfrentando los obstáculos tú mismo (a mano o en PC). Es el tipo de esfuerzo que más retención genera."
+        "🧠 Generación Propia (+10% XP autónomo / +5% con consulta mínima): Redactaste o programaste con TUS palabras y TU lógica enfrentando los obstáculos tú mismo. Máxima retención."
     }
   ];
 
-  // Dominio Previo: cuánto sabías del tema ANTES de sentarte (la dificultad de HOY va en Complejidad).
+  // Dominio Previo con Prueba Objetiva (Cero dudas existenciales)
   const NIVELES_DOMINIO = [
     {
       valor: "Nuevo",
       icono: "🌱",
       etiqueta: "🌱 Nuevo",
-      ayuda: "🌱 Nuevo: primera vez que ves el concepto."
+      ayuda:
+        "🌱 Nuevo (0 contactos previos): Nunca has estudiado este concepto o herramienta específica. Si te pidieran explicarlo o escribir código de esto ahorita mismo, no sabrías por dónde empezar."
     },
     {
-      valor: "Con lagunas",
+      valor: "En construcción",
       icono: "🌿",
-      etiqueta: "🌿 Visto, con lagunas",
-      ayuda: "🌿 Visto, con lagunas: ya lo conocías, pero no lo dominas; quedan huecos o te sigue costando."
+      etiqueta: "🌿 En construcción",
+      ayuda:
+        "🌿 En construcción (Necesitas apoyo / consulta): Ya lo viste antes (en clase, ayer o en el Pomodoro pasado), pero todavía necesitas mirar tus apuntes, la documentación o apoyarte en la IA para avanzar sin trabarte."
     },
     {
-      valor: "Dominado",
+      valor: "Consolidado",
       icono: "🌳",
-      etiqueta: "🌳 Dominado",
-      ayuda: "🌳 Dominado: lo manejas bien; es repaso o mantenimiento (ej. derivadas)."
-    }
-  ];
-
-  const MODOS_IA = [
-    {
-      valor: "Autónomo",
-      icono: "🧠",
-      etiqueta: "Autónomo (Sin IA)",
-      bonoXP: 0.05,
-      ayuda: "100% por tu cuenta sin asistencia de IA (+5% XP por autonomía cognitiva)."
-    },
-    {
-      valor: "Diálogo / Tutoría",
-      icono: "💬",
-      etiqueta: "Diálogo / Tutoría",
-      bonoXP: 0.05,
+      etiqueta: "🌳 Consolidado",
       ayuda:
-        "Alto valor cognitivo: debate de conceptos, preguntas de '¿por qué?' y refuerzo activo con IA (+5% XP)."
-    },
-    {
-      valor: "Copiloto / Apoyo",
-      icono: "🛠️",
-      etiqueta: "Copiloto / Apoyo",
-      bonoXP: 0,
-      ayuda:
-        "Apoyo puntual: consulta de sintaxis, documentación o desbloqueo de bugs entendiendo la solución (XP estándar)."
-    },
-    {
-      valor: "Mecánico / Copy-Paste",
-      icono: "🤖",
-      etiqueta: "Mecánico / Copy-Paste",
-      bonoXP: -0.15,
-      ayuda:
-        "Delegación mecánica: automatización directa o copiar/pegar para entregar rápido sin profundizar (-15% XP)."
+        "🌳 Consolidado (Autónomo): Puedes explicarlo, resolver problemas o programar sobre esto sin mirar el manual ni depender de la IA, o solo estás haciendo un bloque de repaso/mantenimiento veloz."
     }
   ];
 
@@ -222,6 +195,118 @@
     5: "Asimilación profunda: Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda."
   };
 
+  const VALORES_ACTIVIDAD_SET = new Set(TIPOS_ACTIVIDAD.map((a) => a.valor));
+  const VALORES_DINAMICA_SET = new Set(DINAMICAS_COGNITIVAS.map((d) => d.valor));
+  const VALORES_DOMINIO_SET = new Set(NIVELES_DOMINIO.map((d) => d.valor));
+
+  /**
+   * Migra nombres antiguos de Tipo de Actividad al catálogo v3 de 6 opciones.
+   */
+  function migrarTipoActividad(actividadRaw) {
+    const val = String(actividadRaw || "").trim();
+    if (VALORES_ACTIVIDAD_SET.has(val)) return val;
+    if (val === "Teoría / Docs" || val === "Investigación / Diálogo") {
+      return "Estudio Teórico / Conceptual";
+    }
+    if (val === "Diseño / Apuntes") {
+      return "Síntesis / Documentación";
+    }
+    return "Desarrollo / Código";
+  }
+
+  /**
+   * Migra valores antiguos de Dominio Previo ("Con lagunas", "Con base", "Dominado") al catálogo objetivo v3.
+   */
+  function migrarDominioPrevio(dominioRaw, tipoActividad = "") {
+    const val = String(dominioRaw || "").trim();
+    if (VALORES_DOMINIO_SET.has(val)) return val;
+    if (val === "Nuevo") return "Nuevo";
+    if (val === "Con lagunas" || val === "Con base") return "En construcción";
+    if (val === "Dominado") return "Consolidado";
+    if (tipoActividad === "Repaso / Simulacro") return "Consolidado";
+    return "En construcción";
+  }
+
+  /**
+   * Unifica los antiguos campos Produccion_Propia + Modo_IA en la nueva Dinamica_Cognitiva.
+   */
+  function migrarDinamicaCognitiva(dinamicaRaw, produccionLegacy, modoIALegacy, usoIA = 0) {
+    const din = String(dinamicaRaw || "").trim();
+    if (VALORES_DINAMICA_SET.has(din)) return din;
+
+    const prod = String(produccionLegacy || "").trim();
+    const modo = String(modoIALegacy || "").trim();
+    const pctIA = Number(usoIA) || 0;
+
+    // 1. Si era Consumo -> Recepción Pasiva
+    if (prod === "Consumo" || din === "Consumo") {
+      return "Recepción Pasiva";
+    }
+    // 2. Si el modo explícito era Diálogo / Tutoría -> Andamiaje / Co-creación (ej. sesión de GANs)
+    if (modo === "Diálogo / Tutoría" || din === "Diálogo / Tutoría") {
+      return "Andamiaje / Co-creación";
+    }
+    // 3. Si era Reproducción o Copy-Paste -> Delegación / Reproducción
+    if (
+      prod === "Reproducción" ||
+      modo === "Mecánico / Copy-Paste" ||
+      din === "Reproducción" ||
+      din === "Mecánico / Copy-Paste"
+    ) {
+      return "Delegación / Reproducción";
+    }
+    // 4. Si era Generación propia
+    if (prod === "Generación propia" || din === "Generación propia" || modo === "Autónomo") {
+      if ((modo === "Diálogo / Tutoría" || modo === "Copiloto / Apoyo") && pctIA >= 25) {
+        return "Andamiaje / Co-creación";
+      }
+      return "Generación Propia";
+    }
+    // Fallback inteligente según porcentaje de IA
+    if (pctIA === 0) return "Generación Propia";
+    if (pctIA >= 75) return "Delegación / Reproducción";
+    return "Andamiaje / Co-creación";
+  }
+
+  /**
+   * Fusiona el antiguo campo Tema dentro de Notas con formato "[Tema] Notas"
+   * y permite extraer el subtema en cualquier momento para el Inspector.
+   */
+  function formatearNotasConTema(notasRaw, temaLegacy = "") {
+    const notas = String(notasRaw || "").trim();
+    const tema = String(temaLegacy || "").trim();
+
+    // Si notas ya empieza con [Subtema], no duplicar
+    if (/^\[([^\]]+)\]/.test(notas)) {
+      return notas;
+    }
+    if (tema && tema !== "General") {
+      return notas ? `[${tema}] ${notas}` : `[${tema}]`;
+    }
+    return notas;
+  }
+
+  /**
+   * Extrae el subtema desde Notas si tiene prefijo "[Subtema] ..." o usa General.
+   */
+  function extraerSubtemaDeNotas(notasRaw, temaExplicito = "") {
+    const notas = String(notasRaw || "").trim();
+    const match = notas.match(/^\[([^\]]+)\]\s*(.*)$/);
+    if (match) {
+      return {
+        subtema: match[1].trim() || "General",
+        notasLimpias: match[2].trim(),
+        notasCompletas: notas
+      };
+    }
+    const temaLimpio = String(temaExplicito || "").trim();
+    return {
+      subtema: temaLimpio && temaLimpio !== "General" ? temaLimpio : "General",
+      notasLimpias: notas,
+      notasCompletas: formatearNotasConTema(notas, temaLimpio)
+    };
+  }
+
   /**
    * Calcula la diferencia en minutos entre dos horas (HH:MM), soportando cruce de medianoche.
    */
@@ -233,7 +318,7 @@
 
     const [h1, m1] = partesInicio;
     const [h2, m2] = partesFin;
-    if (Number.isNaN(h1) || Number.isNaN(m1) || Number.isNaN(h2) || Number.isNaN(m2)) {
+    if (Number.isNaN(h1) || Number.isNaN(m1) || Number.isNaN(h2) || Number.isNaN(h2)) {
       return 0;
     }
 
@@ -254,15 +339,19 @@
   }
 
   /**
-   * Clasifica la hora de inicio (HH:MM) en su franja biológica del día.
+   * Clasifica la hora de inicio (HH:MM) en bloques simétricos de 6 horas exactas:
+   * - 00:00–05:59 -> Madrugada
+   * - 06:00–11:59 -> Mañana
+   * - 12:00–17:59 -> Tarde
+   * - 18:00–23:59 -> Noche
    */
   function calcularFranjaHoraria(horaInicio) {
     if (!horaInicio) return "Mañana";
     const hora = Number(String(horaInicio).split(":")[0]);
     if (Number.isNaN(hora)) return "Mañana";
-    if (hora >= 4 && hora < 8) return "Madrugada";
-    if (hora >= 8 && hora < 13) return "Mañana";
-    if (hora >= 13 && hora < 19) return "Tarde";
+    if (hora >= 0 && hora < 6) return "Madrugada";
+    if (hora >= 6 && hora < 12) return "Mañana";
+    if (hora >= 12 && hora < 18) return "Tarde";
     return "Noche";
   }
 
@@ -283,30 +372,45 @@
   }
 
   /**
-   * Devuelve el bono/ajuste multiplicador según el Modo de Uso de IA (+5% Autónomo/Diálogo, 0% Copiloto, -15% Mecánico).
+   * Devuelve el ajuste multiplicador según la Dinámica Cognitiva y el % de Uso de IA:
+   * - Recepción Pasiva: 0%
+   * - Delegación / Reproducción: -15% si IA >= 50%, 0% si IA < 50%
+   * - Andamiaje / Co-creación: +5%
+   * - Generación Propia: +10% si IA == 0%, +5% si tuvo consulta puntual
    */
-  function obtenerBonoModoIA(modoIA) {
-    const item = MODOS_IA.find((m) => m.valor === modoIA);
-    return item ? item.bonoXP : 0;
+  function obtenerBonoDinamica(dinamicaCognitiva, usoIA = 0) {
+    const pct = Number(usoIA) || 0;
+    const din = migrarDinamicaCognitiva(dinamicaCognitiva, "", dinamicaCognitiva, pct);
+
+    if (din === "Recepción Pasiva") return 0;
+    if (din === "Delegación / Reproducción") {
+      return pct >= 50 || dinamicaCognitiva === "Mecánico / Copy-Paste" ? -0.15 : 0;
+    }
+    if (din === "Andamiaje / Co-creación") return 0.05;
+    if (din === "Generación Propia") {
+      return pct === 0 ? 0.1 : 0.05;
+    }
+    return 0;
   }
 
   /**
    * Calcula los puntos de experiencia (XP) en función de duración, calidad de asimilación (1-5),
-   * complejidad (+10% desafiante, +20% muy difícil), objetivo (+10% Sí, +5% Parcial) y modo de IA.
+   * complejidad (+10% desafiante, +20% muy difícil), objetivo (+10% Sí, +5% Parcial) y dinámica cognitiva.
    */
   function calcularXP(
     minutos,
     calidad,
     complejidad = "Fácil",
     objetivoCumplido = "No",
-    modoIA = "Copiloto / Apoyo"
+    dinamicaCognitiva = "Andamiaje / Co-creación",
+    usoIA = 0
   ) {
     const min = Math.max(0, Number(minutos) || 0);
     const cal = Math.min(5, Math.max(1, Number(calidad) || 3));
     const bonoComp = obtenerBonoComplejidad(complejidad);
     const bonoObj = obtenerBonoObjetivo(objetivoCumplido);
-    const bonoIA = obtenerBonoModoIA(modoIA);
-    const multiplicador = Math.max(0.5, 1 + cal * 0.2 + bonoComp + bonoObj + bonoIA);
+    const bonoDin = obtenerBonoDinamica(dinamicaCognitiva, usoIA);
+    const multiplicador = Math.max(0.5, 1 + cal * 0.2 + bonoComp + bonoObj + bonoDin);
     return Math.round(min * multiplicador);
   }
 
@@ -388,11 +492,19 @@
     const bloqueosNo = lista.filter((s) => s.objetivoCumplido === "No").length;
     const tasaObjetivos = totalSesiones ? Math.round((cumplidosSi / totalSesiones) * 100) : 0;
 
-    // Desglose por Modo de Uso de IA
-    const iaAutonomo = lista.filter((s) => s.modoIA === "Autónomo").length;
-    const iaDialogo = lista.filter((s) => s.modoIA === "Diálogo / Tutoría").length;
-    const iaCopiloto = lista.filter((s) => s.modoIA === "Copiloto / Apoyo").length;
-    const iaMecanico = lista.filter((s) => s.modoIA === "Mecánico / Copy-Paste").length;
+    // Desglose por Dinámica Cognitiva
+    const dinGeneracion = lista.filter(
+      (s) => s.dinamicaCognitiva === "Generación Propia"
+    ).length;
+    const dinAndamiaje = lista.filter(
+      (s) => s.dinamicaCognitiva === "Andamiaje / Co-creación"
+    ).length;
+    const dinRecepcion = lista.filter(
+      (s) => s.dinamicaCognitiva === "Recepción Pasiva"
+    ).length;
+    const dinDelegacion = lista.filter(
+      (s) => s.dinamicaCognitiva === "Delegación / Reproducción"
+    ).length;
 
     return {
       totalSesiones,
@@ -406,10 +518,15 @@
       cumplidosParcial,
       bloqueosNo,
       tasaObjetivos,
-      iaAutonomo,
-      iaDialogo,
-      iaCopiloto,
-      iaMecanico
+      dinGeneracion,
+      dinAndamiaje,
+      dinRecepcion,
+      dinDelegacion,
+      // Alias retrocompatibles para UI
+      iaAutonomo: dinGeneracion,
+      iaDialogo: dinAndamiaje,
+      iaCopiloto: dinRecepcion,
+      iaMecanico: dinDelegacion
     };
   }
 
@@ -456,8 +573,8 @@
 
   /**
    * Agrupa las sesiones por materia/proyecto contrastando:
-   * - Minutos de Aprendizaje Real (Autónomo, Diálogo / Tutoría y Copiloto)
-   * - Minutos de Uso Mecánico / Copy-Paste
+   * - Minutos de Aprendizaje Activo / Asimilación
+   * - Minutos de Delegación / Reproducción con IA alta
    * - Calidad de Asimilación promedio (1-5)
    */
   function analizarPorMateria(sesiones) {
@@ -475,8 +592,9 @@
         };
       }
       const dur = Number(s.duracion) || 0;
+      const din = s.dinamicaCognitiva || "Andamiaje / Co-creación";
       mapaMaterias[mat].minutos += dur;
-      if (s.modoIA === "Mecánico / Copy-Paste") {
+      if (din === "Delegación / Reproducción" && Number(s.usoIA) >= 50) {
         mapaMaterias[mat].minutosMecanicos += dur;
       } else {
         mapaMaterias[mat].minutosAprendizaje += dur;
@@ -508,7 +626,7 @@
   }
 
   /**
-   * Analiza los patrones de comportamiento por Tipo de Actividad, Contexto, Energía Previa y Objetivos.
+   * Analiza los patrones de comportamiento por Tipo de Actividad, Dinámica Cognitiva, Dominio Previo y Objetivos.
    */
   function analizarHabitos(sesiones) {
     const lista = Array.isArray(sesiones) ? sesiones : [];
@@ -516,7 +634,7 @@
     // 1. Por Tipo de Actividad
     const mapaActividades = {};
     lista.forEach((s) => {
-      const act = s.tipoActividad || "Desarrollo / Código";
+      const act = migrarTipoActividad(s.tipoActividad);
       if (!mapaActividades[act]) {
         mapaActividades[act] = { minutos: 0, sumaCalidad: 0, sumaIA: 0, conteo: 0 };
       }
@@ -585,17 +703,20 @@
       };
     });
 
-    // 6. Balance Cognitivo: Consumir/Ingesta vs. Producir/Práctica
+    // 6. Balance Cognitivo: Ingesta / Recepción vs. Práctica / Co-creación / Generación
     const actividadesConsumo = new Set([
       "Clase / Cátedra",
-      "Teoría / Docs",
-      "Investigación / Diálogo"
+      "Estudio Teórico / Conceptual"
     ]);
     let minConsumo = 0;
     let minProduccion = 0;
     lista.forEach((s) => {
       const dur = Number(s.duracion) || 0;
-      if (actividadesConsumo.has(s.tipoActividad)) {
+      const din = s.dinamicaCognitiva || "";
+      if (
+        din === "Recepción Pasiva" ||
+        (din === "" && actividadesConsumo.has(migrarTipoActividad(s.tipoActividad)))
+      ) {
         minConsumo += dur;
       } else {
         minProduccion += dur;
@@ -605,9 +726,11 @@
     const pctProduccion = totalMinBalance ? Math.round((minProduccion / totalMinBalance) * 100) : 0;
     const pctConsumo = totalMinBalance ? 100 - pctProduccion : 0;
 
-    // 7. Rendimiento según Nivel de Producción Propia (Consumo vs. Reproducción vs. Generación propia)
-    const resumenProduccion = NIVELES_PRODUCCION.map((med) => {
-      const filtradas = lista.filter((s) => (s.produccion || "Reproducción") === med.valor);
+    // 7. Rendimiento según Dinámica Cognitiva (4 niveles)
+    const resumenDinamica = DINAMICAS_COGNITIVAS.map((med) => {
+      const filtradas = lista.filter(
+        (s) => (s.dinamicaCognitiva || "Andamiaje / Co-creación") === med.valor
+      );
       const conteo = filtradas.length;
       const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
       const calidadProm = conteo
@@ -625,9 +748,11 @@
       };
     });
 
-    // 8. Rendimiento según Dominio Previo del Tema (Nuevo vs. Con lagunas vs. Dominado)
+    // 8. Rendimiento según Dominio Previo del Tema (Nuevo vs. En construcción vs. Consolidado)
     const resumenDominio = NIVELES_DOMINIO.map((fam) => {
-      const filtradas = lista.filter((s) => (s.dominioPrevio || "Con lagunas") === fam.valor);
+      const filtradas = lista.filter(
+        (s) => migrarDominioPrevio(s.dominioPrevio) === fam.valor
+      );
       const conteo = filtradas.length;
       const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
       const calidadProm = conteo
@@ -654,15 +779,15 @@
       { clave: "Desafiante", tipo: "complejidad", etiqueta: "🟡 Desafiante" },
       { clave: "Muy difícil", tipo: "complejidad", etiqueta: "🔴 Muy difícil" },
       { clave: "Nuevo", tipo: "dominioPrevio", etiqueta: "🌱 Nuevo" },
-      { clave: "Con lagunas", tipo: "dominioPrevio", etiqueta: "🌿 Con lagunas" },
-      { clave: "Dominado", tipo: "dominioPrevio", etiqueta: "🌳 Dominado" }
+      { clave: "En construcción", tipo: "dominioPrevio", etiqueta: "🌿 En construcción" },
+      { clave: "Consolidado", tipo: "dominioPrevio", etiqueta: "🌳 Consolidado" }
     ];
 
     const matrizFriccion = categoriasFriccion.map((cat) => {
       const sub = lista.filter((s) =>
         cat.tipo === "complejidad"
           ? (s.complejidad || "Desafiante") === cat.clave
-          : (s.dominioPrevio || "Con lagunas") === cat.clave
+          : migrarDominioPrevio(s.dominioPrevio) === cat.clave
       );
       const total = sub.length;
       const si = sub.filter((s) => s.objetivoCumplido === "Sí").length;
@@ -688,7 +813,8 @@
       resumenContextos,
       resumenObjetivos,
       resumenComplejidad,
-      resumenProduccion,
+      resumenDinamica,
+      resumenProduccion: resumenDinamica, // Alias retrocompatible
       resumenDominio,
       matrizFriccion,
       balanceCognitivo: {
@@ -749,7 +875,7 @@
     if (partes.length !== 3 || partes.some(Number.isNaN)) return "Sin fecha";
     const d = new Date(partes[0], partes[1] - 1, partes[2]);
     const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Lunes como inicio
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     const lunes = new Date(d.setDate(diff));
     return `${lunes.getFullYear()}-${String(lunes.getMonth() + 1).padStart(2, "0")}-${String(
       lunes.getDate()
@@ -792,7 +918,6 @@
     );
     const conteoSesiones = clavesOrdenadas.map((k) => mapa[k].conteo);
 
-    // Calcular racha de días consecutivos (desde el último día registrado o día actual)
     const diasOrdenados = Array.from(diasUnicosSet).sort();
     let rachaActual = 0;
     let mejorRacha = 0;
@@ -831,6 +956,7 @@
 
   /**
    * Construye la matriz 7x4 para el Mapa de Calor Circadiano (Día de la semana x Franja horaria).
+   * Siempre recalcula con la regla simétrica de 6h a partir de horaInicio para máxima exactitud.
    */
   function analizarMapaCalorCircadiano(sesiones) {
     const lista = Array.isArray(sesiones) ? sesiones : [];
@@ -858,7 +984,7 @@
 
     lista.forEach((s) => {
       const dia = s.diaSemana || calcularDiaSemana(s.fecha);
-      const franja = s.franjaHoraria || calcularFranjaHoraria(s.horaInicio);
+      const franja = calcularFranjaHoraria(s.horaInicio);
       if (!matriz[dia] || !matriz[dia][franja]) return;
 
       const celda = matriz[dia][franja];
@@ -900,7 +1026,7 @@
 
   /**
    * Analiza el Cuadrante de Rendimiento Cognitivo (% Uso IA vs. Asimilación 1-5),
-   * agrupando o desplazando ligeramente puntos superpuestos para visualización en burbujas.
+   * agrupando por Dinámica Cognitiva y desplazando puntos superpuestos en espiral.
    */
   function analizarCuadranteIA(sesiones) {
     const lista = Array.isArray(sesiones) ? sesiones : [];
@@ -916,7 +1042,8 @@
       const ia = Math.min(100, Math.max(0, Number(s.usoIA) || 0));
       const cal = Math.min(5, Math.max(1, Number(s.calidad) || 3));
       const dur = Math.max(5, Number(s.duracion) || 15);
-      const modo = s.modoIA || (ia === 0 ? "Autónomo" : "Copiloto / Apoyo");
+      const dinamica = s.dinamicaCognitiva || "Andamiaje / Co-creación";
+      const { subtema } = extraerSubtemaDeNotas(s.notas, s.tema);
 
       if (cal >= 4 && ia >= 35) qSinergia += 1;
       else if (cal >= 4 && ia < 35) qAutonomo += 1;
@@ -927,7 +1054,6 @@
       const indiceRepetido = conteoCoordenadas[key] || 0;
       conteoCoordenadas[key] = indiceRepetido + 1;
 
-      // Pequeño desplazamiento en espiral cuando hay múltiples sesiones en la misma coordenada exacta
       const angulo = indiceRepetido * 1.9;
       const offsetRadio = indiceRepetido === 0 ? 0 : Math.min(3.5, 1.3 + indiceRepetido * 0.45);
       const xJitter = Math.min(100, Math.max(0, +(ia + Math.cos(angulo) * offsetRadio).toFixed(1)));
@@ -944,11 +1070,11 @@
         calidadReal: cal,
         duracion: Number(s.duracion) || 0,
         materia: s.materia || "General",
-        tema: s.tema || "General",
-        modoIA: modo,
-        tipoActividad: s.tipoActividad || "Desarrollo / Código",
-        produccion: s.produccion || "Reproducción",
-        dominioPrevio: s.dominioPrevio || "Con lagunas",
+        tema: subtema,
+        dinamicaCognitiva: dinamica,
+        modoIA: dinamica, // Alias retrocompatible
+        tipoActividad: migrarTipoActividad(s.tipoActividad),
+        dominioPrevio: migrarDominioPrevio(s.dominioPrevio),
         fecha: s.fecha || ""
       });
     });
@@ -965,9 +1091,9 @@
   }
 
   /**
-   * Desglosa las sesiones por Subtema (Tema específico) y recopila la bitácora de notas.
+   * Desglosa las sesiones por Subtema (extraído de "[Subtema] ..." en Notas) y recopila la bitácora de notas.
    * Incluye la "Curva de Dominio" de cada subtema: la secuencia cronológica de su Dominio Previo
-   * (ej. Nuevo → Con lagunas → Dominado), compactando repeticiones consecutivas.
+   * (ej. Nuevo → En construcción → Consolidado).
    */
   function analizarInspectorMateria(sesiones) {
     const lista = Array.isArray(sesiones) ? sesiones : [];
@@ -979,7 +1105,8 @@
 
     ordenadas.forEach((s) => {
       const mat = (s.materia || "General").trim() || "General";
-      const tem = (s.tema || "General").trim() || "General";
+      const { subtema } = extraerSubtemaDeNotas(s.notas, s.tema);
+      const tem = subtema || "General";
       const key = `${mat}|||${tem}`;
 
       if (!mapaTemas[key]) {
@@ -1006,7 +1133,7 @@
         item.ultimaFecha = s.fecha || "";
       }
 
-      const dominio = s.dominioPrevio || "Con lagunas";
+      const dominio = migrarDominioPrevio(s.dominioPrevio);
       if (item.curvaDominio[item.curvaDominio.length - 1] !== dominio) {
         item.curvaDominio.push(dominio);
       }
@@ -1034,23 +1161,25 @@
    * Devuelve el texto explicativo para un Tipo de Actividad.
    */
   function obtenerTextoAyudaActividad(tipoActividad) {
-    const item = TIPOS_ACTIVIDAD.find((a) => a.valor === tipoActividad);
-    return item ? item.ayuda : TIPOS_ACTIVIDAD[4].ayuda;
+    const act = migrarTipoActividad(tipoActividad);
+    const item = TIPOS_ACTIVIDAD.find((a) => a.valor === act);
+    return item ? item.ayuda : TIPOS_ACTIVIDAD[3].ayuda;
   }
 
   /**
-   * Devuelve el texto explicativo para un Nivel de Producción Propia.
+   * Devuelve el texto explicativo para una Dinámica Cognitiva.
    */
-  function obtenerTextoAyudaProduccion(produccion) {
-    const item = NIVELES_PRODUCCION.find((p) => p.valor === produccion);
-    return item ? item.ayuda : NIVELES_PRODUCCION[1].ayuda;
+  function obtenerTextoAyudaDinamica(dinamicaCognitiva) {
+    const item = DINAMICAS_COGNITIVAS.find((d) => d.valor === dinamicaCognitiva);
+    return item ? item.ayuda : DINAMICAS_COGNITIVAS[2].ayuda;
   }
 
   /**
    * Devuelve el texto explicativo para un nivel de Dominio Previo.
    */
   function obtenerTextoAyudaDominio(dominioPrevio) {
-    const item = NIVELES_DOMINIO.find((d) => d.valor === dominioPrevio);
+    const dom = migrarDominioPrevio(dominioPrevio);
+    const item = NIVELES_DOMINIO.find((d) => d.valor === dom);
     return item ? item.ayuda : NIVELES_DOMINIO[1].ayuda;
   }
 
@@ -1064,36 +1193,36 @@
 
   /**
    * Devuelve el texto explicativo para un nivel de calidad de asimilación (1 al 5),
-   * advirtiendo si se combina modo mecánico con calidad alta.
+   * advirtiendo si se combina delegación mecánica con calidad alta.
    */
-  function obtenerTextoAyudaCalidad(calidad, modoIA = "", usoIA = 0) {
+  function obtenerTextoAyudaCalidad(calidad, dinamicaCognitiva = "", usoIA = 0) {
     const numCal = Number(calidad) || 3;
     const base = TEXTOS_CALIDAD[numCal] || TEXTOS_CALIDAD[3];
-    if (modoIA === "Mecánico / Copy-Paste" && numCal >= 4) {
-      return `${base} ⚠️ Nota: seleccionaste modo 'Mecánico / Copy-Paste'; si solo copiaste sin profundizar, considera nivel 1 o 2 (o cambia a 'Diálogo / Tutoría' si aprendiste debatiendo con la IA).`;
+    if (dinamicaCognitiva === "Delegación / Reproducción" && Number(usoIA) >= 50 && numCal >= 4) {
+      return `${base} ⚠️ Nota: marcaste 'Delegación / Reproducción' con ${usoIA}% de IA; si hubo co-creación y debate conceptual real, considera cambiar a '🔄 Andamiaje / Co-creación'.`;
     }
-    if (Number(usoIA) >= 75 && modoIA !== "Diálogo / Tutoría" && numCal >= 4) {
-      return `${base} 💡 Con ${usoIA}% de IA, califica con 4-5 solo si hubo diálogo y comprensión profunda, no solo fluidez mecánica.`;
+    if (Number(usoIA) >= 75 && dinamicaCognitiva === "Generación Propia" && numCal >= 4) {
+      return `${base} 💡 Con ${usoIA}% de IA, '🔄 Andamiaje / Co-creación' suele describir mejor el proceso que 'Generación Propia'.`;
     }
     return base;
   }
 
   /**
-   * Devuelve el texto explicativo según el Modo de Uso de IA y el porcentaje.
+   * Devuelve el texto explicativo según la Dinámica Cognitiva y el porcentaje de IA.
    */
-  function obtenerTextoAyudaIA(usoIA, modoIA = "Copiloto / Apoyo") {
-    const itemModo = MODOS_IA.find((m) => m.valor === modoIA);
-    if (itemModo) {
-      return itemModo.ayuda;
+  function obtenerTextoAyudaIA(usoIA, dinamicaCognitiva = "Andamiaje / Co-creación") {
+    const itemDin = DINAMICAS_COGNITIVAS.find((d) => d.valor === dinamicaCognitiva);
+    if (itemDin) {
+      return itemDin.ayuda;
     }
     const val = Number(usoIA) || 0;
     if (val === 0) {
-      return "Estudio 100% autónomo: lectura, código o ejercicios sin asistencia.";
+      return "Estudio 100% autónomo sin asistencia de IA.";
     }
     if (val <= 50) {
-      return "Apoyo puntual: estudio propio usando IA para aclarar dudas o depurar errores.";
+      return "Uso moderado de IA como andamiaje, consulta o tutoría.";
     }
-    return "Uso intensivo de IA: distingue arriba si fue por 'Diálogo / Tutoría' (aprendizaje) o 'Mecánico / Copy-Paste'.";
+    return "Uso intensivo de IA: distingue si fue '🔄 Andamiaje / Co-creación' o '🤖 Delegación / Reproducción'.";
   }
 
   StudyTracker.RPG = {
@@ -1102,18 +1231,25 @@
     TRAMOS_RANGO,
     CONTEXTOS,
     TIPOS_ACTIVIDAD,
-    NIVELES_PRODUCCION,
+    DINAMICAS_COGNITIVAS,
+    NIVELES_PRODUCCION: DINAMICAS_COGNITIVAS, // Alias retrocompatible
+    MODOS_IA: DINAMICAS_COGNITIVAS, // Alias retrocompatible
     NIVELES_DOMINIO,
-    MODOS_IA,
     NIVELES_ENERGIA,
     NIVELES_COMPLEJIDAD,
     ESTADOS_OBJETIVO,
+    migrarTipoActividad,
+    migrarDominioPrevio,
+    migrarDinamicaCognitiva,
+    formatearNotasConTema,
+    extraerSubtemaDeNotas,
     calcularMinutos,
     calcularDiaSemana,
     calcularFranjaHoraria,
     obtenerBonoComplejidad,
     obtenerBonoObjetivo,
-    obtenerBonoModoIA,
+    obtenerBonoDinamica,
+    obtenerBonoModoIA: obtenerBonoDinamica,
     calcularXP,
     calcularXpRequeridoParaNivel,
     calcularProgresoRPG,
@@ -1127,11 +1263,11 @@
     analizarCuadranteIA,
     analizarInspectorMateria,
     obtenerTextoAyudaActividad,
-    obtenerTextoAyudaProduccion,
+    obtenerTextoAyudaDinamica,
+    obtenerTextoAyudaProduccion: obtenerTextoAyudaDinamica,
     obtenerTextoAyudaDominio,
     obtenerTextoAyudaObjetivo,
     obtenerTextoAyudaCalidad,
     obtenerTextoAyudaIA
   };
 })(window);
-

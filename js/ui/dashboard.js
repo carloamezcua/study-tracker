@@ -1,18 +1,23 @@
 /**
- * Capa de UI (Dashboard): Renderizado seguro del DOM (prevención de XSS con textContent),
- * filtro rápido por Contexto, autocompletado dinámico de Materia/Tema, modo de edición en línea,
- * selectores rápidos de chips (1 clic), actualización de KPIs, barra RPG exponencial y tabla.
+ * Capa de UI (Dashboard v3): Renderizado seguro del DOM (prevención de XSS con textContent),
+ * formulario en 2 tiempos, chips dinámicos de Materia, taxonomía de Dinámica Cognitiva y Dominio Previo objetivo,
+ * actualización de KPIs, barra RPG exponencial y tabla de historial.
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
   const {
     CONTEXTOS,
+    migrarTipoActividad,
+    migrarDominioPrevio,
+    migrarDinamicaCognitiva,
+    extraerSubtemaDeNotas,
     calcularMinutos,
     calcularXP,
     calcularProgresoRPG,
     calcularKPIs,
     filtrarSesionesAvanzado,
     obtenerTextoAyudaActividad,
+    obtenerTextoAyudaDominio,
     obtenerTextoAyudaObjetivo,
     obtenerTextoAyudaCalidad,
     obtenerTextoAyudaIA
@@ -22,12 +27,11 @@
   const estadoChips = {
     contexto: "Académico",
     tipoActividad: "Desarrollo / Código",
-    produccion: "Reproducción",
-    dominioPrevio: "Con lagunas",
+    dinamicaCognitiva: "Andamiaje / Co-creación",
+    dominioPrevio: "En construcción",
     energiaPrevia: "Media",
     complejidad: "Desafiante",
-    objetivoCumplido: "Sí",
-    modoIA: "Diálogo / Tutoría"
+    objetivoCumplido: "Sí"
   };
 
   // ID de la sesión que se está editando actualmente (null si es registro nuevo)
@@ -56,31 +60,24 @@
 
   const ICONOS_ACTIVIDAD = {
     "Clase / Cátedra": "👨‍🏫",
-    "Teoría / Docs": "📖",
-    "Investigación / Diálogo": "💬",
-    "Diseño / Apuntes": "✍️",
+    "Estudio Teórico / Conceptual": "📖",
+    "Síntesis / Documentación": "✍️",
     "Desarrollo / Código": "💻",
     "Práctica / Debugging": "🧪",
     "Repaso / Simulacro": "🔁"
   };
 
-  const ICONOS_PRODUCCION = {
-    Consumo: "👀",
-    Reproducción: "📋",
-    "Generación propia": "🧠"
+  const ICONOS_DINAMICA = {
+    "Recepción Pasiva": "👀",
+    "Delegación / Reproducción": "🤖",
+    "Andamiaje / Co-creación": "🔄",
+    "Generación Propia": "🧠"
   };
 
   const ICONOS_DOMINIO = {
     Nuevo: "🌱",
-    "Con lagunas": "🌿",
-    Dominado: "🌳"
-  };
-
-  const ICONOS_MODO_IA = {
-    Autónomo: "🧠",
-    "Diálogo / Tutoría": "💬",
-    "Copiloto / Apoyo": "🛠️",
-    "Mecánico / Copy-Paste": "🤖"
+    "En construcción": "🌿",
+    Consolidado: "🌳"
   };
 
   const ICONOS_ENERGIA = {
@@ -102,13 +99,24 @@
   };
 
   const MATERIAS_BASE = [
-    "Base de Datos",
-    "Snowflake",
-    "Proyecto Rails",
-    "PySpark",
-    "Algoritmos",
-    "StudyTracker"
+    "Deep Learning para Visión de Computadoras",
+    "Data Mining y Knowledge Discovery",
+    "Programación IV"
   ];
+
+  function t(key, params) {
+    if (StudyTracker.I18n && typeof StudyTracker.I18n.t === "function") {
+      return StudyTracker.I18n.t(key, params);
+    }
+    return key;
+  }
+
+  function trVal(categoria, valor) {
+    if (StudyTracker.I18n && typeof StudyTracker.I18n.traducirValor === "function") {
+      return StudyTracker.I18n.traducirValor(categoria, valor);
+    }
+    return valor;
+  }
 
   /**
    * Devuelve una copia de los valores seleccionados actualmente en los grupos de chips.
@@ -237,14 +245,24 @@
    * Selecciona un chip dentro de su grupo y actualiza la vista previa de XP y ayudas.
    */
   function seleccionarChip(grupo, valor) {
+    if (grupo === "modoIA" || grupo === "produccion") {
+      grupo = "dinamicaCognitiva";
+    }
     if (!(grupo in estadoChips)) return;
+
+    if (grupo === "tipoActividad") {
+      valor = migrarTipoActividad(valor);
+    } else if (grupo === "dominioPrevio") {
+      valor = migrarDominioPrevio(valor);
+    }
+
     estadoChips[grupo] = valor;
     pintarGrupoChip(grupo, valor);
 
     if (grupo === "tipoActividad") {
       if (valor === "Clase / Cátedra") {
-        estadoChips.modoIA = "Autónomo";
-        pintarGrupoChip("modoIA", "Autónomo");
+        estadoChips.dinamicaCognitiva = "Recepción Pasiva";
+        pintarGrupoChip("dinamicaCognitiva", "Recepción Pasiva");
         const inputIA = document.getElementById("usoIA");
         if (inputIA) inputIA.value = "0";
         actualizarAyudaIA({ desdeChip: true });
@@ -253,17 +271,21 @@
       actualizarAyudaCalidad();
     }
 
+    if (grupo === "dominioPrevio") {
+      actualizarAyudaDominio();
+    }
+
     if (grupo === "objetivoCumplido") {
       actualizarAyudaObjetivo();
     }
 
-    if (grupo === "modoIA") {
+    if (grupo === "dinamicaCognitiva") {
       const inputIA = document.getElementById("usoIA");
       if (inputIA) {
-        if (valor === "Autónomo") {
+        if (valor === "Generación Propia" || valor === "Recepción Pasiva") {
           inputIA.value = "0";
         } else if (Number(inputIA.value) === 0) {
-          inputIA.value = valor === "Mecánico / Copy-Paste" ? "75" : "25";
+          inputIA.value = valor === "Delegación / Reproducción" ? "75" : "35";
         }
       }
       actualizarAyudaIA({ desdeChip: true });
@@ -274,51 +296,106 @@
   }
 
   /**
-   * Alimenta dinámicamente los <datalist> de Materia y Tema con el historial propio del usuario.
+   * Renderiza los chips clicables de Materia extraídos del historial reciente + chip [+ Nueva],
+   * además de alimentar el <datalist> de autocompletado.
    */
   function actualizarAutocompletado(sesiones) {
+    const lista = Array.isArray(sesiones) ? sesiones : [];
     const dlMaterias = document.getElementById("listaMaterias");
-    const dlTemas = document.getElementById("listaTemas");
+    const contenedorChips = document.getElementById("materiaChipsContainer");
+    const inputMateria = document.getElementById("materia");
+
+    // Ordenar materias por aparición más reciente primero
+    const materiasRecientes = [];
+    const vistas = new Set();
+    for (let i = lista.length - 1; i >= 0; i--) {
+      const m = (lista[i].materia || "").trim();
+      if (m && !vistas.has(m)) {
+        vistas.add(m);
+        materiasRecientes.push(m);
+      }
+    }
+    MATERIAS_BASE.forEach((m) => {
+      if (!vistas.has(m)) {
+        vistas.add(m);
+        materiasRecientes.push(m);
+      }
+    });
 
     if (dlMaterias) {
-      const materiasUnicas = new Set(MATERIAS_BASE);
-      (Array.isArray(sesiones) ? sesiones : []).forEach((s) => {
-        if (s.materia) materiasUnicas.add(s.materia.trim());
-      });
       dlMaterias.replaceChildren();
-      materiasUnicas.forEach((mat) => {
+      materiasRecientes.forEach((mat) => {
         const opt = document.createElement("option");
         opt.value = mat;
         dlMaterias.appendChild(opt);
       });
     }
 
-    if (dlTemas) {
-      const temasUnicos = new Set();
-      (Array.isArray(sesiones) ? sesiones : []).forEach((s) => {
-        if (s.tema && s.tema !== "General") temasUnicos.add(s.tema.trim());
+    if (contenedorChips && inputMateria) {
+      // Si el input está vacío y no estamos editando, pre-seleccionar la materia más reciente
+      if (!inputMateria.value.trim() && !sesionEditandoId && materiasRecientes.length > 0) {
+        inputMateria.value = materiasRecientes[0];
+      }
+      const valorActual = inputMateria.value.trim();
+
+      contenedorChips.replaceChildren();
+      materiasRecientes.slice(0, 6).forEach((mat) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "subject-chip-btn" + (mat === valorActual ? " active" : "");
+        btn.textContent = `📚 ${mat}`;
+        btn.title = mat;
+        btn.addEventListener("click", () => {
+          inputMateria.value = mat;
+          contenedorChips.querySelectorAll(".subject-chip-btn").forEach((b) => {
+            b.classList.toggle("active", b === btn);
+          });
+          // Precargar el último contexto, dominio previo y complejidad usados en esa materia
+          const ultimaDeMateria = [...lista]
+            .reverse()
+            .find((s) => (s.materia || "").trim() === mat);
+          if (ultimaDeMateria && !sesionEditandoId) {
+            seleccionarChip("contexto", ultimaDeMateria.contexto || "Académico");
+            seleccionarChip("dominioPrevio", ultimaDeMateria.dominioPrevio || "En construcción");
+            seleccionarChip("complejidad", ultimaDeMateria.complejidad || "Desafiante");
+          }
+        });
+        contenedorChips.appendChild(btn);
       });
-      dlTemas.replaceChildren();
-      temasUnicos.forEach((tem) => {
-        const opt = document.createElement("option");
-        opt.value = tem;
-        dlTemas.appendChild(opt);
+
+      const btnNueva = document.createElement("button");
+      btnNueva.type = "button";
+      btnNueva.className = "subject-chip-btn subject-chip-new";
+      btnNueva.textContent = t("btnNewSubjectChip");
+      btnNueva.addEventListener("click", () => {
+        contenedorChips.querySelectorAll(".subject-chip-btn").forEach((b) => {
+          b.classList.remove("active");
+        });
+        btnNueva.classList.add("active");
+        inputMateria.value = "";
+        inputMateria.focus();
       });
+      contenedorChips.appendChild(btnNueva);
     }
   }
 
-  function t(key, params) {
-    if (StudyTracker.I18n && typeof StudyTracker.I18n.t === "function") {
-      return StudyTracker.I18n.t(key, params);
+  /**
+   * Precarga valores inteligentes a partir de la última sesión registrada (Continuidad Pomodoro).
+   */
+  function aplicarValoresPorDefectoInteligentes(sesionReferencia) {
+    if (!sesionReferencia) return;
+    const inputMateria = document.getElementById("materia");
+    if (inputMateria && sesionReferencia.materia) {
+      inputMateria.value = sesionReferencia.materia;
     }
-    return key;
-  }
-
-  function trVal(categoria, valor) {
-    if (StudyTracker.I18n && typeof StudyTracker.I18n.traducirValor === "function") {
-      return StudyTracker.I18n.traducirValor(categoria, valor);
-    }
-    return valor;
+    seleccionarChip("contexto", sesionReferencia.contexto || "Académico");
+    seleccionarChip("dominioPrevio", sesionReferencia.dominioPrevio || "En construcción");
+    seleccionarChip("complejidad", sesionReferencia.complejidad || "Desafiante");
+    seleccionarChip("tipoActividad", sesionReferencia.tipoActividad || "Desarrollo / Código");
+    seleccionarChip(
+      "dinamicaCognitiva",
+      sesionReferencia.dinamicaCognitiva || "Andamiaje / Co-creación"
+    );
   }
 
   /**
@@ -332,24 +409,36 @@
     document.getElementById("horaInicio").value = sesion.horaInicio;
     document.getElementById("horaFin").value = sesion.horaFin;
     document.getElementById("materia").value = sesion.materia;
-    document.getElementById("tema").value = sesion.tema || "";
     document.getElementById("calidad").value = String(sesion.calidad);
     document.getElementById("usoIA").value = String(sesion.usoIA);
     document.getElementById("notas").value = sesion.notas || "";
 
     seleccionarChip("contexto", sesion.contexto || "Académico");
     seleccionarChip("tipoActividad", sesion.tipoActividad || "Desarrollo / Código");
-    seleccionarChip("produccion", sesion.produccion || "Reproducción");
-    seleccionarChip("dominioPrevio", sesion.dominioPrevio || "Con lagunas");
+    seleccionarChip(
+      "dinamicaCognitiva",
+      migrarDinamicaCognitiva(
+        sesion.dinamicaCognitiva,
+        sesion.produccion,
+        sesion.modoIA,
+        sesion.usoIA
+      )
+    );
+    seleccionarChip("dominioPrevio", sesion.dominioPrevio || "En construcción");
     seleccionarChip("energiaPrevia", sesion.energiaPrevia || "Media");
     seleccionarChip("complejidad", sesion.complejidad || "Desafiante");
     seleccionarChip("objetivoCumplido", sesion.objetivoCumplido || "Sí");
-    seleccionarChip(
-      "modoIA",
-      sesion.modoIA || (Number(sesion.usoIA) === 0 ? "Autónomo" : "Copiloto / Apoyo")
-    );
     document.getElementById("usoIA").value = String(sesion.usoIA);
 
+    // Sincronizar chip visual de materia
+    const contenedorChips = document.getElementById("materiaChipsContainer");
+    if (contenedorChips) {
+      contenedorChips.querySelectorAll(".subject-chip-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.title === sesion.materia);
+      });
+    }
+
+    actualizarAyudaDominio();
     actualizarAyudaActividad();
     actualizarAyudaObjetivo();
     actualizarAyudaIA({ desdeChip: true });
@@ -366,7 +455,6 @@
     if (btnSubmit) btnSubmit.textContent = t("btnSubmitEdit");
     if (btnCancel) btnCancel.style.display = "inline-flex";
 
-    // Resaltar fila activa en la tabla
     document.querySelectorAll("#tablaBody tr").forEach((tr) => {
       tr.classList.toggle("row-editing", tr.dataset.id === sesion.id);
     });
@@ -396,14 +484,12 @@
       tr.classList.remove("row-editing");
     });
 
-    const inputTema = document.getElementById("tema");
     const inputNotas = document.getElementById("notas");
-    if (inputTema) inputTema.value = "";
     if (inputNotas) inputNotas.value = "";
   }
 
   /**
-   * Refresca los textos dinámicos del formulario (título modo edición/creación, ayudas y preview) al cambiar de idioma.
+   * Refresca los textos dinámicos del formulario al cambiar de idioma.
    */
   function refrescarTextosFormulario() {
     const formTitle = document.getElementById("formTitle");
@@ -415,6 +501,7 @@
       if (formTitle) formTitle.textContent = t("formTitleNew");
       if (btnSubmit) btnSubmit.textContent = t("btnSubmitNew");
     }
+    actualizarAyudaDominio();
     actualizarAyudaActividad();
     actualizarAyudaObjetivo();
     actualizarAyudaIA({ desdeChip: true });
@@ -445,11 +532,11 @@
       inputFin.value = ahora.toTimeString().slice(0, 5);
     }
 
-    // Sincronizar estado visual de los chips
     Object.keys(estadoChips).forEach((grupo) => {
       pintarGrupoChip(grupo, estadoChips[grupo]);
     });
 
+    actualizarAyudaDominio();
     actualizarAyudaActividad();
     actualizarAyudaObjetivo();
     actualizarAyudaIA({ desdeChip: true });
@@ -468,6 +555,24 @@
   }
 
   /**
+   * Actualiza la caja de ayuda con la Prueba Objetiva según el Dominio Previo seleccionado.
+   */
+  function actualizarAyudaDominio() {
+    const boxAyuda = document.getElementById("ayudaDominio");
+    if (!boxAyuda) return;
+    if (StudyTracker.I18n) {
+      const mapaKey = {
+        Nuevo: "helpDomNew",
+        "En construcción": "helpDomBuilding",
+        Consolidado: "helpDomConsolidated"
+      };
+      boxAyuda.textContent = t(mapaKey[estadoChips.dominioPrevio] || "helpDomBuilding");
+    } else if (typeof obtenerTextoAyudaDominio === "function") {
+      boxAyuda.textContent = obtenerTextoAyudaDominio(estadoChips.dominioPrevio);
+    }
+  }
+
+  /**
    * Actualiza la caja de ayuda según el Tipo de Actividad seleccionado.
    */
   function actualizarAyudaActividad() {
@@ -476,9 +581,8 @@
     if (StudyTracker.I18n) {
       const mapaKey = {
         "Clase / Cátedra": "helpActClass",
-        "Teoría / Docs": "helpActTheory",
-        "Investigación / Diálogo": "helpActResearch",
-        "Diseño / Apuntes": "helpActDesign",
+        "Estudio Teórico / Conceptual": "helpActTheory",
+        "Síntesis / Documentación": "helpActDesign",
         "Desarrollo / Código": "helpActDev",
         "Práctica / Debugging": "helpActPractice",
         "Repaso / Simulacro": "helpActReview"
@@ -508,7 +612,7 @@
   }
 
   /**
-   * Actualiza la caja de ayuda según la calidad de asimilación seleccionada, la actividad y el modo de IA.
+   * Actualiza la caja de ayuda según la calidad de asimilación seleccionada, la actividad y la dinámica cognitiva.
    */
   function actualizarAyudaCalidad() {
     const selectCalidad = document.getElementById("calidad");
@@ -527,18 +631,22 @@
       const nivel = Math.min(5, Math.max(1, Number(selectCalidad.value) || 3));
       let base = t(`helpQuality${nivel}`);
       if (esModoClase) {
-        if (estadoChips.modoIA === "Mecánico / Copy-Paste") {
+        if (estadoChips.dinamicaCognitiva === "Delegación / Reproducción") {
           base += t("helpQualityClassAiMech");
-        } else if (valIA > 0 || estadoChips.modoIA !== "Autónomo") {
+        } else if (valIA > 0 || estadoChips.dinamicaCognitiva === "Andamiaje / Co-creación") {
           base += t("helpQualityClassAiDialogue");
         } else {
           base += t("helpQualityClassNote");
         }
-      } else if (estadoChips.modoIA === "Mecánico / Copy-Paste" && nivel >= 4) {
+      } else if (
+        estadoChips.dinamicaCognitiva === "Delegación / Reproducción" &&
+        valIA >= 50 &&
+        nivel >= 4
+      ) {
         base += t("helpQualityWarnMech");
       } else if (
         valIA >= 70 &&
-        estadoChips.modoIA !== "Diálogo / Tutoría" &&
+        estadoChips.dinamicaCognitiva === "Generación Propia" &&
         nivel >= 4
       ) {
         base += t("helpQualityWarnHighAi", { ai: valIA });
@@ -547,7 +655,7 @@
     } else {
       boxAyuda.textContent = obtenerTextoAyudaCalidad(
         selectCalidad.value,
-        estadoChips.modoIA,
+        estadoChips.dinamicaCognitiva,
         valIA
       );
     }
@@ -555,7 +663,7 @@
 
   /**
    * Actualiza la etiqueta y descripción de ayuda del deslizador de uso de IA,
-   * manteniendo coherencia con el chip de Modo de IA.
+   * manteniendo coherencia con el chip de Dinámica Cognitiva.
    */
   function actualizarAyudaIA({ desdeChip = false } = {}) {
     const inputIA = document.getElementById("usoIA");
@@ -565,12 +673,9 @@
 
     const val = Number(inputIA.value);
     if (!desdeChip) {
-      if (val === 0 && estadoChips.modoIA !== "Autónomo") {
-        estadoChips.modoIA = "Autónomo";
-        pintarGrupoChip("modoIA", "Autónomo");
-      } else if (val > 0 && estadoChips.modoIA === "Autónomo") {
-        estadoChips.modoIA = "Diálogo / Tutoría";
-        pintarGrupoChip("modoIA", "Diálogo / Tutoría");
+      if (val > 25 && estadoChips.dinamicaCognitiva === "Generación Propia") {
+        estadoChips.dinamicaCognitiva = "Andamiaje / Co-creación";
+        pintarGrupoChip("dinamicaCognitiva", "Andamiaje / Co-creación");
       }
       actualizarAyudaCalidad();
       actualizarPreview();
@@ -579,26 +684,29 @@
     if (labelIA) labelIA.textContent = `${val}%`;
     if (boxAyuda) {
       if (StudyTracker.I18n) {
-        const mapaModo = {
-          Autónomo: "helpAiAuton",
-          "Diálogo / Tutoría": "helpAiDialogue",
-          "Copiloto / Apoyo": "helpAiCopilot",
-          "Mecánico / Copy-Paste": "helpAiMech"
+        const mapaDinamica = {
+          "Recepción Pasiva": "helpDinPassive",
+          "Delegación / Reproducción": "helpDinDelegation",
+          "Andamiaje / Co-creación": "helpDinScaffolding",
+          "Generación Propia": "helpDinOwnGen"
         };
-        boxAyuda.textContent = t(mapaModo[estadoChips.modoIA] || "helpAiCopilot");
+        boxAyuda.textContent = t(
+          mapaDinamica[estadoChips.dinamicaCognitiva] || "helpDinScaffolding"
+        );
       } else {
-        boxAyuda.textContent = obtenerTextoAyudaIA(val, estadoChips.modoIA);
+        boxAyuda.textContent = obtenerTextoAyudaIA(val, estadoChips.dinamicaCognitiva);
       }
     }
   }
 
   /**
-   * Calcula y muestra la vista previa de minutos y XP (incluyendo bonos por complejidad, objetivo y modo de IA).
+   * Calcula y muestra la vista previa de minutos y XP (incluyendo bonos por complejidad, objetivo y dinámica cognitiva).
    */
   function actualizarPreview() {
     const horaInicio = document.getElementById("horaInicio")?.value;
     const horaFin = document.getElementById("horaFin")?.value;
     const calidad = Number(document.getElementById("calidad")?.value || 3);
+    const usoIA = Number(document.getElementById("usoIA")?.value || 0);
 
     const min = calcularMinutos(horaInicio, horaFin);
     const xp = calcularXP(
@@ -606,7 +714,8 @@
       calidad,
       estadoChips.complejidad,
       estadoChips.objetivoCumplido,
-      estadoChips.modoIA
+      estadoChips.dinamicaCognitiva,
+      usoIA
     );
 
     const bonosActivos = [];
@@ -614,9 +723,15 @@
     if (estadoChips.complejidad === "Muy difícil") bonosActivos.push(t("bonusHard"));
     if (estadoChips.objetivoCumplido === "Sí") bonosActivos.push(t("bonusGoalYes"));
     if (estadoChips.objetivoCumplido === "Parcial") bonosActivos.push(t("bonusGoalPartial"));
-    if (estadoChips.modoIA === "Autónomo") bonosActivos.push(t("bonusAiAuton"));
-    if (estadoChips.modoIA === "Diálogo / Tutoría") bonosActivos.push(t("bonusAiDialogue"));
-    if (estadoChips.modoIA === "Mecánico / Copy-Paste") bonosActivos.push(t("bonusAiMech"));
+    if (estadoChips.dinamicaCognitiva === "Generación Propia") {
+      bonosActivos.push(usoIA === 0 ? t("bonusDinOwnAuton") : t("bonusAiAuton"));
+    }
+    if (estadoChips.dinamicaCognitiva === "Andamiaje / Co-creación") {
+      bonosActivos.push(t("bonusAiDialogue"));
+    }
+    if (estadoChips.dinamicaCognitiva === "Delegación / Reproducción" && usoIA >= 50) {
+      bonosActivos.push(t("bonusAiMech"));
+    }
 
     const elDuracion = document.getElementById("previewDuracion");
     const elXP = document.getElementById("previewXP");
@@ -629,9 +744,7 @@
   }
 
   /**
-   * Actualiza el indicador visual del estado de sincronización con Excel.
-   * @param {string} texto
-   * @param {"connected" | "warning" | "default"} tipoEstado
+   * Actualiza el indicador visual del estado de sincronización con CSV.
    */
   function actualizarEstadoArchivo(texto, tipoEstado = "default") {
     const status = document.getElementById("fileStatus");
@@ -666,7 +779,6 @@
       }
     });
 
-    // Actualizar selector desplegable de Materias
     const selectMateria = document.getElementById("subjectFilterSelect");
     if (selectMateria) {
       const conteoPorMateria = {};
@@ -726,7 +838,7 @@
   }
 
   /**
-   * Renderiza el Mapa de Calor Circadiano (7 Días x 4 Franjas Horarias) con color dinámico.
+   * Renderiza el Mapa de Calor Circadiano (7 Días x 4 Franjas Horarias de 6h).
    */
   function renderizarMapaCalorCircadiano(datosMapaCalor) {
     const contenedor = document.getElementById("heatmapCircadiano");
@@ -853,13 +965,11 @@
   }
 
   /**
-   * Renderiza el Balance Cognitivo (Preparación/Teoría vs. Producción/Práctica),
-   * las tarjetas de Energía Previa y las de Complejidad.
+   * Renderiza el Balance Cognitivo, Dinámica Cognitiva, Dominio Previo, Energía y Complejidad.
    */
   function renderizarResumenHabitos(datosHabitos) {
     if (!datosHabitos) return;
 
-    // 1. Barra de Balance Cognitivo
     const boxBalance = document.getElementById("balanceCognitivoBox");
     if (boxBalance && datosHabitos.balanceCognitivo) {
       const { minConsumo, minProduccion, pctConsumo, pctProduccion } =
@@ -893,18 +1003,19 @@
       boxBalance.append(header, barTrack);
     }
 
-    // 1B. Resumen por Nivel de Producción Propia (Consumo vs. Reproducción vs. Generación propia)
+    // Resumen por Dinámica Cognitiva
     const contenedorProd = document.getElementById("resumenProduccionBar");
-    if (contenedorProd && Array.isArray(datosHabitos.resumenProduccion)) {
+    const listaDinamica = datosHabitos.resumenDinamica || datosHabitos.resumenProduccion;
+    if (contenedorProd && Array.isArray(listaDinamica)) {
       contenedorProd.replaceChildren();
-      datosHabitos.resumenProduccion.forEach((item) => {
+      listaDinamica.forEach((item) => {
         const pill = document.createElement("div");
         pill.className = "habit-stat-pill";
 
         const title = document.createElement("span");
         title.className = "habit-stat-title";
-        const prodTrad = trVal("produccion", item.valor);
-        title.textContent = `${item.icono} ${prodTrad}:`;
+        const dinTrad = trVal("dinamicaCognitiva", item.valor);
+        title.textContent = `${item.icono} ${dinTrad}:`;
 
         const val = document.createElement("strong");
         val.textContent = item.conteo
@@ -916,7 +1027,7 @@
       });
     }
 
-    // 1C. Resumen por Dominio Previo del Tema (Nuevo vs. Con lagunas vs. Dominado)
+    // Resumen por Dominio Previo del Tema (Nuevo vs. En construcción vs. Consolidado)
     const contenedorDom = document.getElementById("resumenDominioBar");
     if (contenedorDom && Array.isArray(datosHabitos.resumenDominio)) {
       contenedorDom.replaceChildren();
@@ -939,7 +1050,7 @@
       });
     }
 
-    // 2. Resumen por Energía Previa
+    // Resumen por Energía Previa
     const contenedorEnergia = document.getElementById("resumenHabitosBar");
     if (contenedorEnergia) {
       contenedorEnergia.replaceChildren();
@@ -962,7 +1073,7 @@
       });
     }
 
-    // 3. Resumen por Complejidad
+    // Resumen por Complejidad
     const contenedorComp = document.getElementById("resumenComplejidadBar");
     if (contenedorComp && Array.isArray(datosHabitos.resumenComplejidad)) {
       contenedorComp.replaceChildren();
@@ -1065,10 +1176,12 @@
 
           const meta = document.createElement("div");
           meta.className = "note-log-meta";
-          const icAct = ICONOS_ACTIVIDAD[s.tipoActividad] || "💻";
-          meta.textContent = `${s.fecha} · 📚 ${s.materia} (${s.tema}) · ${icAct} ${trVal(
+          const actNorm = migrarTipoActividad(s.tipoActividad);
+          const icAct = ICONOS_ACTIVIDAD[actNorm] || "💻";
+          const { subtema } = extraerSubtemaDeNotas(s.notas, s.tema);
+          meta.textContent = `${s.fecha} · 📚 ${s.materia} (${subtema}) · ${icAct} ${trVal(
             "tipoActividad",
-            s.tipoActividad
+            actNorm
           )} · ⭐️ ${s.calidad}/5 · 🤖 ${s.usoIA}%`;
 
           const text = document.createElement("div");
@@ -1083,7 +1196,7 @@
   }
 
   /**
-   * Crea una fila <tr> segura para la tabla de historial con Materia, Tema, Contexto, Modo de IA y acciones CRUD.
+   * Crea una fila <tr> segura para la tabla de historial con Materia, Subtema, Actividad, Dinámica Cognitiva y acciones CRUD.
    */
   function crearFilaSesion(sesion, { onEditar, onEliminar }) {
     const tr = document.createElement("tr");
@@ -1107,7 +1220,7 @@
     const tdHorario = document.createElement("td");
     tdHorario.textContent = `${sesion.horaInicio} - ${sesion.horaFin}`;
 
-    // Materia + Contexto y Tema específico
+    // Materia + Contexto y Subtema extraído de Notas
     const tdMateriaTema = document.createElement("td");
     const strongMateria = document.createElement("strong");
     strongMateria.textContent = sesion.materia;
@@ -1115,26 +1228,22 @@
     subTema.className = "cell-sub";
     const ctxVal = sesion.contexto || "Académico";
     const icCtx = ICONOS_CONTEXTO[ctxVal] || "🎓";
-    subTema.textContent = `${icCtx} ${trVal("contexto", ctxVal)} · ${sesion.tema || "General"}`;
+    const { subtema, notasLimpias } = extraerSubtemaDeNotas(sesion.notas, sesion.tema);
+    subTema.textContent = `${icCtx} ${trVal("contexto", ctxVal)} · ${subtema}`;
     tdMateriaTema.append(strongMateria, subTema);
 
-    // Actividad + Producción Propia y Dominio Previo
+    // Actividad + Dominio Previo
     const tdActividad = document.createElement("td");
-    const actVal = sesion.tipoActividad || "Desarrollo / Código";
+    const actVal = migrarTipoActividad(sesion.tipoActividad);
     const iconoAct = ICONOS_ACTIVIDAD[actVal] || "💻";
     const divAct = document.createElement("div");
     divAct.textContent = `${iconoAct} ${trVal("tipoActividad", actVal)}`;
-    const subProdDom = document.createElement("small");
-    subProdDom.className = "cell-sub";
-    const prodVal = sesion.produccion || "Reproducción";
-    const domVal = sesion.dominioPrevio || "Con lagunas";
-    const icProd = ICONOS_PRODUCCION[prodVal] || "📋";
+    const subDom = document.createElement("small");
+    subDom.className = "cell-sub";
+    const domVal = migrarDominioPrevio(sesion.dominioPrevio, actVal);
     const icDom = ICONOS_DOMINIO[domVal] || "🌿";
-    subProdDom.textContent = `${icProd} ${trVal("produccion", prodVal)} · ${icDom} ${trVal(
-      "dominioPrevio",
-      domVal
-    )}`;
-    tdActividad.append(divAct, subProdDom);
+    subDom.textContent = `${icDom} ${trVal("dominioPrevio", domVal)}`;
+    tdActividad.append(divAct, subDom);
 
     // Contexto Operativo (Energía + Complejidad + Objetivo)
     const tdContexto = document.createElement("td");
@@ -1164,23 +1273,27 @@
     badgeCalidad.textContent = `⭐️ ${calSegura} / 5`;
     tdCalidad.appendChild(badgeCalidad);
 
-    // Modo de IA + % Uso IA
+    // Dinámica Cognitiva + % Uso IA
     const tdIA = document.createElement("td");
-    const modoActual =
-      sesion.modoIA || (Number(sesion.usoIA) === 0 ? "Autónomo" : "Copiloto / Apoyo");
-    const icModoIA = ICONOS_MODO_IA[modoActual] || "🛠️";
-    const divModoIA = document.createElement("div");
-    divModoIA.className =
-      modoActual === "Mecánico / Copy-Paste"
+    const dinamicaActual = migrarDinamicaCognitiva(
+      sesion.dinamicaCognitiva,
+      sesion.produccion,
+      sesion.modoIA,
+      sesion.usoIA
+    );
+    const icDin = ICONOS_DINAMICA[dinamicaActual] || "🔄";
+    const divDinamica = document.createElement("div");
+    divDinamica.className =
+      dinamicaActual === "Delegación / Reproducción" && Number(sesion.usoIA) >= 50
         ? "ia-mode-tag ia-mode-mecanico"
-        : modoActual === "Diálogo / Tutoría" || modoActual === "Autónomo"
+        : dinamicaActual === "Andamiaje / Co-creación" || dinamicaActual === "Generación Propia"
         ? "ia-mode-tag ia-mode-aprendizaje"
         : "ia-mode-tag";
-    divModoIA.textContent = `${icModoIA} ${trVal("modoIA", modoActual)}`;
+    divDinamica.textContent = `${icDin} ${trVal("dinamicaCognitiva", dinamicaActual)}`;
     const subPorcentajeIA = document.createElement("small");
     subPorcentajeIA.className = "cell-sub";
     subPorcentajeIA.textContent = t("tableAiSupportSub", { pct: sesion.usoIA });
-    tdIA.append(divModoIA, subPorcentajeIA);
+    tdIA.append(divDinamica, subPorcentajeIA);
 
     // XP Ganados
     const tdXP = document.createElement("td");
@@ -1190,7 +1303,7 @@
     // Notas
     const tdNotas = document.createElement("td");
     tdNotas.className = "notes-cell";
-    tdNotas.textContent = sesion.notas || "-";
+    tdNotas.textContent = notasLimpias || sesion.notas || "-";
 
     // Acciones: Editar y Eliminar
     const tdAcciones = document.createElement("td");
@@ -1234,11 +1347,10 @@
   function renderizarDashboard(todasLasSesiones, { onEditarSesion, onEliminarSesion } = {}) {
     const listaGlobal = Array.isArray(todasLasSesiones) ? todasLasSesiones : [];
 
-    // Actualizar autocompletado y contadores de pestañas de filtro
     actualizarAutocompletado(listaGlobal);
     actualizarContadoresFiltro(listaGlobal);
 
-    // 1. Barra RPG Exponencial (siempre refleja el XP y Nivel total del personaje)
+    // 1. Barra RPG Exponencial
     const kpisGlobales = calcularKPIs(listaGlobal);
     const progreso = calcularProgresoRPG(kpisGlobales.totalXP);
 
@@ -1251,7 +1363,7 @@
     document.getElementById("uiXpBar").style.width = `${progreso.porcentajeBarra}%`;
     document.getElementById("uiXpTotalBadge").textContent = `${progreso.totalXP} XP`;
 
-    // Aplicar filtros globales combinados (Contexto + Periodo + Materia) para KPIs, Gráficos y Tabla
+    // Aplicar filtros globales combinados
     const sesionesFiltradas = filtrarSesionesAvanzado(listaGlobal, {
       contexto: filtroContextoActual,
       periodo: filtroPeriodoActual,
@@ -1260,7 +1372,7 @@
 
     const kpis = calcularKPIs(sesionesFiltradas);
 
-    // 2. Tarjetas KPI (filtradas por el contexto seleccionado)
+    // 2. Tarjetas KPI
     document.getElementById("kpiHoras").textContent = `${kpis.totalHoras} h`;
     document.getElementById("kpiMinutos").textContent = t("kpiTotalMinutesSub", {
       min: kpis.totalMinutos
@@ -1275,9 +1387,9 @@
     const elKpiIASub = document.getElementById("kpiIASub");
     if (elKpiIASub) {
       elKpiIASub.textContent = t("kpiAiSub", {
-        dial: kpis.iaDialogo,
-        auton: kpis.iaAutonomo,
-        mech: kpis.iaMecanico
+        dial: kpis.dinAndamiaje,
+        auton: kpis.dinGeneracion,
+        mech: kpis.dinDelegacion
       });
     }
 
@@ -1292,7 +1404,7 @@
       });
     }
 
-    // 3. Tabla de Historial (ordenada de más reciente a más antigua y limitada a los últimos 5 por defecto)
+    // 3. Tabla de Historial
     const sesionesOrdenadas = [...sesionesFiltradas].reverse();
     const totalFiltradas = sesionesOrdenadas.length;
     const hayMasDelLimite = totalFiltradas > LIMITE_HISTORIAL_RECIENTE;
@@ -1400,11 +1512,13 @@
     cambiarMetricaHeatmap,
     alternarVistaHistorial,
     seleccionarChip,
+    aplicarValoresPorDefectoInteligentes,
     cargarSesionEnFormulario,
     salirModoEdicion,
     refrescarTextosFormulario,
     inicializarFormulario,
     ponerHoraActual,
+    actualizarAyudaDominio,
     actualizarAyudaActividad,
     actualizarAyudaObjetivo,
     actualizarAyudaCalidad,
@@ -1414,4 +1528,3 @@
     renderizarDashboard
   };
 })(window);
-

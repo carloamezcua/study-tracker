@@ -1,4 +1,4 @@
-# ⚔️ StudyTracker — Local-First Analytics & CSV Sync
+# ⚔️ StudyTracker v3 — Local-First Analytics & CSV Sync
 
 > 🌐 **Idioma / Language:** [🇪🇸 Español](#-español) | [🇬🇧 English](#-english)
 
@@ -6,242 +6,111 @@
 
 ## 🇪🇸 Español
 
-Aplicación web **Local-First** gamificada (estilo RPG) ultra-ligera con **micro-servidor local en Node.js** (y soporte directo por navegador vía *File System Access API*) para registrar, editar y eliminar bloques de estudio, evaluar hábitos cognitivos y sincronizar los datos en tiempo real directamente sobre un archivo CSV local (`data/study-tracker.csv`) sin librerías de hojas de cálculo externas.
+Aplicación web **Local-First** gamificada (estilo RPG) ultra-ligera con **micro-servidor local en Node.js** (y soporte directo por navegador vía *File System Access API*) para registrar, editar y eliminar bloques de estudio sin fatiga de decisión, evaluar hábitos cognitivos y sincronizar los datos en tiempo real directamente sobre un archivo CSV local (`data/study-tracker.csv`) con **respaldos automáticos diarios** (`data/backups/YYYY-MM-DD.csv`).
 
-### ✨ Características Principales
+### ✨ Características Principales (v3.0)
 
 - **Curva Exponencial de Nivel RPG (*"Level 92 is half of 99"*):**
   - Inspirada en *Old School RuneScape*, la experiencia requerida **se duplica cada 7 niveles**:
     $$\text{XP}(\text{Nivel } L) = \text{REDONDEAR}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
   - Subida rápida en los primeros niveles para motivar la constancia, progresión creciente (+10.4% por nivel) y propiedad matemática exacta donde el **Nivel 92 representa el 50% del XP total hacia el Nivel 99**.
-- **Taxonomía Ortogonal de 1 Clic (`4 Contextos` × `7 Actividades` × `Producción Propia` × `Dominio Previo`):**
+- **Formulario en 2 Etapas Cognitivas + Pre-llenado Inteligente (*Smart Defaults*):**
+  - **🎯 Etapa 1: Punto de Partida (Al Iniciar):** Pre-llena automáticamente la última materia, contexto, actividad y energía de la franja horaria actual. Incluye **Chips Rápidos de Materias Recientes** (1 clic para elegir materia o `[+ Nueva]`).
+  - **🏁 Etapa 2: Evaluación del Bloque (Al Terminar):** Evalúa la Dinámica Cognitiva, el `% IA`, la Fluidez del bloque, la Asimilación (1–5) y las Notas con `[Subtema]`.
+- **Taxonomía Ortogonal v3 (`4 Contextos` × `6 Actividades` × `4 Dinámicas Cognitivas` × `3 Niveles de Dominio Previo`):**
   - **Contexto / Propósito (4 chips):**
     - `🎓 Académico`: Materias universitarias/escolares, tareas y exámenes de carrera.
     - `🏅 Certificación`: Certificaciones profesionales (ej. *Snowflake*) y cursos técnicos estructurados.
     - `🚀 Proyecto Propio`: Desarrollo de software personal, portafolio o proyectos en pareja.
     - `🤝 Externo`: Proyectos de amigos/terceros (ej. *Ruby on Rails*), incluyendo el estudio requerido para ellos.
-  - **Nivel de Producción Propia y Dominio Previo del Tema:**
-    - **Producción Propia (`Produccion_Propia`):**
-      - `👀 Consumo`: Leíste, viste o escuchaste sin producir nada propio (PDF, video, documentación, clase).
-      - `📋 Reproducción`: Escribiste o programaste, pero copiando, transcribiendo o siguiendo algo ya masticado por una fuente o la IA (a mano o en PC).
-      - `🧠 Generación propia`: Lo escribiste o programaste con tus palabras y tu lógica, resolviendo los obstáculos por tu cuenta. Máximo impacto en retención.
-    - **Dominio Previo (`Dominio_Previo`):**
-      - `🌱 Nuevo`: Primer contacto con el concepto (mayor carga cognitiva).
-      - `🌿 Con lagunas`: Ya lo conocías o viste en clase, pero aún no lo dominas o te sigue costando.
-      - `🌳 Dominado`: Lo manejas con fluidez; bloque de repaso, mantenimiento o consolidación ágil.
-  - **Tipo de Actividad (7 chips con ayuda dinámica en vivo):**
+  - **La Prueba Objetiva de Dominio Previo (`Dominio_Previo` — Cero dudas):**
+    - `🌱 Nuevo` *(0 contactos previos)*: Nunca has estudiado este concepto/herramienta específica. Si te pidieran explicarlo o escribir código ahorita mismo, no sabrías por dónde empezar.
+    - `🌿 En construcción` *(Necesitas apoyo/consulta)*: Ya lo viste antes (en clase, ayer o en el Pomodoro pasado), pero todavía necesitas mirar tus apuntes, la documentación o apoyarte en la IA para avanzar sin trabarte.
+    - `🌳 Consolidado` *(Autónomo)*: Puedes explicarlo, resolver problemas o programar sobre esto sin mirar el manual ni depender de la IA, o solo estás haciendo un bloque de repaso/mantenimiento veloz.
+  - **Dinámica Cognitiva Unificada (`Dinamica_Cognitiva` — ¿Cómo trabajaste y qué rol jugó la IA?):**
+    - `👀 Recepción Pasiva (0% ajuste XP)`: Leer, escuchar clase o ver un video sin producir ni debatir activamente aún.
+    - `🤖 Delegación / Reproducción (-15% XP si IA ≥50%)`: La IA o la fuente hizo el trabajo pesado y tú solo copiaste, transcribiste o seguiste pasos sin construirlo desde tu mente.
+    - `🔄 Andamiaje / Co-creación (+5% XP)`: Pensaste con apoyo; usaste la IA como tutor socrático (debatiendo el *"¿por qué?"*), copiloto de sintaxis o estructurador de tus propias ideas.
+    - `🧠 Generación Propia (+10% XP con 0% IA · +5% con consulta mínima)`: El esfuerzo mental pesado salió de tu cabeza (redactar con tus palabras, resolver o programar con tu propia lógica).
+  - **Tipo de Actividad (6 chips ortogonales con ayuda dinámica en vivo):**
 
 | Actividad | ¿Qué significa y cuándo usarla? | ¿Cómo no confundirla con otras? |
 | :--- | :--- | :--- |
-| **`👨‍🏫 Clase / Cátedra`** | **En vivo con un profesor o ponente:** asistir a una clase escolar, cátedra universitaria o taller guiado. Evalúa tu **concentración, interés y retención**. | Aquí el ritmo lo lleva un **profesor en vivo**. Si estudias un curso pregrabado o lees por tu cuenta a tu ritmo, usa `📖 Teoría / Docs`. |
-| **`📖 Teoría / Docs`** | **Consumo estructurado a tu propio ritmo:** leer documentación oficial (ej. *Snowflake Docs*), libros, artículos técnicos o ver videocursos grabados. | Sigue una **fuente lineal o guía oficial**. Si en cambio estás saltando entre fuentes para responder una duda abierta o debatiendo un *"¿por qué?"*, es `💬 Investigación / Diálogo`. |
-| **`💬 Investigación / Diálogo`** | **Explorar dudas abiertas o debatir conceptos:** buscar cómo/por qué funciona algo, comparar tecnologías o tener una sesión socrática de preguntas y respuestas con IA. | No sigues un manual de principio a fin (`📖 Teoría / Docs`); estás **investigando una incógnita puntual o dialogando** para destrabar tu comprensión. |
-| **`✍️ Diseño / Apuntes`** | **Sintetizar y estructurar con tus palabras:** pasar en limpio apuntes o *cheatsheets* (en cuaderno o compu), hacer resúmenes propios, mapas mentales o diagramas (ER, arquitectura). | Mientras que en `📖 Teoría` consumes información, aquí **produces síntesis o diseño** sin escribir código todavía. |
-| **`💻 Desarrollo / Código`** | **Construir e implementar:** escribir código nuevo, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o entregable. | Es **creación de software/entregables**. Si el código ya existe y estás cazando un error o resolviendo ejercicios aislados, usa `🧪 Práctica / Debugging`. |
+| **`👨‍🏫 Clase / Cátedra`** | **En vivo con un profesor o ponente:** asistir a una clase escolar, cátedra universitaria o taller guiado. Evalúa tu **concentración, interés y retención**. | Aquí el ritmo lo lleva un **profesor en vivo**. Si estudias por tu cuenta a tu ritmo, usa `📖 Estudio Teórico / Conceptual`. |
+| **`📖 Estudio Teórico / Conceptual`** | **Comprender el *qué* o el *porqué*:** leer documentación oficial (ej. *Snowflake Docs*), libros, papers, ver videocursos grabados o debatir conceptos teóricos con IA. | Se enfoca en **comprender conceptos o investigar teoría** antes de pasar a redactar apuntes propios (`✍️ Síntesis`) o programar (`💻 Desarrollo`). |
+| **`✍️ Síntesis / Documentación`** | **Traducir y estructurar en un artefacto propio:** redactar apuntes o *cheatsheets* (en cuaderno o PC), resúmenes, mapas mentales o diagramas de arquitectura. | Mientras que en `📖 Estudio Teórico` consumes/exploras conceptos, aquí **produces síntesis o diseño tangible** sin escribir código todavía. |
+| **`💻 Desarrollo / Código`** | **Construir e implementar:** escribir código nuevo, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o entregable. | Es **creación de software/entregables**. Si estás cazando un error o resolviendo ejercicios aislados, usa `🧪 Práctica / Debugging`. |
 | **`🧪 Práctica / Debugging`** | **Ejercitar o destrabar errores:** hacer laboratorios prácticos, ejercicios tipo kata/algoritmos o depurar (*debugging*) un bug hasta encontrar la causa. | Se enfoca en **entrenar destreza o arreglar fallos**, no en levantar funcionalidades nuevas desde cero (`💻 Desarrollo`). |
 | **`🔁 Repaso / Simulacro`** | **Consolidar memoria sobre algo ya visto:** repasar tus propios apuntes previos, flashcards, explicar un tema sin mirar o hacer exámenes de simulacro (*mock exams*). | Solo aplica a temas que **ya estudiaste antes** y estás reforzando para no olvidarlos o para medirte antes de un examen. |
 
-- **¿Qué pasa si estoy en `👨‍🏫 Clase / Cátedra` y uso IA?**
-  - Al seleccionar `👨‍🏫 Clase / Cátedra`, el formulario ajusta por defecto **`🧠 Autónomo (0% IA)`** para ahorrarte clics cuando solo escuchas al profesor, pero **puedes cambiar libremente el Modo de IA** según lo que haya pasado en el salón:
-    1. **Sin IA (`🧠 Autónomo · 0%` → `+5% XP`):** Atendiste la clase y tomaste notas por tu cuenta. La escala 1–5 mide tu concentración e interés.
-    2. **Usar IA para resolver dudas que surgen en clase (`💬 Diálogo / Tutoría` o `🛠️ Copiloto` → `+5%` / `0% XP`):** El profesor explicó algo confuso y le preguntaste a la IA un ejemplo rápido para no perder el hilo. La IA **apoyó tu comprensión en vivo** y la ayuda del formulario te guía a calificar qué tanto retuviste gracias a ese apoyo.
-    3. **Usar IA en clase solo para acabar rápido una actividad (`🤖 Mecánico / Copy-Paste` → `-15% XP`):** El profesor dejó un ejercicio en clase y usaste pura asistencia de IA para entregarlo rápido sin procesarlo. El sistema **te descuenta `-15% XP`**, registra esos minutos como **Mecánicos** en las gráficas del Dashboard y te advierte en la escala de Asimilación considerar nivel `1` o `2`.
-- **Impacto Cognitivo de IA y Calidad de Asimilación (1 al 5):**
-  - Separa la **fluidez mecánica** del **aprendizaje real**: la escala 1–5 evalúa tu **Asimilación Cognitiva** (desde `1 - Mecánico / Sin retención` hasta `5 - Asimilación profunda`).
-  - **Modo de Uso de IA (4 chips):**
-    - `🧠 Autónomo (+5% XP)`: 100% por tu cuenta (0% IA).
-    - `💬 Diálogo / Tutoría (+5% XP)`: Debate conceptual, preguntas de *"¿por qué?"* y refuerzo activo con IA.
-    - `🛠️ Copiloto / Apoyo (0% ajuste)`: Consulta puntual de sintaxis o desbloqueo de bugs entendiendo la solución.
-    - `🤖 Mecánico / Copy-Paste (-15% XP)`: Automatización directa para entregar rápido sin leer a fondo.
-  - El Dashboard contrasta en vivo tus minutos de **Aprendizaje (Autónomo / Diálogo / Copiloto)** frente a los minutos **Mecánicos (Copy-Paste)** por materia.
-- **Filtro Rápido por Contexto e Historial Compacto:**
-  - Barra de pestañas interactiva (`🌐 Todos`, `🎓 Académico`, `🏅 Certificación`, `🚀 Proyecto Propio`, `🤝 Externo`) que filtra al instante las tarjetas KPI, los 3 gráficos y la tabla de historial manteniendo tu nivel global de personaje en la barra superior.
-  - **Vista compacta de últimos 5 registros:** La tabla muestra por defecto solo las **5 sesiones más recientes** para evitar que el Dashboard crezca sin límite, con un botón **`📂 Ver todos (X)` / `⬆️ Mostrar solo últimos 5`** para expandir o contraer en 1 clic sin afectar los cálculos globales.
-- **Detector de Bloqueos y Fluidez del Bloque (Regla de Oro sin malinterpretaciones):**
-  - **Complejidad:** `🟢 Fácil (+0% XP)` · `🟡 Desafiante (+10% XP)` · `🔴 Muy difícil (+20% XP)`.
-  - **¿Fluidez y Avance del Bloque? (evalúa este bloque de tiempo, nunca si ya terminaste el entregable entero):**
-    - `✅ Sí (Flujo limpio +10% XP)`: Avanzaste a buen ritmo en la parte que planeaste para esta sesión (ej. escribir 1 página de tu *Cheatsheet* o programar un módulo), aunque la tarea total continúe mañana.
-    - `⚠️ Parcial (Con tropiezos +5% XP)`: Sí hubo progreso, pero perdiste una parte importante del bloque atorado en un bug, distracción, cansancio o confusión y el ritmo fue accidentado.
-    - `❌ No (Bloqueo / 0% XP)`: Te quedaste estancado casi toda la sesión en un obstáculo técnico/conceptual sin lograr destrabarlo, o tuviste que abortar la sesión sin avance efectivo.
-- **Cronómetro y Temporizador Pomodoro Integrado:**
-  - **Modo Cronómetro (`⏱️`):** Cuenta progresiva con captura automática de la **Fecha**, **Hora de Inicio** al pulsar *Iniciar* y **Hora de Fin** al pulsar *Terminar* (o al guardar directamente la sesión).
-  - **Modo Pomodoro (`🍅`):** Cuenta regresiva por bloques de enfoque (`25m`, `50m` o personalizado) y bloques de descanso (`5m`, `15m`) con aviso acústico vía *Web Audio API*.
-  - Basado en marcas de tiempo reales (`Date.now()`) y persistencia en `localStorage` para no perder precisión en segundo plano ni al recargar la pestaña.
-- **Sincronización en Tiempo Real con CSV (`data/study-tracker.csv`) y Cero Dependencias de Excel:**
-  - Todas las fórmulas (duración con cruce de medianoche, XP, bonos y curva de niveles) viven en **JavaScript puro** (`js/domain/metrics.js`), eliminando la librería `SheetJS` (~850 KB) y la duplicación de fórmulas.
-  - **Modo 1 (Servidor Local `server.js`):** Cada alta, edición (`✏️`) o eliminación (`✖`) actualiza directamente `data/study-tracker.csv` (con firma `UTF-8 BOM` compatible con acentos y emojis) sin preguntar nada.
-  - **Modo 2 (100% Navegador sin servidor):** Si abres la app sin `server.js` y pulsas *Sincronizar CSV*, puedes vincular un archivo `.csv` local usando la *File System Access API* del navegador.
-  - La carpeta `data/` y los archivos `.csv` están excluidos en `.gitignore` por privacidad.
-- **Interfaz Bilingüe en Tiempo Real (`ES` / `EN`):**
-  - Selector rápido `ES` | `EN` en la barra superior con persistencia en `localStorage` (`study_tracker_lang`).
-  - Traduce al instante toda la interfaz, el cronómetro/Pomodoro, las ayudas dinámicas, los gráficos de Chart.js y la tabla de historial, manteniendo intactos los valores canónicos en el `Store` y en `data/study-tracker.csv`.
+- **Franjas Horarias Circadianas de 6 Horas Exactas:**
+  - `00:00–05:59` → `Madrugada`
+  - `06:00–11:59` → `Mañana`
+  - `12:00–17:59` → `Tarde`
+  - `18:00–23:59` → `Noche`
+- **Etiquetas de Subtema en Notas (`[Subtema] Nota`):**
+  - Escribe `[Subtema]` al inicio de tus notas (ej. `[Mesa Redonda - GANs] Debate de arquitectura`) para agrupar automáticamente tus sesiones en el **Inspector de Subtemas** sin añadir campos obligatorios extra al formulario.
+- **Sincronización en Tiempo Real con CSV (`data/study-tracker.csv`) y Respaldos Automáticos:**
+  - **Modo 1 (Servidor Local `server.js`):** Cada alta, edición (`✏️`) o eliminación (`✖`) actualiza directamente `data/study-tracker.csv` (`UTF-8 con BOM`) y crea un respaldo diario automático en `data/backups/YYYY-MM-DD.csv` antes de sobrescribir.
+  - **Modo 2 (100% Navegador sin servidor):** Puedes vincular cualquier `.csv` local usando la *File System Access API* del navegador.
+  - Migración automática transparente si cargas un archivo CSV antiguo de 20 columnas (v2) al nuevo esquema de 18 columnas (v3).
 
-### 🏗️ Arquitectura del Proyecto
+### 🧮 Esquema de 18 Columnas en CSV (`data/study-tracker.csv`) y Fórmulas en JavaScript
 
-```mermaid
-flowchart TD
-    subgraph UI["Capa de Presentación / Frontend Layer"]
-        HTML["index.html"]
-        CSS["css/styles.css"]
-        I18N["js/ui/i18n.js\n(Bilingual ES / EN Engine)"]
-        TIMER["js/ui/timer.js\n(Stopwatch + Pomodoro)"]
-        DASH["js/ui/dashboard.js\n(Context Filter, CRUD UI & KPIs)"]
-        CHARTS["js/ui/charts.js\n(3 Chart.js Instances)"]
-    end
+El archivo `data/study-tracker.csv` se guarda en texto plano `UTF-8 con BOM` (estándar RFC 4180) con las siguientes **18 columnas**:
 
-    subgraph Controller["Controlador Principal / Main Controller"]
-        APP["js/app.js\n(Orchestrator & Events)"]
-    end
-
-    subgraph State["Capa de Estado / State Layer"]
-        STORE["js/state/store.js\n(StudyStore Pub/Sub + CRUD)"]
-        LS[("LocalStorage")]
-    end
-
-    subgraph Domain["Capa de Dominio / Domain Layer"]
-        METRICS["js/domain/metrics.js\n(Lv.1-99 Curve, AI Modes & Habits)"]
-    end
-
-    subgraph Sync["Sincronización CSV / Local CSV Sync"]
-        SYNC["js/services/excel-sync.js\n(Pure JS RFC 4180 CSV + API Client)"]
-        SERVER["server.js\n(Node.js HTTP + Native FS)"]
-        CSV[("data/study-tracker.csv\n(UTF-8 BOM, Git-ignored)")]
-    end
-
-    HTML --> APP
-    APP --> I18N
-    APP -->|Inicializa y sincroniza horas| TIMER
-    TIMER -->|Auto-llena Fecha, Inicio y Fin| DASH
-    APP -->|Crear / Editar / Borrar| STORE
-    STORE -->|Respaldo rápido| LS
-    STORE -->|Notifica cambios| APP
-    APP -->|Renderiza y Filtra| DASH
-    DASH --> CHARTS
-    APP -->|Sincroniza texto .csv| SYNC
-    SYNC <-->|GET / PUT /api/csv| SERVER
-    SERVER <-->|Lectura / Escritura directa| CSV
-    STORE --> METRICS
-    DASH --> METRICS
-    CHARTS --> METRICS
-    SYNC --> METRICS
-```
-
-### 🧮 Esquema de 20 Columnas en CSV (`data/study-tracker.csv`) y Fórmulas en JavaScript
-
-El archivo `data/study-tracker.csv` se guarda en texto plano `UTF-8 con BOM` (estándar RFC 4180, listo para Python, Pandas, Snowflake, SQLite o Excel) con las siguientes 20 columnas:
-
-`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tema,Tipo_Actividad,Produccion_Propia,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,Modo_IA,Uso_IA_Porcentaje,XP_Ganados,Notas`
+`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tipo_Actividad,Dinamica_Cognitiva,Uso_IA_Porcentaje,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,XP_Ganados,Notas`
 
 | Métrica | Regla / Fórmula en JavaScript (`js/domain/metrics.js`) |
 | :--- | :--- |
 | **Duración (min)** | Diferencia entre `Hora_Fin` y `Hora_Inicio` (soporta cruce de medianoche sumando `1440` min). |
-| **XP Ganados** | $\text{REDONDEAR}\Big(\text{Duración} \times \max(0.5,\ 1 + \text{Calidad}\times 0.2 + \text{BonoReto} + \text{BonoMeta} + \text{BonoModoIA})\Big)$ |
+| **XP Ganados** | $\text{REDONDEAR}\Big(\text{Duración} \times \max(0.5,\ 1 + \text{Calidad}\times 0.2 + \text{BonoReto} + \text{BonoMeta} + \text{BonoDinamica})\Big)$ |
 | **Nivel Exponencial (1-99)** | $\text{XP}(L) = \text{REDONDEAR}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Nivel 92 = 50% de 99)* |
-| **Tasa Objetivos (Sí)** | Porcentaje de sesiones donde `Objetivo_Cumplido === "Sí"`. |
-| **Bloqueos (No)** | Total de sesiones con bloqueo o sin avance (`Objetivo_Cumplido === "No"`). |
+| **Franja Horaria** | `00:00–05:59 Madrugada` · `06:00–11:59 Mañana` · `12:00–17:59 Tarde` · `18:00–23:59 Noche` |
 
 ### 🚀 Cómo Iniciar el Proyecto
-
-No requiere instalar paquetes externos (`node_modules`), ya que tanto el frontend como `server.js` usan código nativo:
 
 1. Haz doble clic en **`start.bat`** (o ejecuta `npm start` / `node server.js` en la terminal).
 2. Se abrirá automáticamente `http://localhost:3000`.
 3. El indicador superior mostrará **`🟢 Sincronizado en vivo: data/study-tracker.csv`**.
-4. Cada sesión que registres, edites (`✏️`) o elimines (`✖`) actualizará instantáneamente el archivo `data/study-tracker.csv`.
 
 ---
 
 ## 🇬🇧 English
 
-An ultra-lightweight gamified **Local-First** web application (RPG-style) powered by a **zero-dependency Node.js micro-server** (plus direct browser *File System Access API* support) to log, edit, and delete study blocks, evaluate cognitive habits, and sync your data in real time directly onto a local CSV file (`data/study-tracker.csv`) with zero external spreadsheet libraries.
+An ultra-lightweight gamified **Local-First** web application (RPG-style) powered by a **zero-dependency Node.js micro-server** (plus direct browser *File System Access API* support) to log, edit, and delete study blocks without decision fatigue, evaluate cognitive habits, and sync your data in real time directly onto a local CSV file (`data/study-tracker.csv`) with **automatic daily backups** (`data/backups/YYYY-MM-DD.csv`).
 
-### ✨ Key Features
+### ✨ Key Features (v3.0)
 
 - **Exponential RPG Level Curve (*"Level 92 is half of 99"*):**
   - Inspired by *Old School RuneScape*, required experience **doubles every 7 levels**:
     $$\text{XP}(\text{Level } L) = \text{ROUND}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
-  - Fast early leveling to reward consistency, progressive scaling (+10.4% per level), and the exact mathematical property where **Level 92 equals 50% of the total XP required for Level 99**.
-- **Orthogonal 1-Click Taxonomy (`4 Contexts` × `7 Activities` × `Own Production` × `Prior Mastery`):**
-  - **Context / Purpose (4 chips):**
-    - `🎓 Academic` (`Académico`): University/school courses, assignments, and degree exams.
-    - `🏅 Certification` (`Certificación`): Professional certifications (e.g., *Snowflake*) and structured technical courses.
-    - `🚀 Own Project` (`Proyecto Propio`): Personal software engineering, portfolio, or duo projects.
-    - `🤝 External` (`Externo`): Third-party or friends' projects (e.g., *Ruby on Rails*), including the research required for them.
-  - **Own Production Level & Topic Prior Mastery:**
-    - **Own Production (`Produccion_Propia`):**
-      - `👀 Consumption` (`Consumo`): Reading, watching, or listening without producing your own output (PDF, video, documentation, lecture).
-      - `📋 Reproduction` (`Reproducción`): Writing or coding, but copying, transcribing, or following material pre-digested by an AI or external source.
-      - `🧠 Own generation` (`Generación propia`): Writing or coding in your own words and logic, tackling the mental hurdles yourself. Highest retention impact.
-    - **Prior Mastery (`Dominio_Previo`):**
-      - `🌱 New` (`Nuevo`): First encounter with the concept (highest cognitive load).
-      - `🌿 With gaps` (`Con lagunas`): Already seen in class or past studies, but not yet mastered or still tricky.
-      - `🌳 Mastered` (`Dominado`): Solid grasp; fast-paced review, maintenance, or consolidation.
-  - **Activity Type (7 chips with live dynamic helper):**
+- **2-Stage Cognitive Form + Smart Defaults:**
+  - **🎯 Stage 1: Starting Point (At Start):** Auto-prefills your latest subject, context, activity, and typical energy for the current time slot. Includes **Recent Subject Quick-Chips** (1 click to pick a subject or `[+ New]`).
+  - **🏁 Stage 2: Block Evaluation (At End):** Rate the Cognitive Dynamic, `% AI`, Block Fluency, Assimilation (1–5), and Notes with `[Subtopic]`.
+- **v3 Orthogonal Taxonomy (`4 Contexts` × `6 Activities` × `4 Cognitive Dynamics` × `3 Objective Prior Mastery Levels`):**
+  - **The Objective Prior Mastery Test (`Dominio_Previo`):**
+    - `🌱 New` (`Nuevo` — *0 prior contacts*): You have never studied this specific concept/tool. If asked to explain it or write code right now, you wouldn't know where to start.
+    - `🌿 In progress` (`En construcción` — *Needs support/lookup*): You saw it before (in class, yesterday, or last Pomodoro), but still need notes, docs, or AI to progress without getting stuck.
+    - `🌳 Consolidated` (`Consolidado` — *Autonomous*): You can explain it, solve problems, or code without looking at the manual or relying on AI, or you are doing a fast review/maintenance block.
+  - **Unified Cognitive Dynamic (`Dinamica_Cognitiva` — How did you work & what role did AI play?):**
+    - `👀 Passive Reception` (`Recepción Pasiva` — `0% XP adj.`): Reading, listening to a lecture, or watching a video without actively producing or debating yet.
+    - `🤖 Delegation / Reproduction` (`Delegación / Reproducción` — `-15% XP if AI ≥50%`): AI or the source did the heavy lifting and you copied, transcribed, or followed steps mechanically.
+    - `🔄 Scaffolding / Co-creation` (`Andamiaje / Co-creación` — `+5% XP`): You thought with support; used AI as a Socratic tutor, syntax copilot, or structurer of your own ideas.
+    - `🧠 Own Generation` (`Generación Propia` — `+10% XP at 0% AI · +5% with minor lookup`): The heavy mental effort came from your own head.
+  - **6 Clean Activity Types (`Tipo_Actividad`):**
+    - `👨‍🏫 Class / Lecture` (`Clase / Cátedra`)
+    - `📖 Theoretical / Conceptual Study` (`Estudio Teórico / Conceptual`)
+    - `✍️ Synthesis / Documentation` (`Síntesis / Documentación`)
+    - `💻 Dev / Code` (`Desarrollo / Código`)
+    - `🧪 Practice / Debug` (`Práctica / Debugging`)
+    - `🔁 Review / Mock` (`Repaso / Simulacro`)
+- **6-Hour Circadian Time Slots:**
+  - `00:00–05:59` → `Early Morning` (`Madrugada`)
+  - `06:00–11:59` → `Morning` (`Mañana`)
+  - `12:00–17:59` → `Afternoon` (`Tarde`)
+  - `18:00–23:59` → `Night` (`Noche`)
 
-| Activity | What it means & when to use it | How to distinguish it from similar ones |
-| :--- | :--- | :--- |
-| **`👨‍🏫 Class / Lecture`** (`Clase / Cátedra`) | **Live with a professor or speaker:** attending a school/university lecture or guided workshop. Measures your **focus, interest, and live retention**. | Paced by a **live instructor**. If you are studying a recorded course or reading on your own schedule, use `📖 Theory / Docs`. |
-| **`📖 Theory / Docs`** (`Teoría / Docs`) | **Self-paced structured consumption:** reading official documentation (e.g., *Snowflake Docs*), books, articles, or watching recorded courses. | Follows a **linear source or official guide**. If you are jumping across sources to answer an open question or debating *"why?"*, use `💬 Research / Dialogue`. |
-| **`💬 Research / Dialogue`** (`Investigación / Diálogo`) | **Exploring open questions or debating concepts:** investigating how/why something works, comparing tools, or having a Socratic Q&A session with AI. | Not following a manual from start to finish (`📖 Theory / Docs`); you are **investigating a specific question or dialoguing** to unlock understanding. |
-| **`✍️ Design / Notes`** (`Diseño / Apuntes`) | **Synthesizing & structuring in your own words:** writing clean notes or cheatsheets (notebook or PC), summaries, mind maps, or architecture/ER diagrams. | While `📖 Theory` is consuming information, here you **produce synthesis or design** without writing code yet. |
-| **`💻 Dev / Code`** (`Desarrollo / Código`) | **Building & implementing:** writing new code, SQL queries, scripts, or developing project/assignment features. | Focused on **building deliverables/features**. If you are hunting down a bug or solving isolated practice problems, use `🧪 Practice / Debugging`. |
-| **`🧪 Practice / Debugging`** (`Práctica / Debugging`) | **Practicing or unblocking errors:** hands-on labs, coding katas, or debugging an issue until finding and fixing the root cause. | Focused on **training skill or fixing bugs**, rather than building new features from scratch (`💻 Dev / Code`). |
-| **`🔁 Review / Mock Exam`** (`Repaso / Simulacro`) | **Consolidating memory on previously studied material:** reviewing your own notes, flashcards, explaining from memory, or taking mock exams. | Only applies to topics you **already studied before** and are reinforcing for retention or exam readiness. |
+### 🧮 18-Column CSV Schema (`data/study-tracker.csv`)
 
-- **What happens if I use AI during `👨‍🏫 Class / Lecture`?**
-  - Clicking `👨‍🏫 Class / Lecture` defaults to **`🧠 Autonomous (0% AI)`** to save clicks when you just listen to the instructor, but **you can freely switch the AI Mode** depending on what happened during class:
-    1. **No AI (`🧠 Autonomous · 0%` → `+5% XP`):** You paid attention and took your own notes. The 1–5 scale rates your focus and interest.
-    2. **Using AI to clarify live questions (`💬 Dialogue / Tutoring` or `🛠️ Copilot` → `+5%` / `0% XP`):** The professor mentioned something unclear and you asked AI for a quick example to stay on track. AI **boosted your live comprehension**.
-    3. **Using AI just to finish an in-class activity quickly (`🤖 Mechanical / Copy-Paste` → `-15% XP`):** You delegated an in-class exercise to AI just to turn it in fast without processing it. The app **applies the `-15% XP` penalty**, logs those minutes as **Mechanical** in the Dashboard charts, and warns you to consider assimilation level `1` or `2`.
-- **Cognitive AI Impact & Learning Assimilation Scale (1 to 5):**
-  - Separates **mechanical speed** from **real learning**: the 1–5 scale measures your **Cognitive Assimilation** (from `1 - Mechanical / No retention` up to `5 - Deep assimilation`).
-  - **AI Interaction Mode (4 chips):**
-    - `🧠 Autonomous (+5% XP)`: 100% on your own (0% AI).
-    - `💬 Dialogue / Tutoring (+5% XP)`: Conceptual debate, *"why?"* questions, and active reinforcement with AI.
-    - `🛠️ Copilot / Support (0% adj.)`: Targeted syntax lookup or bug unblocking while understanding the fix.
-    - `🤖 Mechanical / Copy-Paste (-15% XP)`: Direct automation to deliver quickly without reading deeply.
-  - The Dashboard contrasts your **Real Learning Minutes (Autonomous / Dialogue / Copilot)** against **Mechanical Minutes (Copy-Paste)** per subject.
-- **Quick Context Filter Bar & Compact History:**
-  - Interactive tab bar (`🌐 All`, `🎓 Academic`, `🏅 Certification`, `🚀 Own Project`, `🤝 External`) that instantaneously filters KPI cards, all 3 charts, and the history table while keeping your global character level in the top banner.
-  - **Latest 5 records compact view:** The history table displays only the **5 most recent sessions** by default so the page stays clean as your database grows, with a 1-click **`📂 View all (X)` / `⬆️ Show latest 5 only`** toggle button.
-- **Blocker Detector & Block Progress (no penalty on long tasks):**
-  - **Complexity:** `🟢 Easy (+0% XP)` · `🟡 Challenging (+10% XP)` · `🔴 Very Hard (+20% XP)`.
-  - **Block Progress / Goal? (with live helper guide):**
-    - `✅ Yes (Solid progress +10% XP)`: Completed the planned goal **or** made steady progress on a long multi-session task (so multi-session projects never penalize your XP).
-    - `⚠️ Partial (With hurdles +5% XP)`: Moved forward, but slower than expected due to doubts or partial distractions.
-    - `❌ No (Blocked / 0% XP)`: Technical blocker, total distraction, or interruption without progress (counted in the blockers metric).
-- **Built-in Stopwatch & Pomodoro Timer:**
-  - **Stopwatch Mode (`⏱️`):** Count-up timer that automatically captures the **Date**, **Start Time** when clicking *Start*, and **End Time** when clicking *Finish* (or when submitting the form directly).
-  - **Pomodoro Mode (`🍅`):** Countdown timer with focus presets (`25m`, `50m`, or custom minutes) and break presets (`5m`, `15m`) with an acoustic chime via *Web Audio API*.
-  - Driven by real wall-clock timestamps (`Date.now()`) and `localStorage` persistence so it never drifts in background tabs or across page reloads.
-- **Real-Time CSV Synchronization (`data/study-tracker.csv`) & Zero Spreadsheet Libraries:**
-  - All formulas (duration with midnight crossover, XP, bonuses, and level curve) live in **pure JavaScript** (`js/domain/metrics.js`), eliminating the external `SheetJS` library (~850 KB) and formula duplication.
-  - **Mode 1 (Local Server `server.js`):** Every new entry, inline edit (`✏️`), or deletion (`✖`) directly updates `data/study-tracker.csv` (`UTF-8 with BOM`) on disk without prompts.
-  - **Mode 2 (100% Browser without server):** If opened without `server.js`, clicking *Sync CSV* lets you link a local `.csv` file directly using the browser's *File System Access API*.
-  - The `data/` folder and `.csv` files are excluded in `.gitignore` for privacy.
-- **Real-Time Bilingual Interface (`ES` / `EN`):**
-  - Quick `ES` | `EN` toggle in the top bar persisted in `localStorage` (`study_tracker_lang`).
-  - Instantly translates the entire UI, stopwatch/Pomodoro, dynamic helper boxes, Chart.js labels, and history table while preserving canonical data values in the `Store` and `data/study-tracker.csv`.
-
-### 🧮 20-Column CSV Schema (`data/study-tracker.csv`) & JavaScript Formulas
-
-The generated `data/study-tracker.csv` file is stored in plain-text `UTF-8 with BOM` (RFC 4180 standard, ready for Python, Pandas, Snowflake, SQLite, or Excel) with the following 20 columns:
-
-`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tema,Tipo_Actividad,Produccion_Propia,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,Modo_IA,Uso_IA_Porcentaje,XP_Ganados,Notas`
-
-| Metric | Rule / Formula in JavaScript (`js/domain/metrics.js`) |
-| :--- | :--- |
-| **Duration (min)** | Difference between `Hora_Fin` and `Hora_Inicio` (supports midnight crossover by adding `1440` min). |
-| **XP Earned** | $\text{ROUND}\Big(\text{Duration} \times \max(0.5,\ 1 + \text{Quality}\times 0.2 + \text{ChallengeBonus} + \text{GoalBonus} + \text{AiModeBonus})\Big)$ |
-| **Exponential Level (1-99)** | $\text{XP}(L) = \text{ROUND}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Level 92 = 50% of 99)* |
-| **Goal Rate (Yes)** | Percentage of sessions where `Objetivo_Cumplido === "Sí"`. |
-| **Blockers (No)** | Total sessions with a blocker or no progress (`Objetivo_Cumplido === "No"`). |
-
-### 🚀 Getting Started
-
-No external `node_modules` installation is required, as both the frontend and `server.js` use native code:
-
-1. Double-click **`start.bat`** (or run `npm start` / `node server.js` in your terminal).
-2. `http://localhost:3000` will open automatically in your browser.
-3. The top status pill will display **`🟢 Live synced: data/study-tracker.csv`**.
-4. Every session you log, edit (`✏️`), or delete (`✖`) will instantaneously update `data/study-tracker.csv`.
+`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tipo_Actividad,Dinamica_Cognitiva,Uso_IA_Porcentaje,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,XP_Ganados,Notas`

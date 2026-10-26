@@ -1511,3 +1511,85 @@ tr.row-editing td {
 .guide-card li strong {
   color: var(--text);
 }
+
+/* Bloques del Formulario en 2 Tiempos (v3) */
+.form-stage-card {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 12px 13px;
+  margin-bottom: 14px;
+}
+
+.form-stage-card.stage-start {
+  border-left: 3px solid #38bdf8;
+}
+
+.form-stage-card.stage-end {
+  border-left: 3px solid #34d399;
+}
+
+.form-stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+}
+
+.form-stage-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: 0.01em;
+}
+
+.form-stage-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.16);
+  color: #a5b4fc;
+}
+
+.subject-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+
+.subject-chip-btn {
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 7px;
+  padding: 5px 9px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subject-chip-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.subject-chip-btn.active {
+  background: rgba(99, 102, 241, 0.22);
+  border-color: var(--accent);
+  color: #e0e7ff;
+}
+
+.subject-chip-btn.subject-chip-new {
+  border-style: dashed;
+  color: #38bdf8;
+}
+

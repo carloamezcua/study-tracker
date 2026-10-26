@@ -10,6 +10,7 @@ const path = require("node:path");
 const PORT = process.env.PORT || 3000;
 const ROOT_DIR = __dirname;
 const DATA_DIR = path.join(ROOT_DIR, "data");
+const BACKUPS_DIR = path.join(DATA_DIR, "backups");
 const CSV_FILE_PATH = path.join(DATA_DIR, "study-tracker.csv");
 const CSV_RELATIVE_PATH = "data/study-tracker.csv";
 
@@ -27,6 +28,9 @@ const MIME_TYPES = {
 function asegurarDirectorioDatos() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+  if (!fs.existsSync(BACKUPS_DIR)) {
+    fs.mkdirSync(BACKUPS_DIR, { recursive: true });
   }
 }
 
@@ -105,6 +109,19 @@ function manejarPutCsv(req, res) {
     }
 
     try {
+      if (fs.existsSync(CSV_FILE_PATH)) {
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+        const dd = String(hoy.getDate()).padStart(2, "0");
+        const backupPath = path.join(BACKUPS_DIR, `${yyyy}-${mm}-${dd}.csv`);
+        try {
+          fs.copyFileSync(CSV_FILE_PATH, backupPath);
+        } catch (_) {
+          // Si falla el backup secundario no interrumpimos el guardado principal
+        }
+      }
+
       fs.writeFileSync(CSV_FILE_PATH, buffer);
       const stats = fs.statSync(CSV_FILE_PATH);
       enviarJSON(res, 200, {

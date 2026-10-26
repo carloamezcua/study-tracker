@@ -3,14 +3,16 @@
  * sin librerías externas (cero SheetJS). Todas las fórmulas (duración, XP, bonos y nivel RPG)
  * se calculan exclusivamente en JavaScript (js/domain/metrics.js).
  *
- * Soporta dos modos de sincronización:
- * 1. Servidor local (server.js -> data/study-tracker.csv): automático y sin pedir permisos.
- * 2. API nativa del navegador (File System Access API): permite vincular y sobreescribir
- *    un archivo .csv local directamente desde el navegador incluso sin ejecutar server.js.
+ * Soporta migración transparente al vuelo desde el esquema antiguo de 20 columnas al nuevo de 18 columnas.
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
   const {
+    migrarTipoActividad,
+    migrarDominioPrevio,
+    migrarDinamicaCognitiva,
+    formatearNotasConTema,
+    extraerSubtemaDeNotas,
     calcularMinutos,
     calcularDiaSemana,
     calcularFranjaHoraria,
@@ -20,6 +22,7 @@
   let servidorLocalActivo = false;
   let archivoLocalHandle = null; // FileSystemFileHandle cuando se usa sin server.js
 
+  // Esquema oficial v3 de 18 columnas limpias
   const ENCABEZADOS_CSV = [
     "Fecha",
     "Dia_Semana",
@@ -28,17 +31,15 @@
     "Franja_Horaria",
     "Contexto",
     "Materia",
-    "Tema",
     "Tipo_Actividad",
-    "Produccion_Propia",
+    "Dinamica_Cognitiva",
+    "Uso_IA_Porcentaje",
     "Dominio_Previo",
     "Energia_Previa",
     "Complejidad",
     "Objetivo_Cumplido",
     "Duracion_Minutos",
     "Calidad",
-    "Modo_IA",
-    "Uso_IA_Porcentaje",
     "XP_Ganados",
     "Notas"
   ];
@@ -55,8 +56,8 @@
   }
 
   /**
-   * Construye el texto CSV completo (con firma UTF-8 BOM para compatibilidad de acentos y emojis).
-   * Todas las métricas (Duración y XP) se guardan ya calculadas por JavaScript.
+   * Construye el texto CSV completo de 18 columnas (con firma UTF-8 BOM para compatibilidad de acentos y emojis).
+   * Todas las métricas (Duración, Franja Horaria de 6h y XP) se guardan ya calculadas por JavaScript.
    */
   function construirContenidoCSV(sesiones) {
     const lista = Array.isArray(sesiones) ? sesiones : [];
@@ -71,33 +72,43 @@
       const complejidad = s.complejidad || "Desafiante";
       const objetivoCumplido = s.objetivoCumplido || "Sí";
       const usoIA = Math.min(100, Math.max(0, Math.round(Number(s.usoIA) || 0)));
-      const modoIA = s.modoIA || (usoIA === 0 ? "Autónomo" : "Copiloto / Apoyo");
-      const xp =
-        Number(s.xp) > 0
-          ? Number(s.xp)
-          : calcularXP(duracion, calidad, complejidad, objetivoCumplido, modoIA);
+      const tipoActividad = migrarTipoActividad(s.tipoActividad);
+      const dinamicaCognitiva = migrarDinamicaCognitiva(
+        s.dinamicaCognitiva,
+        s.produccion,
+        s.modoIA,
+        usoIA
+      );
+      const dominioPrevio = migrarDominioPrevio(s.dominioPrevio, tipoActividad);
+      const notas = formatearNotasConTema(s.notas, s.tema);
+      const xp = calcularXP(
+        duracion,
+        calidad,
+        complejidad,
+        objetivoCumplido,
+        dinamicaCognitiva,
+        usoIA
+      );
 
       const fila = [
         s.fecha || "",
-        s.diaSemana || calcularDiaSemana(s.fecha),
+        calcularDiaSemana(s.fecha),
         s.horaInicio || "",
         s.horaFin || "",
-        s.franjaHoraria || calcularFranjaHoraria(s.horaInicio),
+        calcularFranjaHoraria(s.horaInicio),
         s.contexto || "Académico",
         s.materia || "General",
-        s.tema || "General",
-        s.tipoActividad || "Desarrollo / Código",
-        s.produccion || "Reproducción",
-        s.dominioPrevio || "Con lagunas",
+        tipoActividad,
+        dinamicaCognitiva,
+        usoIA,
+        dominioPrevio,
         s.energiaPrevia || "Media",
         complejidad,
         objetivoCumplido,
         duracion,
         calidad,
-        modoIA,
-        usoIA,
         xp,
-        s.notas || ""
+        notas
       ];
 
       lineas.push(fila.map(escaparCeldaCSV).join(","));
@@ -113,7 +124,6 @@
     const texto = String(textoCrudo || "").replace(/^\uFEFF/, "");
     if (!texto.trim()) return [];
 
-    // Detectar automáticamente si la primera línea usa ';' (típico al guardar en Excel en español) o ','
     const primeraLineaFin = texto.indexOf("\n");
     const cabeceraMuestra = primeraLineaFin >= 0 ? texto.slice(0, primeraLineaFin) : texto;
     const delimitador =
@@ -169,8 +179,8 @@
   }
 
   /**
-   * Convierte el texto de un archivo CSV en objetos de sesión normalizables,
-   * recalculando Duración y XP en JavaScript cuando sea necesario.
+   * Convierte el texto de un archivo CSV (18 columnas nuevas o 20 columnas legacy) en objetos de sesión normalizables,
+   * aplicando las 4 reglas de migración automática y recalculando Franja Horaria y XP en JavaScript.
    */
   function extraerSesionesDesdeCSV(textoCSV) {
     const matriz = parsearFilasCSV(textoCSV);
@@ -195,19 +205,8 @@
       if (!fecha && !materia) continue;
 
       const contexto = r.Contexto || r.contexto || "Académico";
-      const tema = r.Tema || r.tema || "General";
-      const tipoActividad = r.Tipo_Actividad || r.tipoActividad || "Desarrollo / Código";
-      const produccion = r.Produccion_Propia || r.produccion || "";
-      // Acepta la columna nueva (Dominio_Previo) o la antigua (Familiaridad) para migrar archivos viejos
-      const dominioPrevio = r.Dominio_Previo || r.dominioPrevio || "";
-      const familiaridadLegacy = r.Familiaridad || r.familiaridad || "";
-      const energiaPrevia = r.Energia_Previa || r.energiaPrevia || "Media";
-      const complejidad = r.Complejidad || r.complejidad || "Desafiante";
-      const objetivoCumplido = r.Objetivo_Cumplido || r.objetivoCumplido || "Sí";
-      const modoIA = r.Modo_IA || r.modoIA || "";
-
-      const duracion = calcularMinutos(horaInicio, horaFin) || Number(r.Duracion_Minutos || 0);
-      const calidad = Math.min(5, Math.max(1, Number(r.Calidad || 3)));
+      const temaLegacy = r.Tema || r.tema || "";
+      const tipoActividad = migrarTipoActividad(r.Tipo_Actividad || r.tipoActividad);
 
       let rawIA = r.Uso_IA_Porcentaje !== undefined ? r.Uso_IA_Porcentaje : "0";
       rawIA = parseFloat(String(rawIA).replace("%", "").replace(",", ".")) || 0;
@@ -217,8 +216,35 @@
         rawIA = Math.round(rawIA);
       }
 
-      const xp = calcularXP(duracion, calidad, complejidad, objetivoCumplido, modoIA || undefined);
-      const notas = r.Notas || r.notas || "";
+      const dinamicaCognitiva = migrarDinamicaCognitiva(
+        r.Dinamica_Cognitiva || r.dinamicaCognitiva,
+        r.Produccion_Propia || r.produccion,
+        r.Modo_IA || r.modoIA,
+        rawIA
+      );
+
+      const dominioPrevio = migrarDominioPrevio(
+        r.Dominio_Previo || r.dominioPrevio || r.Familiaridad || r.familiaridad,
+        tipoActividad
+      );
+      const energiaPrevia = r.Energia_Previa || r.energiaPrevia || "Media";
+      const complejidad = r.Complejidad || r.complejidad || "Desafiante";
+      const objetivoCumplido = r.Objetivo_Cumplido || r.objetivoCumplido || "Sí";
+
+      const duracion = calcularMinutos(horaInicio, horaFin) || Number(r.Duracion_Minutos || 0);
+      const calidad = Math.min(5, Math.max(1, Number(r.Calidad || 3)));
+
+      const notasUnificadas = formatearNotasConTema(r.Notas || r.notas || "", temaLegacy);
+      const { subtema } = extraerSubtemaDeNotas(notasUnificadas, temaLegacy);
+
+      const xp = calcularXP(
+        duracion,
+        calidad,
+        complejidad,
+        objetivoCumplido,
+        dinamicaCognitiva,
+        rawIA
+      );
 
       nuevas.push({
         fecha: String(fecha).slice(0, 10),
@@ -226,20 +252,20 @@
         horaFin: String(horaFin).slice(0, 5),
         contexto,
         materia,
-        tema,
+        tema: subtema,
         tipoActividad,
-        produccion: produccion || undefined,
-        dominioPrevio: dominioPrevio || undefined,
-        familiaridad: familiaridadLegacy || undefined,
+        dinamicaCognitiva,
+        produccion: dinamicaCognitiva,
+        modoIA: dinamicaCognitiva,
+        dominioPrevio,
         energiaPrevia,
         complejidad,
         objetivoCumplido,
         duracion,
         calidad,
-        modoIA: modoIA || undefined,
         usoIA: rawIA,
         xp,
-        notas
+        notas: notasUnificadas
       });
     }
 
@@ -247,9 +273,23 @@
   }
 
   /**
+   * Detecta si el texto CSV crudo aún tiene encabezados del esquema antiguo de 20 columnas.
+   */
+  function esEsquemaCSVLegacy(textoCSV) {
+    const primeraLinea = String(textoCSV || "")
+      .replace(/^\uFEFF/, "")
+      .split(/\r?\n/)[0] || "";
+    return (
+      primeraLinea.includes("Produccion_Propia") ||
+      primeraLinea.includes("Modo_IA") ||
+      primeraLinea.includes(",Tema,")
+    );
+  }
+
+  /**
    * Conecta al inicio con el servidor local (server.js).
    * Si data/study-tracker.csv ya existe en disco, carga sus sesiones;
-   * si no existe, lo crea automáticamente con las sesiones iniciales.
+   * si estaba en el formato antiguo de 20 columnas, lo migra automáticamente a las 18 columnas nuevas.
    */
   async function inicializarConexionServidor(sesionesActuales) {
     if (global.location.protocol === "file:") {
@@ -273,6 +313,12 @@
         if (resCsv.ok) {
           const textoCSV = await resCsv.text();
           const sesiones = extraerSesionesDesdeCSV(textoCSV);
+
+          // Si el archivo en disco aún tenía 20 columnas, persistir el nuevo formato de 18 columnas
+          if (esEsquemaCSVLegacy(textoCSV) && sesiones.length > 0) {
+            await guardarEnServidorLocal(sesiones);
+          }
+
           return {
             conectado: true,
             origen: "leido_de_disco",
@@ -319,6 +365,8 @@
       const sesiones = extraerSesionesDesdeCSV(texto);
       if (sesiones.length === 0 && Array.isArray(sesionesActuales) && sesionesActuales.length > 0) {
         await guardarEnArchivoLocalNavegador(sesionesActuales);
+      } else if (esEsquemaCSVLegacy(texto) && sesiones.length > 0) {
+        await guardarEnArchivoLocalNavegador(sesiones);
       }
       return {
         ok: true,
@@ -462,6 +510,7 @@
   }
 
   const servicio = {
+    ENCABEZADOS_CSV,
     construirContenidoCSV,
     extraerSesionesDesdeCSV,
     inicializarConexionServidor,

@@ -203,154 +203,158 @@
         </div>
 
         <form id="studyForm">
-          <!-- CONTEXTO / PROPÓSITO (4 CHIPS DE 1 CLIC) -->
-          <div class="form-group">
-            <label data-i18n="labelContext">Contexto / Propósito</label>
-            <div class="chip-group" data-group="contexto">
-              <button type="button" class="chip-btn active" data-value="Académico">🎓 Académico</button>
-              <button type="button" class="chip-btn" data-value="Certificación">🏅 Certificación</button>
-              <button type="button" class="chip-btn" data-value="Proyecto Propio">🚀 Proyecto Propio</button>
-              <button type="button" class="chip-btn" data-value="Externo">🤝 Externo</button>
+          <!-- BLOQUE A: PUNTO DE PARTIDA (AL INICIAR) -->
+          <div class="form-stage-card stage-start" id="formStageStart">
+            <div class="form-stage-header">
+              <span class="form-stage-title" data-i18n="stageStartTitle">🎯 1. Punto de Partida</span>
+              <span class="form-stage-badge" data-i18n="stageStartBadge">Al iniciar sesión</span>
             </div>
-          </div>
 
-          <div class="row">
+            <!-- CONTEXTO / PROPÓSITO (4 CHIPS DE 1 CLIC) -->
             <div class="form-group">
-              <label for="fecha" data-i18n="labelDate">Fecha</label>
-              <input type="date" id="fecha" required>
+              <label data-i18n="labelContext">Contexto / Propósito</label>
+              <div class="chip-group" data-group="contexto">
+                <button type="button" class="chip-btn active" data-value="Académico">🎓 Académico</button>
+                <button type="button" class="chip-btn" data-value="Certificación">🏅 Certificación</button>
+                <button type="button" class="chip-btn" data-value="Proyecto Propio">🚀 Proyecto Propio</button>
+                <button type="button" class="chip-btn" data-value="Externo">🤝 Externo</button>
+              </div>
             </div>
+
+            <!-- MATERIA / PROYECTO (CHIPS DINÁMICOS DEL HISTORIAL + INPUT) -->
             <div class="form-group">
               <label for="materia" data-i18n="labelSubject">Materia / Proyecto</label>
-              <input type="text" id="materia" list="listaMaterias" data-i18n-placeholder="placeholderSubject" placeholder="Ej. Snowflake, Base de Datos" required>
+              <div class="subject-chips-row" id="materiaChipsContainer"></div>
+              <input type="text" id="materia" list="listaMaterias" data-i18n-placeholder="placeholderSubject" placeholder="Escribe una nueva materia o selecciona un chip arriba..." required>
               <datalist id="listaMaterias"></datalist>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label for="tema"><span data-i18n="labelTopic">Tema específico</span> <span class="label-hint" data-i18n="labelTopicHint">(Subtema o módulo)</span></label>
-            <input type="text" id="tema" list="listaTemas" data-i18n-placeholder="placeholderTopic" placeholder="Ej. Virtual Warehouses, Rutas MVC..." required>
-            <datalist id="listaTemas"></datalist>
-          </div>
-
-          <div class="row">
-            <div class="form-group">
-              <label for="horaInicio" data-i18n="labelStartTime">Hora Inicio</label>
-              <input type="time" id="horaInicio" required>
-              <button type="button" id="btnHoraInicioActual" class="quick-btn" data-i18n="btnNowStart">⏱️ Poner hora actual</button>
-            </div>
-            <div class="form-group">
-              <label for="horaFin" data-i18n="labelEndTime">Hora Fin</label>
-              <input type="time" id="horaFin" required>
-              <button type="button" id="btnHoraFinActual" class="quick-btn" data-i18n="btnNowEnd">🏁 Poner hora actual</button>
-            </div>
-          </div>
-
-          <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (7 CHIPS) -->
-          <div class="form-group">
-            <label data-i18n="labelActivity">Tipo de Actividad</label>
-            <div class="chip-group chip-grid-6" data-group="tipoActividad">
-              <button type="button" class="chip-btn" data-value="Clase / Cátedra">👨‍🏫 Clase / Cátedra</button>
-              <button type="button" class="chip-btn" data-value="Teoría / Docs">📖 Teoría / Docs</button>
-              <button type="button" class="chip-btn" data-value="Investigación / Diálogo">💬 Investigación / Diálogo</button>
-              <button type="button" class="chip-btn" data-value="Diseño / Apuntes">✍️ Diseño / Apuntes</button>
-              <button type="button" class="chip-btn active" data-value="Desarrollo / Código">💻 Desarrollo / Código</button>
-              <button type="button" class="chip-btn" data-value="Práctica / Debugging">🧪 Práctica / Debugging</button>
-              <button type="button" class="chip-btn" data-value="Repaso / Simulacro">🔁 Repaso / Simulacro</button>
-            </div>
-            <div id="ayudaActividad" class="helper-box">
-              Construir e implementar: escribir código, notebooks, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o tarea.
-            </div>
-          </div>
-
-          <!-- 1B. NIVEL DE PRODUCCIÓN PROPIA Y DOMINIO PREVIO -->
-          <div class="row">
-            <div class="form-group">
-              <label data-i18n="labelProduction">Nivel de Producción Propia</label>
-              <div class="chip-group" data-group="produccion">
-                <button type="button" class="chip-btn" data-value="Consumo">👀 Consumo</button>
-                <button type="button" class="chip-btn active" data-value="Reproducción">📋 Reproducción</button>
-                <button type="button" class="chip-btn" data-value="Generación propia">🧠 Generación propia</button>
+            <div class="row">
+              <div class="form-group">
+                <label for="fecha" data-i18n="labelDate">Fecha</label>
+                <input type="date" id="fecha" required>
+              </div>
+              <div class="form-group">
+                <label data-i18n="labelEnergy">Energía Previa</label>
+                <div class="chip-group" data-group="energiaPrevia">
+                  <button type="button" class="chip-btn" data-value="Alta">🔋 Alta</button>
+                  <button type="button" class="chip-btn active" data-value="Media">⚡ Media</button>
+                  <button type="button" class="chip-btn" data-value="Baja">🪫 Baja</button>
+                </div>
               </div>
             </div>
-            <div class="form-group">
-              <label data-i18n="labelMastery">Dominio Previo del Tema</label>
-              <div class="chip-group" data-group="dominioPrevio">
-                <button type="button" class="chip-btn" data-value="Nuevo">🌱 Nuevo</button>
-                <button type="button" class="chip-btn active" data-value="Con lagunas">🌿 Con lagunas</button>
-                <button type="button" class="chip-btn" data-value="Dominado">🌳 Dominado</button>
+
+            <div class="row">
+              <div class="form-group">
+                <label for="horaInicio" data-i18n="labelStartTime">Hora Inicio</label>
+                <input type="time" id="horaInicio" required>
+                <button type="button" id="btnHoraInicioActual" class="quick-btn" data-i18n="btnNowStart">⏱️ Poner hora actual</button>
+              </div>
+              <div class="form-group">
+                <label for="horaFin" data-i18n="labelEndTime">Hora Fin</label>
+                <input type="time" id="horaFin" required>
+                <button type="button" id="btnHoraFinActual" class="quick-btn" data-i18n="btnNowEnd">🏁 Poner hora actual</button>
               </div>
             </div>
-          </div>
 
-          <!-- 2. ENERGÍA PREVIA Y COMPLEJIDAD DEL TEMA -->
-          <div class="row">
-            <div class="form-group">
-              <label data-i18n="labelEnergy">Energía Previa</label>
-              <div class="chip-group" data-group="energiaPrevia">
-                <button type="button" class="chip-btn" data-value="Alta">🔋 Alta</button>
-                <button type="button" class="chip-btn active" data-value="Media">⚡ Media</button>
-                <button type="button" class="chip-btn" data-value="Baja">🪫 Baja</button>
+            <!-- DOMINIO PREVIO OBJETIVO Y COMPLEJIDAD -->
+            <div class="row">
+              <div class="form-group">
+                <label data-i18n="labelMastery">Dominio Previo del Tema</label>
+                <div class="chip-group" data-group="dominioPrevio">
+                  <button type="button" class="chip-btn" data-value="Nuevo">🌱 Nuevo</button>
+                  <button type="button" class="chip-btn active" data-value="En construcción">🌿 En construcción</button>
+                  <button type="button" class="chip-btn" data-value="Consolidado">🌳 Consolidado</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label><span data-i18n="labelComplexity">Complejidad</span> <span class="label-hint" data-i18n="labelComplexityHint">(+XP)</span></label>
+                <div class="chip-group" data-group="complejidad">
+                  <button type="button" class="chip-btn" data-value="Fácil">🟢 Fácil</button>
+                  <button type="button" class="chip-btn active" data-value="Desafiante">🟡 Reto</button>
+                  <button type="button" class="chip-btn" data-value="Muy difícil">🔴 Difícil</button>
+                </div>
               </div>
             </div>
+            <div id="ayudaDominio" class="helper-box">
+              🌿 En construcción (Necesitas apoyo / consulta): Ya lo viste antes (en clase, ayer o en el Pomodoro pasado), pero todavía necesitas mirar tus apuntes, la documentación o apoyarte en la IA para avanzar sin trabarte.
+            </div>
+          </div>
+
+          <!-- BLOQUE B: EVALUACIÓN DEL BLOQUE (AL TERMINAR) -->
+          <div class="form-stage-card stage-end" id="formStageEnd">
+            <div class="form-stage-header">
+              <span class="form-stage-title" data-i18n="stageEndTitle">🏁 2. Evaluación del Bloque</span>
+              <span class="form-stage-badge" data-i18n="stageEndBadge">Al terminar</span>
+            </div>
+
+            <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (6 CHIPS LIMPIOS) -->
             <div class="form-group">
-              <label><span data-i18n="labelComplexity">Complejidad</span> <span class="label-hint" data-i18n="labelComplexityHint">(+XP)</span></label>
-              <div class="chip-group" data-group="complejidad">
-                <button type="button" class="chip-btn" data-value="Fácil">🟢 Fácil</button>
-                <button type="button" class="chip-btn active" data-value="Desafiante">🟡 Reto</button>
-                <button type="button" class="chip-btn" data-value="Muy difícil">🔴 Difícil</button>
+              <label data-i18n="labelActivity">Tipo de Actividad</label>
+              <div class="chip-group chip-grid-6" data-group="tipoActividad">
+                <button type="button" class="chip-btn" data-value="Clase / Cátedra">👨‍🏫 Clase / Cátedra</button>
+                <button type="button" class="chip-btn" data-value="Estudio Teórico / Conceptual">📖 Estudio Teórico / Conceptual</button>
+                <button type="button" class="chip-btn" data-value="Síntesis / Documentación">✍️ Síntesis / Documentación</button>
+                <button type="button" class="chip-btn active" data-value="Desarrollo / Código">💻 Desarrollo / Código</button>
+                <button type="button" class="chip-btn" data-value="Práctica / Debugging">🧪 Práctica / Debugging</button>
+                <button type="button" class="chip-btn" data-value="Repaso / Simulacro">🔁 Repaso / Simulacro</button>
+              </div>
+              <div id="ayudaActividad" class="helper-box">
+                💻 Desarrollo / Código: Construir e implementar (escribir código, notebooks, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o entregable).
               </div>
             </div>
-          </div>
 
-          <!-- 3. OBJETIVO CUMPLIDO / AVANCE DEL BLOQUE -->
-          <div class="form-group">
-            <label><span data-i18n="labelGoal">¿Fluidez y Avance del Bloque?</span> <span class="label-hint" data-i18n="labelGoalHint">(Evalúa este bloque, no si terminaste todo el entregable)</span></label>
-            <div class="chip-group" data-group="objetivoCumplido">
-              <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Flujo limpio +10%)</button>
-              <button type="button" class="chip-btn" data-value="Parcial">⚠️ Parcial (Con tropiezos +5%)</button>
-              <button type="button" class="chip-btn" data-value="No">❌ No (Bloqueo)</button>
+            <!-- 2. DINÁMICA COGNITIVA UNIFICADA (4 CHIPS) + PORCENTAJE IA -->
+            <div class="form-group">
+              <label><span data-i18n="labelCognitiveDynamic">Dinámica Cognitiva e IA</span> <span class="label-hint" data-i18n="labelCognitiveDynamicHint">(+10% Gen. Propia · +5% Co-creación · -15% Delegación)</span></label>
+              <div class="chip-group chip-grid-2" data-group="dinamicaCognitiva">
+                <button type="button" class="chip-btn" data-value="Recepción Pasiva">👀 Recepción Pasiva</button>
+                <button type="button" class="chip-btn" data-value="Delegación / Reproducción">🤖 Delegación / Reproducción</button>
+                <button type="button" class="chip-btn active" data-value="Andamiaje / Co-creación">🔄 Andamiaje / Co-creación</button>
+                <button type="button" class="chip-btn" data-value="Generación Propia">🧠 Generación Propia</button>
+              </div>
+              <div class="ia-slider-row">
+                <span class="ia-slider-label"><span data-i18n="labelAiSlider">Porcentaje de apoyo IA:</span> <strong id="iaLabel">25%</strong></span>
+                <input type="range" id="usoIA" min="0" max="100" step="5" value="25">
+              </div>
+              <div id="ayudaIA" class="helper-box">
+                🔄 Andamiaje / Co-creación (+5% XP): Diálogo e iteración activa con la IA (tú propones tus ideas o código, la IA corrige tus conceptos o desbloquea dudas y aprendes de tus errores).
+              </div>
             </div>
-            <div id="ayudaObjetivo" class="helper-box">
-              ✅ Flujo limpio (+10% XP): Evalúa ESTE bloque, no si acabaste toda la tarea/proyecto. Úsalo si avanzaste a buen ritmo en lo planeado para esta sesión sin quedarte estancado.
-            </div>
-          </div>
 
-          <!-- 4. MODO DE INTERACCIÓN CON IA + PORCENTAJE -->
-          <div class="form-group">
-            <label><span data-i18n="labelAiMode">Modo de Uso de IA</span> <span class="label-hint" data-i18n="labelAiModeHint">(+5% Autónomo/Diálogo · -15% Mecánico)</span></label>
-            <div class="chip-group chip-grid-2" data-group="modoIA">
-              <button type="button" class="chip-btn" data-value="Autónomo">🧠 Autónomo (Sin IA)</button>
-              <button type="button" class="chip-btn active" data-value="Diálogo / Tutoría">💬 Diálogo / Tutoría</button>
-              <button type="button" class="chip-btn" data-value="Copiloto / Apoyo">🛠️ Copiloto / Apoyo</button>
-              <button type="button" class="chip-btn" data-value="Mecánico / Copy-Paste">🤖 Mecánico / Copy-Paste</button>
+            <!-- 3. OBJETIVO CUMPLIDO / AVANCE DEL BLOQUE -->
+            <div class="form-group">
+              <label><span data-i18n="labelGoal">¿Fluidez y Avance del Bloque?</span> <span class="label-hint" data-i18n="labelGoalHint">(Evalúa este bloque, no si terminaste todo el entregable)</span></label>
+              <div class="chip-group" data-group="objetivoCumplido">
+                <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Flujo limpio +10%)</button>
+                <button type="button" class="chip-btn" data-value="Parcial">⚠️ Parcial (Con tropiezos +5%)</button>
+                <button type="button" class="chip-btn" data-value="No">❌ No (Bloqueo)</button>
+              </div>
+              <div id="ayudaObjetivo" class="helper-box">
+                ✅ Flujo limpio (+10% XP): Evalúa ESTE bloque, no si acabaste toda la tarea/proyecto. Úsalo si avanzaste a buen ritmo en lo planeado para esta sesión sin quedarte estancado.
+              </div>
             </div>
-            <div class="ia-slider-row">
-              <span class="ia-slider-label"><span data-i18n="labelAiSlider">Porcentaje de apoyo IA:</span> <strong id="iaLabel">25%</strong></span>
-              <input type="range" id="usoIA" min="0" max="100" step="5" value="25">
-            </div>
-            <div id="ayudaIA" class="helper-box">
-              Alto valor cognitivo: debate de conceptos, preguntas de '¿por qué?' y refuerzo activo con IA (+5% XP).
-            </div>
-          </div>
 
-          <!-- 5. CALIDAD DE APRENDIZAJE / ASIMILACIÓN REAL -->
-          <div class="form-group">
-            <label for="calidad" data-i18n="labelQuality">Calidad de Aprendizaje / Asimilación (1 al 5)</label>
-            <select id="calidad">
-              <option value="1" data-i18n="qualityOpt1">1 - ⭐️ Mecánico / Sin retención (Solo copié o distraído)</option>
-              <option value="2" data-i18n="qualityOpt2">2 - ⭐️⭐️ Superficial / Pasivo (Entendí por encima)</option>
-              <option value="3" selected data-i18n="qualityOpt3">3 - ⭐️⭐️⭐️ Comprensión estándar (Entendí la lógica)</option>
-              <option value="4" data-i18n="qualityOpt4">4 - ⭐️⭐️⭐️⭐️ Aprendizaje sólido (Razoné y puedo replicarlo)</option>
-              <option value="5" data-i18n="qualityOpt5">5 - ⭐️⭐️⭐️⭐️⭐️ Asimilación profunda (Dominio total)</option>
-            </select>
-            <div id="ayudaCalidad" class="helper-box">
-              Comprensión estándar: Entendí la lógica general de lo realizado y resolví partes por mi cuenta.
+            <!-- 4. CALIDAD DE APRENDIZAJE / ASIMILACIÓN REAL -->
+            <div class="form-group">
+              <label for="calidad" data-i18n="labelQuality">Calidad de Aprendizaje / Asimilación (1 al 5)</label>
+              <select id="calidad">
+                <option value="1" data-i18n="qualityOpt1">1 - ⭐️ Mecánico / Sin retención (Solo copié o distraído)</option>
+                <option value="2" data-i18n="qualityOpt2">2 - ⭐️⭐️ Superficial / Pasivo (Entendí por encima)</option>
+                <option value="3" selected data-i18n="qualityOpt3">3 - ⭐️⭐️⭐️ Comprensión estándar (Entendí la lógica)</option>
+                <option value="4" data-i18n="qualityOpt4">4 - ⭐️⭐️⭐️⭐️ Aprendizaje sólido (Razoné y puedo replicarlo)</option>
+                <option value="5" data-i18n="qualityOpt5">5 - ⭐️⭐️⭐️⭐️⭐️ Asimilación profunda (Dominio total)</option>
+              </select>
+              <div id="ayudaCalidad" class="helper-box">
+                Comprensión estándar: Entendí la lógica general de lo realizado y resolví partes por mi cuenta.
+              </div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label for="notas" data-i18n="labelNotes">Notas breves</label>
-            <textarea id="notas" rows="2" data-i18n-placeholder="placeholderNotes" placeholder="¿Qué aprendiste, qué debatiste o dónde te trabaste?"></textarea>
+            <!-- 5. NOTAS Y SUBTEMA UNIFICADOS -->
+            <div class="form-group" style="margin-bottom:0;">
+              <label for="notas"><span data-i18n="labelNotes">Notas y Subtema</span> <span class="label-hint" data-i18n="labelNotesHint">(Ej. [GANs] Lo que aprendiste o dónde te trabaste)</span></label>
+              <textarea id="notas" rows="2" data-i18n-placeholder="placeholderNotes" placeholder="[Subtema opcional] ¿Qué aprendiste, debatiste o qué te trabó?"></textarea>
+            </div>
           </div>
 
           <div class="form-actions">
@@ -438,7 +442,7 @@
           <div class="panel">
             <h2>
               <span data-i18n="chartQuadTitle">🎯 Cuadrante de Rendimiento Cognitivo (% IA vs. Asimilación)</span>
-              <small class="chart-hint" data-i18n="chartQuadHint">Tamaño de burbuja = Duración · Color = Modo de IA</small>
+              <small class="chart-hint" data-i18n="chartQuadHint">Tamaño de burbuja = Duración · Color = Dinámica Cognitiva</small>
             </h2>
             <div class="subtitle" data-i18n="chartQuadSubtitle">Detecta si la IA está potenciando tu aprendizaje (arriba-derecha) o generando ilusión de fluidez con baja retención (abajo-derecha).</div>
             <div class="quadrant-badges-grid" id="quadrantSummaryBadges">
@@ -457,21 +461,21 @@
               <span data-i18n="chart2Title">📚 Impacto de IA y Aprendizaje por Materia</span>
               <small class="chart-hint" data-i18n="chart2ClickHint">💡 Haz clic en una barra para filtrar por esa materia</small>
             </h2>
-            <div class="subtitle" data-i18n="chart2Subtitle">Contrasta tus minutos de aprendizaje real (Autónomo, Diálogo o Copiloto) frente a las sesiones mecánicas (Copy-Paste) y tu asimilación (1-5).</div>
+            <div class="subtitle" data-i18n="chart2Subtitle">Contrasta tus minutos de aprendizaje activo (Generación Propia y Andamiaje) frente a las sesiones de delegación mecánica y tu asimilación (1-5).</div>
             <div class="chart-box">
               <canvas id="chartPorMateria"></canvas>
             </div>
           </div>
         </div>
 
-        <!-- PESTAÑA 3: HÁBITOS, BALANCE COGNITIVO, MEDIO, FAMILIARIDAD Y FRICCIÓN -->
+        <!-- PESTAÑA 3: HÁBITOS, BALANCE COGNITIVO, DINÁMICA, DOMINIO Y FRICCIÓN -->
         <div class="analytics-tab-panel" id="tabPanel-habitos">
           <div class="panel">
             <h2>
-              <span data-i18n="chart3Title">🧠 Patrones de Hábito: 7 Actividades y Balance Cognitivo</span>
+              <span data-i18n="chart3Title">🧠 Patrones de Hábito: 6 Actividades y Balance Cognitivo</span>
               <small class="chart-hint" data-i18n="chart3Hint">Comportamiento por tipo de tarea y método</small>
             </h2>
-            <div class="subtitle" data-i18n="chart3Subtitle">Minutos y asimilación promedio según las 7 actividades de estudio y proporción entre consumo receptivo (Clase, Teoría, Investigación) y producción activa (Apuntes, Código, Práctica, Repaso).</div>
+            <div class="subtitle" data-i18n="chart3Subtitle">Minutos y asimilación promedio según las 6 actividades de estudio y proporción entre recepción pasiva y producción / co-creación activa.</div>
             <div id="balanceCognitivoBox" class="balance-cognitivo-box"></div>
             <div class="chart-box">
               <canvas id="chartPorActividad"></canvas>
@@ -491,10 +495,10 @@
 
           <div class="panel">
             <h2>
-              <span data-i18n="habitMatrixTitle">🧠 Impacto de Producción Propia, Dominio Previo, Energía y Reto</span>
+              <span data-i18n="habitMatrixTitle">🧠 Impacto de Dinámica Cognitiva, Dominio Previo, Energía y Reto</span>
             </h2>
-            <div class="subtitle" data-i18n="habitMatrixSubtitle">Descubre cómo cambia tu retención promedio y el uso de IA cuando generas con tu propia cabeza vs. reproduces, según tu dominio previo del tema y tu energía inicial.</div>
-            <h4 class="sub-section-title" data-i18n="habitByProductionTitle">🧠 Por Nivel de Producción Propia</h4>
+            <div class="subtitle" data-i18n="habitMatrixSubtitle">Descubre cómo cambia tu retención promedio y el uso de IA según la dinámica cognitiva, tu dominio previo del tema y tu energía inicial.</div>
+            <h4 class="sub-section-title" data-i18n="habitByProductionTitle">🔄 Por Dinámica Cognitiva</h4>
             <div id="resumenProduccionBar" class="habit-summary-bar"></div>
             <h4 class="sub-section-title" data-i18n="habitByMasteryTitle">🌱 Por Dominio Previo del Tema</h4>
             <div id="resumenDominioBar" class="habit-summary-bar"></div>
@@ -509,10 +513,10 @@
         <div class="analytics-tab-panel" id="tabPanel-inspector">
           <div class="panel">
             <h2>
-              <span data-i18n="inspectorTopicsTitle">🗂️ Radiografía por Subtemas (Tema específico)</span>
+              <span data-i18n="inspectorTopicsTitle">🗂️ Radiografía por Subtemas ([Subtema] en Notas)</span>
               <small class="chart-hint" data-i18n="inspectorTopicsHint">Haz clic en cualquier subtema para filtrar su materia</small>
             </h2>
-            <div class="subtitle" data-i18n="inspectorTopicsSubtitle">Desglose de tiempo invertido, sesiones, asimilación promedio, uso de IA y XP por cada subtema o módulo.</div>
+            <div class="subtitle" data-i18n="inspectorTopicsSubtitle">Desglose de tiempo invertido, sesiones, asimilación promedio, uso de IA, curva de dominio y XP por cada subtema o módulo.</div>
             <div id="inspectorSubtemasList" class="inspector-topics-list"></div>
           </div>
 
@@ -539,12 +543,12 @@
             <tr>
               <th data-i18n="thDateSlot">Fecha / Franja</th>
               <th data-i18n="thSchedule">Horario</th>
-              <th data-i18n="thSubjectTopic">Materia / Tema</th>
-              <th data-i18n="thActivity">Actividad</th>
+              <th data-i18n="thSubjectTopic">Materia / Subtema</th>
+              <th data-i18n="thActivity">Actividad · Dominio</th>
               <th data-i18n="thEnergyChallengeGoal">Energía · Reto · Meta</th>
               <th data-i18n="thDuration">Duración</th>
               <th data-i18n="thAssimilation">Asimilación</th>
-              <th data-i18n="thAiModePct">IA (Modo · %)</th>
+              <th data-i18n="thAiModePct">Dinámica · % IA</th>
               <th data-i18n="thXpEarned">XP Ganados</th>
               <th data-i18n="thNotes">Notas</th>
               <th data-i18n="thActions">Acciones</th>
@@ -566,13 +570,13 @@
       <h2 data-i18n="guideMainTitle">📖 Guía de Referencia y Criterios del Sistema</h2>
       <div class="subtitle" data-i18n="guideMainSubtitle">Manual rápido para elegir la actividad correcta, calificar el avance de tu bloque sin ambigüedades e interpretar los gráficos analíticos.</div>
       <div class="guide-grid">
-        <!-- TARJETA 1: LAS 7 ACTIVIDADES Y CASOS GRISES -->
+        <!-- TARJETA 1: LAS 6 ACTIVIDADES Y CÓMO DISTINGUIRLAS -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard1Title">🧭 1. Las 7 Actividades y Cómo Distinguirlas</h4>
+          <h4 data-i18n="guideCard1Title">🧭 1. Las 6 Actividades de Estudio</h4>
           <ul>
-            <li data-i18n-html="guideCard1Li1"><strong>👨‍🏫 Clase / Cátedra:</strong> Sesión en vivo con profesor. <em>Tip:</em> Si en clase haces un ejercicio con IA solo por salir del paso, regístralo aparte o baja la asimilación.</li>
-            <li data-i18n-html="guideCard1Li2"><strong>📖 Teoría / Docs vs. 💬 Investigación:</strong> Usa <code>Teoría / Docs</code> cuando consumes material estructurado (documentación, libro, video). Usa <code>Investigación / Diálogo</code> cuando haces preguntas abiertas o debates el <em>"¿por qué?"</em> con una IA.</li>
-            <li data-i18n-html="guideCard1Li3"><strong>✍️ Diseño / Apuntes:</strong> Cuando traduces ideas a tus propias palabras (cheatsheets a mano, resúmenes, diagramas).</li>
+            <li data-i18n-html="guideCard1Li1"><strong>👨‍🏫 Clase / Cátedra:</strong> Sesión en vivo con profesor o ponente.</li>
+            <li data-i18n-html="guideCard1Li2"><strong>📖 Estudio Teórico / Conceptual:</strong> Leer documentación, papers o libros, ver cursos grabados o investigar y debatir conceptos con IA.</li>
+            <li data-i18n-html="guideCard1Li3"><strong>✍️ Síntesis / Documentación:</strong> Destilar ideas en apuntes propios, cheatsheets a mano o en PC, resúmenes o diagramas de arquitectura.</li>
             <li data-i18n-html="guideCard1Li4"><strong>💻 Código vs. 🧪 Debugging:</strong> <code>Desarrollo / Código</code> es construir funcionalidades; <code>Práctica / Debugging</code> es resolver ejercicios o cazar un bug específico.</li>
             <li data-i18n-html="guideCard1Li5"><strong>🔁 Repaso / Simulacro:</strong> Estudiar de tus propios apuntes previos, flashcards o exámenes de prueba antes de una evaluación.</li>
           </ul>
@@ -589,14 +593,14 @@
           </ul>
         </div>
 
-        <!-- TARJETA 3: PRODUCCIÓN PROPIA, DOMINIO PREVIO, ENERGÍA Y RETO -->
+        <!-- TARJETA 3: PRUEBA OBJETIVA DE DOMINIO PREVIO, ENERGÍA Y RETO -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard3Title">🧠 3. Producción Propia, Dominio Previo, Energía y Reto</h4>
+          <h4 data-i18n="guideCard3Title">🌱 3. Dominio Previo (Prueba Objetiva), Energía y Reto</h4>
           <ul>
-            <li data-i18n-html="guideCard3Li1"><strong>Producción Propia:</strong> <code>👀 Consumo</code> (solo leer/escuchar/ver sin producir), <code>📋 Reproducción</code> (copiar, transcribir o seguir algo ya masticado por IA/fuente) o <code>🧠 Generación propia</code> (pensar y redactar/codear con tu lógica y palabras; máximo impacto en retención).</li>
-            <li data-i18n-html="guideCard3Li2"><strong>Dominio Previo:</strong> <code>🌱 Nuevo</code> (primer contacto), <code>🌿 Visto, con lagunas</code> (ya visto pero aún cuesta o hay huecos) vs. <code>🌳 Dominado</code> (repaso o consolidación ágil).</li>
-            <li data-i18n-html="guideCard3Li3"><strong>Energía Previa:</strong> <code>🔋 Alta</code>, <code>⚡ Media</code> o <code>🪫 Baja</code> al sentarte a estudiar (alimenta el Mapa de Calor Circadiano).</li>
-            <li data-i18n-html="guideCard3Li4"><strong>Complejidad del Reto:</strong> <code>🟢 Fácil (0%)</code>, <code>🟡 Desafiante (+10% XP)</code>, <code>🔴 Muy difícil (+20% XP)</code>.</li>
+            <li data-i18n-html="guideCard3Li1"><strong>🌱 Nuevo (0 contactos previos):</strong> Nunca has estudiado este concepto; si te pidieran explicarlo o programarlo ahorita, no sabrías por dónde empezar.</li>
+            <li data-i18n-html="guideCard3Li2"><strong>🌿 En construcción (Necesitas apoyo):</strong> Ya lo viste antes, pero aún necesitas mirar apuntes, documentación o apoyarte en la IA para avanzar sin trabarte.</li>
+            <li data-i18n-html="guideCard3Li3"><strong>🌳 Consolidado (Autónomo):</strong> Puedes explicarlo o programarlo sin mirar el manual ni depender de la IA, o es un repaso veloz.</li>
+            <li data-i18n-html="guideCard3Li4"><strong>Franjas Horarias (6h):</strong> <code>00:00–05:59 Madrugada</code> · <code>06:00–11:59 Mañana</code> · <code>12:00–17:59 Tarde</code> · <code>18:00–23:59 Noche</code>.</li>
           </ul>
         </div>
 
@@ -612,14 +616,14 @@
           </ul>
         </div>
 
-        <!-- TARJETA 5: MODOS DE USO DE IA Y MULTIPLICADORES -->
+        <!-- TARJETA 5: DINÁMICAS COGNITIVAS UNIFICADAS -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard5Title">🤖 5. Modos de Uso de IA vs. Porcentaje</h4>
+          <h4 data-i18n="guideCard5Title">🔄 5. Las 4 Dinámicas Cognitivas</h4>
           <ul>
-            <li data-i18n-html="guideCard5Li1"><strong>🧠 Autónomo (+5% XP):</strong> 100% por tu cuenta sin asistencia de IA (fija automáticamente el slider en <code>0%</code>).</li>
-            <li data-i18n-html="guideCard5Li2"><strong>💬 Diálogo / Tutoría (+5% XP):</strong> Usas la IA como tutor socrático (preguntas de <em>"¿por qué?"</em>, analogías y validación de tus ideas).</li>
-            <li data-i18n-html="guideCard5Li3"><strong>🛠️ Copiloto / Apoyo (0% ajuste):</strong> La IA te ayuda a sintetizar, consultar sintaxis o destrabar un error puntual, pero tú procesas y escribes el resultado.</li>
-            <li data-i18n-html="guideCard5Li4"><strong>🤖 Mecánico / Copy-Paste (-15% XP):</strong> Delegación directa para acabar y entregar rápido sin profundizar.</li>
+            <li data-i18n-html="guideCard5Li1"><strong>👀 Recepción Pasiva (0% ajuste):</strong> Leer, ver o escuchar sin producir aún entregables propios.</li>
+            <li data-i18n-html="guideCard5Li2"><strong>🤖 Delegación / Reproducción (-15% XP si IA &ge; 50%):</strong> Copiar, transcribir o seguir algo ya masticado por la IA/fuente sin enfrentar el obstáculo.</li>
+            <li data-i18n-html="guideCard5Li3"><strong>🔄 Andamiaje / Co-creación (+5% XP):</strong> Tú redactas o propones, la IA corrige tus conceptos o debate el <em>"¿por qué?"</em> y aprendes de tus errores (ej. sesión de GANs).</li>
+            <li data-i18n-html="guideCard5Li4"><strong>🧠 Generación Propia (+10% XP):</strong> Resuelves y escribes con tu propia lógica y palabras enfrentando la fricción tú mismo.</li>
           </ul>
         </div>
 
@@ -628,8 +632,8 @@
           <h4 data-i18n="guideCard6Title">📊 6. Lectura del Dashboard y Fórmulas RPG</h4>
           <ul>
             <li data-i18n-html="guideCard6Li1"><strong>Cuadrante IA (Pestaña 2):</strong> <code>🚀 Sinergia IA</code> (IA &ge; 35% y Calidad &ge; 4), <code>🧠 Dominio Propio</code> (IA &lt; 35% y Calidad &ge; 4), <code>🤖 Ilusión Mecánica</code> (IA &ge; 35% y Calidad &le; 2), <code>🪫 Fricción</code> (IA &lt; 35% y Calidad &le; 2).</li>
-            <li data-i18n-html="guideCard6Li2"><strong>Balance Cognitivo (Pestaña 3):</strong> Compara minutos de <em>Consumo receptivo</em> (Clase, Teoría, Investigación) vs. <em>Producción activa</em> (Apuntes, Código, Debugging, Repaso).</li>
-            <li data-i18n-html="guideCard6Li3"><strong>Fórmula XP:</strong> <code>ROUND(Minutos * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoAvance + BonoModoIA))</code>.</li>
+            <li data-i18n-html="guideCard6Li2"><strong>Subtemas en Notas (Pestaña 4):</strong> Escribe <code>[Subtema] Tu nota</code> (ej. <code>[GANs] Resumen del paper</code>) para agrupar automáticamente en el Inspector.</li>
+            <li data-i18n-html="guideCard6Li3"><strong>Fórmula XP:</strong> <code>ROUND(Minutos * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoAvance + BonoDinamica))</code>.</li>
             <li data-i18n-html="guideCard6Li4"><strong>Curva Exponencial (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code>.</li>
           </ul>
         </div>

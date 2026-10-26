@@ -161,20 +161,27 @@
     const canvas = document.getElementById("chartCuadranteIA");
     if (!canvas) return;
 
-    const coloresPorModo = {
-      Autónomo: { bg: "rgba(16, 185, 129, 0.72)", border: "#10b981" },
-      "Diálogo / Tutoría": { bg: "rgba(99, 102, 241, 0.75)", border: "#818cf8" },
-      "Copiloto / Apoyo": { bg: "rgba(56, 189, 248, 0.72)", border: "#38bdf8" },
-      "Mecánico / Copy-Paste": { bg: "rgba(239, 68, 68, 0.75)", border: "#f87171" }
+    const coloresPorDinamica = {
+      "Generación Propia": { bg: "rgba(16, 185, 129, 0.75)", border: "#10b981" },
+      "Andamiaje / Co-creación": { bg: "rgba(99, 102, 241, 0.78)", border: "#818cf8" },
+      "Recepción Pasiva": { bg: "rgba(56, 189, 248, 0.72)", border: "#38bdf8" },
+      "Delegación / Reproducción": { bg: "rgba(239, 68, 68, 0.75)", border: "#f87171" }
     };
 
-    const modos = ["Autónomo", "Diálogo / Tutoría", "Copiloto / Apoyo", "Mecánico / Copy-Paste"];
-    const datasets = modos.map((modo) => {
-      const puntosModo = datosCuadrante.puntos.filter((p) => p.modoIA === modo);
-      const col = coloresPorModo[modo] || coloresPorModo["Copiloto / Apoyo"];
+    const dinamicas = [
+      "Generación Propia",
+      "Andamiaje / Co-creación",
+      "Recepción Pasiva",
+      "Delegación / Reproducción"
+    ];
+    const datasets = dinamicas.map((din) => {
+      const puntosDin = datosCuadrante.puntos.filter(
+        (p) => (p.dinamicaCognitiva || p.modoIA) === din
+      );
+      const col = coloresPorDinamica[din] || coloresPorDinamica["Andamiaje / Co-creación"];
       return {
-        label: trVal("modoIA", modo),
-        data: puntosModo,
+        label: trVal("dinamicaCognitiva", din),
+        data: puntosDin,
         backgroundColor: col.bg,
         borderColor: col.border,
         borderWidth: 2
@@ -203,13 +210,18 @@
             callbacks: {
               label(context) {
                 const raw = context.raw || {};
-                const modoTrad = trVal("modoIA", raw.modoIA || "");
-                const prodTrad = trVal("produccion", raw.produccion || "Reproducción");
-                const domTrad = trVal("dominioPrevio", raw.dominioPrevio || "Con lagunas");
+                const dinTrad = trVal(
+                  "dinamicaCognitiva",
+                  raw.dinamicaCognitiva || raw.modoIA || "Andamiaje / Co-creación"
+                );
+                const domTrad = trVal(
+                  "dominioPrevio",
+                  raw.dominioPrevio || "En construcción"
+                );
                 return [
                   `📚 ${raw.materia || ""} — ${raw.tema || ""}`,
-                  `⭐️ ${t("thAssimilation")}: ${raw.calidadReal}/5 | 🤖 IA: ${raw.iaReal}% (${modoTrad})`,
-                  `🧠 ${prodTrad} | 🌱 ${domTrad}`,
+                  `⭐️ ${t("thAssimilation")}: ${raw.calidadReal}/5 | 🤖 IA: ${raw.iaReal}%`,
+                  `🔄 ${dinTrad} | 🌱 ${domTrad}`,
                   `⏱️ ${t("thDuration")}: ${raw.duracion} min (${raw.fecha || ""})`
                 ];
               }
