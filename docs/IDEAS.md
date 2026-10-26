@@ -60,6 +60,32 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 > 3. Sustitución de `Dominio Previo` subjetivo por la **Prueba Objetiva de 3 Niveles** (`🌱 Nuevo`, `🌿 En construcción`, `🌳 Consolidado`) y eliminación de `Dominio_Final`.
 > 4. Subtemas agrupados mediante corchetes `[Subtema]` en Notas.
 
+### 🧩 Rediseño de Fluidez del Bloque y Prevención de Sesgo Punitivo en XP `[S · ⭐⭐⭐]`
+
+> **Problema raíz:** Marcar `❌ No (Bloqueo)` o `⚠️ Parcial` genera fricción psicológica y sensación de "castigo de XP", especialmente cuando la sesión terminó no por un fallo cognitivo, sino por **fuerza mayor** (ej. tener que entregar la tarea como estuviera por límite de tiempo, o una interrupción externa que obligó a retirarse cuando el estudio iba fluido).
+
+#### 🔍 Diagnóstico del Problema y Casos Reales
+
+1. **Aclaración matemática:**
+   - Técnicamente, `❌ No` **NO da 0 XP**: la fórmula otorga el 100% del XP base de los minutos estudiados y la calidad de asimilación. Solo omite el bono multiplicador del `+10%` o `+5%` (en 25 min, la diferencia son apenas ~3 XP).
+   - Sin embargo, la etiqueta con `❌`, la palabra "Bloqueo" y el texto `(0% bono)` producen una sensación punitiva de haber "reprobado" la sesión.
+2. **Confusión entre "Meta de la Tarea Completa" vs. "Flujo del Bloque":**
+   - Si tenías que entregar una tarea a una hora límite y trabajaste 25 min a tope entregando lo que alcanzaste, el bloque de tiempo fue productivo (`✅ Sí`), aunque la tarea total no haya quedado completa.
+3. **Interrupciones externas vs. Bloqueos cognitivos reales:**
+   - Una emergencia, llamada o corte no es un bloqueo mental: es una sesión que duró menos tiempo con buen foco (debe registrarse el tiempo efectivo con flujo normal).
+   - Un bloqueo cognitivo real es quedarse atrapado 30 minutos en un bug o concepto sin lograr destrabarlo (lo cual alimenta la Matriz de Fricción).
+
+#### 💡 Propuestas de Solución a Evaluar
+
+1. **Renombrar etiquetas para eliminar el estigma punitivo:**
+   - `🟢 En ritmo / Flujo (+10% XP)`: Avance constante en lo previsto para este bloque.
+   - `🟡 Accidentado / Con fricción (+5% XP)`: Distracciones, prisa por entrega o avance lento, pero hubo progreso.
+   - `🔴 Atorado / Sin avance (XP Base)`: Obstáculo técnico o conceptual; se visibiliza el cuello de botella pero se premia el tiempo y esfuerzo invertido.
+2. **Guía en vivo para Interrupciones Externas:**
+   - Aclarar en la ayuda dinámica que si hubo que retirarse antes por un factor externo cuando todo iba bien, se registra el tiempo efectivo transcurrido y se califica con flujo normal (`🟢 En ritmo`).
+3. **Condición con Asistencia de IA:**
+   - Si se delegó mecánicamente a la IA para salir del paso por prisa, ese ajuste ya lo descuenta la Dinámica Cognitiva (`-15% XP`), evitando penalizar dos veces.
+
 ---
 
 ## ⚡ Experiencia de uso (reducir fricción)
@@ -94,8 +120,11 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 - [ ] **Productivity Tracker en lugar de solo Study Tracker** `[M · ⭐⭐⭐]`
   - *Concepto:* Permitir documentar cuando se trabaja en proyectos personales, tareas de trabajo independiente o desarrollo de software sin que se sienta exclusivamente como "estudiar".
   - *Enfoque:* Mantener la misma fórmula y KPIs pero adaptando etiquetas para abarcar *Deep Work* y construcción de proyectos.
-- [ ] Hay algo que quiero revisar, lo de flujo parcial y bloqueo, si es parcial es porque me distraje pero si es bloqueo es porque no pude completar la meta, pueddee que porque tenia que entregar la tarea asi como estuviera, o porque pasó algo que me obligó a retirarme pero que tal si todo iba bien, ya no recibo xp eso se me hace mala onda, sé que debe de haber alguna manera de registrar eso pero no castigando la xp, tal vez una condición de que si fue con ia que no de xp o algo así.
-- [ ] Modificar como se ve el formulario, todo está en un lado izquiedo como en un recuadro y al ser varias opciones se alarga mucho el dashboard, creo que esa forma es como un convenio entre la visualización de dashboards pero en mi caso siento que me afecta.
+- [ ] **Rediseño de Fluidez del Bloque y Prevención de Sesgo Punitivo en XP** `[S · ⭐⭐⭐]`
+  - *(Ver análisis detallado y propuestas arriba en la sección `### 🧩 Rediseño de Fluidez del Bloque`)*.
+- [ ] **Rediseño del Layout del Formulario (Evitar columna izquierda alargada)** `[M · ⭐⭐]`
+  - *Problema:* El formulario ocupa una columna lateral fija de 420px a la izquierda, lo que alarga mucho la página verticalmente cuando hay varias opciones en pantalla.
+  - *Objetivo:* Explorar layouts alternativos (ej. formulario horizontal colapsable, vista compacta por pestañas o disposición balanceada) para que no canse visualmente.
 
 ---
 
