@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.png" alt="StudyTracker Logo" width="128" height="128" style="border-radius: 26px;">
+</p>
+
 # ⚔️ StudyTracker v3 — Local-First Analytics & CSV Sync
 
 > 🌐 **Idioma / Language:** [🇪🇸 Español](#-español) | [🇬🇧 English](#-english)  

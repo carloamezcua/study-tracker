@@ -151,7 +151,10 @@ function manejarPutCsv(req, res) {
 }
 
 function servirArchivoEstatico(req, res, pathname) {
-  const rutaRelativa = pathname === "/" ? "/index.html" : pathname;
+  let rutaRelativa = pathname === "/" ? "/index.html" : pathname;
+  if (rutaRelativa === "/favicon.ico") {
+    rutaRelativa = "/assets/favicon.ico";
+  }
   const rutaSegura = path.normalize(rutaRelativa).replace(/^(\.\.[/\\])+/, "");
   const archivoAbsoluto = path.join(ROOT_DIR, rutaSegura);
 
