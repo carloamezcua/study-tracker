@@ -1,7 +1,7 @@
 # ⚔️ StudyTracker v3 — Local-First Analytics & CSV Sync
 
 > 🌐 **Idioma / Language:** [🇪🇸 Español](#-español) | [🇬🇧 English](#-english)  
-> 📚 **Documentación / Docs:** [❓ Preguntas y Decisiones](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🗺️ Ruta v3](docs/ruta_refactorizaci%C3%B3n.md)
+> 📚 **Documentación / Docs:** [📐 Decisiones & Versiones](docs/DECISIONES.md) · [❓ Preguntas Guía](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🗺️ Ruta v3](docs/ruta_refactorizaci%C3%B3n.md)
 
 ---
 

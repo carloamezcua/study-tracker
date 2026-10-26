@@ -1,6 +1,7 @@
 # ❓ Preguntas Guía y Decisiones de Diseño
 
 > Este archivo no es solo una lista de tareas: es para **pensar y documentar la arquitectura cognitiva**.
+> Para consultar el historial de versiones (v1 → v2 → v3) y el registro formal de decisiones técnicas, consulta [docs/DECISIONES.md](DECISIONES.md).
 > Debajo de cada pregunta se registran las respuestas (`**R:**`) y las lecciones aprendidas que se han convertido en decisiones de diseño del sistema.
 > Puedes pegar una sección completa a una IA y pedirle que te **entreviste** o cuestione tus respuestas antes de hacer cambios mayores.
 

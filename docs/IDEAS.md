@@ -12,11 +12,11 @@
 
 ## 🔥 Prioridad alta (siguiente a considerar)
 
-| Idea                                                                  | Esfuerzo | Impacto | Notas                                                                                                    |
-| --------------------------------------------------------------------- | :------: | :-----: | -------------------------------------------------------------------------------------------------------- |
-| **Manejo Correcto de Pausas en el Cronómetro**                       |    S     |  ⭐⭐⭐  | Descontar el tiempo pausado para que no infle artificialmente la duración al pulsar *Terminar*.          |
-| **Bono de XP por Pomodoros Consecutivos (Combos)**                    |    S     |   ⭐⭐   | Recompensar bloques encadenados (ej. 2 o más pomodoros de 25m seguidos con descansos cumplidos).         |
-| **Productivity Tracker (Expansión multi-propósito)**                  |    M     |  ⭐⭐⭐  | Expandir más allá de estudio para cubrir trabajo en proyectos personales sin que se sienta solo "estudio". |
+| Idea                                                         | Esfuerzo | Impacto | Notas                                                                                                        |
+| ------------------------------------------------------------ | :------: | :-----: | ------------------------------------------------------------------------------------------------------------ |
+| **Manejo Correcto de Pausas en el Cronómetro**        |    S    | ⭐⭐⭐ | Descontar el tiempo pausado para que no infle artificialmente la duración al pulsar *Terminar*.           |
+| **Bono de XP por Pomodoros Consecutivos (Combos)**     |    S    |  ⭐⭐  | Recompensar bloques encadenados (ej. 2 o más pomodoros de 25m seguidos con descansos cumplidos).            |
+| **Productivity Tracker (Expansión multi-propósito)** |    M    | ⭐⭐⭐ | Expandir más allá de estudio para cubrir trabajo en proyectos personales sin que se sienta solo "estudio". |
 
 ---
 
@@ -54,6 +54,7 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 > **Lección aprendida:** El estudio moderno con LLMs no es blanco o negro (consumo vs. producción pura), sino un proceso de **andamiaje cognitivo**.
 >
 > **Solución implementada en v3.0:**
+>
 > 1. Fusión de `Teoría` e `Investigación` en **`📖 Estudio Teórico / Conceptual`** (resuelve la duda de si leer un paper o explorar dudas con IA es teoría o investigación).
 > 2. Fusión de `Producción Propia` y `Modo IA` en **4 Dinámicas Cognitivas**, incorporando explícitamente **`🔄 Andamiaje / Co-creación (+5% XP)`** para sesiones socráticas como la preparación de la mesa redonda sobre GANs.
 > 3. Sustitución de `Dominio Previo` subjetivo por la **Prueba Objetiva de 3 Niveles** (`🌱 Nuevo`, `🌿 En construcción`, `🌳 Consolidado`) y eliminación de `Dominio_Final`.
@@ -84,7 +85,7 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 ## 🧱 Calidad técnica y arquitectura
 
 - [X] **Documentación de arquitectura y decisiones en PREGUNTAS.md** *(Implementado)*
-- [ ] Documento corto de decisiones de arquitectura (`docs/DECISIONES.md`) `[S · ⭐⭐]`
+- [X] **Documento de decisiones de arquitectura y versiones** ([docs/DECISIONES.md](DECISIONES.md)) *(Implementado)*
 
 ---
 
@@ -93,6 +94,8 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 - [ ] **Productivity Tracker en lugar de solo Study Tracker** `[M · ⭐⭐⭐]`
   - *Concepto:* Permitir documentar cuando se trabaja en proyectos personales, tareas de trabajo independiente o desarrollo de software sin que se sienta exclusivamente como "estudiar".
   - *Enfoque:* Mantener la misma fórmula y KPIs pero adaptando etiquetas para abarcar *Deep Work* y construcción de proyectos.
+- [ ] Hay algo que quiero revisar, lo de flujo parcial y bloqueo, si es parcial es porque me distraje pero si es bloqueo es porque no pude completar la meta, pueddee que porque tenia que entregar la tarea asi como estuviera, o porque pasó algo que me obligó a retirarme pero que tal si todo iba bien, ya no recibo xp eso se me hace mala onda, sé que debe de haber alguna manera de registrar eso pero no castigando la xp, tal vez una condición de que si fue con ia que no de xp o algo así.
+- [ ] Modificar como se ve el formulario, todo está en un lado izquiedo como en un recuadro y al ser varias opciones se alarga mucho el dashboard, creo que esa forma es como un convenio entre la visualización de dashboards pero en mi caso siento que me afecta.
 
 ---
 
@@ -100,8 +103,8 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 
 | Idea                                       | Fecha      | Motivo                                                                                                                             |
 | ------------------------------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Actividad `🗂️ Preparación / Contexto`     | 2026-10-20 | No es estudio real sino logística previa; se eliminó del sistema para no ensuciar las métricas cognitivas ni inflar minutos/XP. |
-| Campo `Dominio_Final` en el formulario     | 2026-10-26 | Nadie domina un tema nuevo en 25 minutos; pedir calificar el dominio al final reintroducía fatiga de decisión y redundancia.     |
+| Actividad `🗂️ Preparación / Contexto` | 2026-10-20 | No es estudio real sino logística previa; se eliminó del sistema para no ensuciar las métricas cognitivas ni inflar minutos/XP. |
+| Campo `Dominio_Final` en el formulario   | 2026-10-26 | Nadie domina un tema nuevo en 25 minutos; pedir calificar el dominio al final reintroducía fatiga de decisión y redundancia.     |
 
 ---
 
@@ -109,20 +112,21 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 
 | Idea                                                                                                                                                                                                                                    | Fecha      | Commit/PR        |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------- |
-| **Refactor v3 — Esquema Canónico de 18 Columnas en CSV** con migración al vuelo retrocompatible en `excel-sync.js`                                                                                                                     | 2026-10-26 | v3 Refactor      |
-| **Refactor v3 — Taxonomía Ortogonal:** 6 Actividades, 4 Dinámicas Cognitivas y Prueba Objetiva de Dominio Previo (3 niveles)                                                                                                           | 2026-10-26 | v3 Refactor      |
-| **Refactor v3 — Formulario en 2 Etapas Cognitivas** (Punto de Partida al Iniciar vs. Evaluación del Bloque al Terminar)                                                                                                                | 2026-10-26 | v3 Refactor      |
-| **Refactor v3 — Chips Rápidos de Materias Recientes** (1 clic para seleccionar materia o `[+ Nueva]`) + Pre-llenado inteligente por franja                                                                                             | 2026-10-26 | v3 Refactor      |
-| **Refactor v3 — Franjas Horarias Circadianas Simétricas de 6h** (00:00–05:59 Madrugada, 06:00–11:59 Mañana, 12:00–17:59 Tarde, 18:00–23:59 Noche)                                                                                     | 2026-10-26 | v3 Refactor      |
-| **Refactor v3 — Extracción Automática de Subtemas por `[Subtema]` en Notas** para el Inspector de Materia                                                                                                                               | 2026-10-26 | v3 Refactor      |
-| **Refactor v3 — Respaldos Automáticos Diarios en Servidor** (`data/backups/YYYY-MM-DD.csv`) antes de sobrescribir el archivo                                                                                                            | 2026-10-26 | v3 Refactor      |
-| **Refactor v3 — Grid Fluido Responsivo y Text Wrap en Chips de Actividad** para evitar desbordamiento horizontal en tarjetas                                                                                                            | 2026-10-26 | v3 Bugfix        |
-| Mostrar solo los últimos 5 registros en el historial (con botón *Ver todos*)                                                                                                                                                            | 2026-10-20 | Tanda 1          |
-| Redefinir *Objetivo Cumplido* a *Fluidez y Avance del Bloque* (`Sí = Flujo limpio +10%`, `Parcial = Con tropiezos +5%`, `No = Bloqueo`) con Regla de Oro para evitar malinterpretaciones                                         | 2026-10-20 | Tanda 1 / 2      |
-| Actividad `👨‍🏫 Clase / Cátedra` con ajuste automático de IA a 0% y escala enfocada en concentración e interés                                                                                                                      | 2026-10-20 | Tanda 1          |
-| Migrar persistencia de `.xlsx` (SheetJS + fórmulas de Excel duplicadas) a `.csv` puro (`data/study-tracker.csv`) con fórmulas 100% en JS                                                                                            | 2026-10-20 | CSV Refactor     |
-| Dashboard Analítico Interactivo en 4 pestañas (Evolución Día/Semana/Mes + Racha, Mapa de Calor Circadiano 7×4, Cuadrante Cognitivo IA en burbujas, Balance Consumo/Producción e Inspector de Subtemas/Notas con filtros cruzados)     | 2026-10-20 | Analytics v2     |
-| **Refactor Tanda 2 — Nivel de Producción Propia (`👀 Consumo`, `📋 Reproducción`, `🧠 Generación propia`)** reemplaza medio digital/papel para capturar esfuerzo cognitivo real sin sesgo de soporte                                      | 2026-10-20 | Tanda 2 Refactor |
-| **Refactor Tanda 2 — Dominio Previo en 3 niveles (`🌱 Nuevo`, `🌿 Con lagunas`, `🌳 Dominado`)** + Matriz de Fricción adaptada y Curva de Dominio en Inspector de Materia                                                             | 2026-10-20 | Tanda 2 Refactor |
-| **Reclasificación de sesiones históricas Cheatsheet (5 sesiones)** como `📋 Reproducción` y `🌿 Con lagunas` (material sintetizado por IA y reproducido a mano)                                                                        | 2026-10-20 | Tanda 2 Refactor |
-| Rediseño completo de la **Guía de Referencia del Sistema** en 6 tarjetas temáticas dentro del Dashboard y en `README.md`                                                                                                         | 2026-10-20 | Tanda 2          |
+| **Documento de Decisiones de Arquitectura e Historial de Versiones (`docs/DECISIONES.md`)**                                                                                                                                             | 2026-10-26 | Docs             |
+| **Refactor v3 — Esquema Canónico de 18 Columnas en CSV** con migración al vuelo retrocompatible en `excel-sync.js`                                                                                                           | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Taxonomía Ortogonal:** 6 Actividades, 4 Dinámicas Cognitivas y Prueba Objetiva de Dominio Previo (3 niveles)                                                                                                   | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Formulario en 2 Etapas Cognitivas** (Punto de Partida al Iniciar vs. Evaluación del Bloque al Terminar)                                                                                                         | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Chips Rápidos de Materias Recientes** (1 clic para seleccionar materia o `[+ Nueva]`) + Pre-llenado inteligente por franja                                                                                    | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Franjas Horarias Circadianas Simétricas de 6h** (00:00–05:59 Madrugada, 06:00–11:59 Mañana, 12:00–17:59 Tarde, 18:00–23:59 Noche)                                                                          | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Extracción Automática de Subtemas por `[Subtema]` en Notas** para el Inspector de Materia                                                                                                                    | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Respaldos Automáticos Diarios en Servidor** (`data/backups/YYYY-MM-DD.csv`) antes de sobrescribir el archivo                                                                                                  | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Grid Fluido Responsivo y Text Wrap en Chips de Actividad** para evitar desbordamiento horizontal en tarjetas                                                                                                     | 2026-10-26 | v3 Bugfix        |
+| Mostrar solo los últimos 5 registros en el historial (con botón *Ver todos*)                                                                                                                                                        | 2026-10-20 | Tanda 1          |
+| Redefinir *Objetivo Cumplido* a *Fluidez y Avance del Bloque* (`Sí = Flujo limpio +10%`, `Parcial = Con tropiezos +5%`, `No = Bloqueo`) con Regla de Oro para evitar malinterpretaciones                                     | 2026-10-20 | Tanda 1 / 2      |
+| Actividad `👨‍🏫 Clase / Cátedra` con ajuste automático de IA a 0% y escala enfocada en concentración e interés                                                                                                                  | 2026-10-20 | Tanda 1          |
+| Migrar persistencia de `.xlsx` (SheetJS + fórmulas de Excel duplicadas) a `.csv` puro (`data/study-tracker.csv`) con fórmulas 100% en JS                                                                                        | 2026-10-20 | CSV Refactor     |
+| Dashboard Analítico Interactivo en 4 pestañas (Evolución Día/Semana/Mes + Racha, Mapa de Calor Circadiano 7×4, Cuadrante Cognitivo IA en burbujas, Balance Consumo/Producción e Inspector de Subtemas/Notas con filtros cruzados) | 2026-10-20 | Analytics v2     |
+| **Refactor Tanda 2 — Nivel de Producción Propia (`👀 Consumo`, `📋 Reproducción`, `🧠 Generación propia`)** reemplaza medio digital/papel para capturar esfuerzo cognitivo real sin sesgo de soporte                    | 2026-10-20 | Tanda 2 Refactor |
+| **Refactor Tanda 2 — Dominio Previo en 3 niveles (`🌱 Nuevo`, `🌿 Con lagunas`, `🌳 Dominado`)** + Matriz de Fricción adaptada y Curva de Dominio en Inspector de Materia                                                 | 2026-10-20 | Tanda 2 Refactor |
+| **Reclasificación de sesiones históricas Cheatsheet (5 sesiones)** como `📋 Reproducción` y `🌿 Con lagunas` (material sintetizado por IA y reproducido a mano)                                                            | 2026-10-20 | Tanda 2 Refactor |
+| Rediseño completo de la **Guía de Referencia del Sistema** en 6 tarjetas temáticas dentro del Dashboard y en `README.md`                                                                                                     | 2026-10-20 | Tanda 2          |
