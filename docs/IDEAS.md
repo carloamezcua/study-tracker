@@ -1,26 +1,28 @@
 # 💡 Ideas y Mejoras Futuras
 
 > Bandeja de entrada de ideas. **Anotar aquí no es comprometerse a hacerlo.**
-> Cuando una idea se implemente, muévela a la sección "✅ Hechas" con la fecha.
+> Cuando una idea se implemente, muévela a la sección "✅ Hechas" con la fecha y commit.
 
 **Cómo usar este archivo**
 
 - Escribe la idea en una línea, sin filtrarla. Refínala después.
 - Etiqueta cada una con esfuerzo (`S` horas · `M` días · `L` semanas) e impacto (⭐ a ⭐⭐⭐).
 
+---
+
 ## 🔥 Prioridad alta (siguiente a considerar)
 
-| Idea                                                                                 | Esfuerzo | Impacto | Notas                                                                          |
-| ------------------------------------------------------------------------------------ | :------: | :-----: | ------------------------------------------------------------------------------ |
-| Modo "registro rápido" (1 clic, solo lo esencial)                                   |    S    | ⭐⭐⭐ | Los demás campos se completan después o son opcionales. Ver P1 en PREGUNTAS. |
-| Valores por defecto inteligentes (recordar el último contexto/actividad/modo de IA) |    S    | ⭐⭐⭐ | Reduce clics por sesión.                                                      |
-| Respaldo automático del `.xlsx` antes de cada escritura                           |    S    | ⭐⭐⭐ | Protege contra corrupción del archivo. Ej. `data/backups/AAAA-MM-DD.xlsx`.  |
+| Idea                                                                  | Esfuerzo | Impacto | Notas                                                                                                    |
+| --------------------------------------------------------------------- | :------: | :-----: | -------------------------------------------------------------------------------------------------------- |
+| **Manejo Correcto de Pausas en el Cronómetro**                       |    S     |  ⭐⭐⭐  | Descontar el tiempo pausado para que no infle artificialmente la duración al pulsar *Terminar*.          |
+| **Bono de XP por Pomodoros Consecutivos (Combos)**                    |    S     |   ⭐⭐   | Recompensar bloques encadenados (ej. 2 o más pomodoros de 25m seguidos con descansos cumplidos).         |
+| **Productivity Tracker (Expansión multi-propósito)**                  |    M     |  ⭐⭐⭐  | Expandir más allá de estudio para cubrir trabajo en proyectos personales sin que se sienta solo "estudio". |
 
 ---
 
 ## 🎮 Gamificación (más allá de subir de nivel)
 
-Hoy solo hay **XP → Nivel → Rango**. Esto es lo que añadiría profundidad. Ver también la sección de gamificación en [PREGUNTAS.md](PREGUNTAS.md).
+Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP → Nivel 1-99 → Rango**). Ver también [PREGUNTAS.md](PREGUNTAS.md).
 
 - [ ] **Sistema de Logros y Desafíos** `[M · ⭐⭐⭐]`
   - 🍅 *Combo Pomodoro:* Completar 2 pomodoros seguidos (con descanso de 5 min entre ambos).
@@ -41,84 +43,65 @@ Hoy solo hay **XP → Nivel → Rango**. Esto es lo que añadiría profundidad. 
 ## 🧠 Analítica, Modelo Cognitivo y Taxonomía
 
 - [X] ¿Cuánto se estudia al día, semana, mes? *(Implementado en Pestaña 1 del Dashboard Analítico)*
+- [X] **Redefinir Franjas Horarias Circadianas (00:00 a 23:59)** *(Implementado en v3.0: 4 franjas simétricas de 6h)*
+- [X] **Resolución del Dilema de Taxonomía Rígida con IA** *(Implementado en v3.0: 6 actividades ortogonales + 4 dinámicas cognitivas)*
 - [ ] **Métrica de Progreso Real vs. Tiempo Invertido (Desacoplar Duración, Dominio y Dificultad)** `[M · ⭐⭐⭐]`
   - *Lucha cognitiva vs. Eficiencia:* Tardar mucho tiempo en una tarea puede ser síntoma de asimilación profunda de un concepto difícil (no de lentitud o ineficiencia). Al revés: avanzar muy rápido suele significar que el tema ya se domina o es intrínsecamente trivial.
-  - *Revisar redundancias:* Evaluar si marcar `🌳 Dominado` y `🟢 Fácil` duplica información, y buscar una forma de medir el *progreso efectivo* realizado en el bloque para contrastarlo contra el tiempo invertido.
-- [ ] **Redefinir Franjas Horarias Circadianas (00:00 a 23:59)** `[S · ⭐⭐]`
-  - *Problema actual:* En `js/domain/metrics.js`, el horario de 00:00 a 03:59 cae por defecto en `Noche` (porque solo contempla Madrugada de 04:00 a 07:59).
-  - *Corrección:* La noche debe terminar a las 23:59. De 00:00 en adelante (hasta las 06:59 o 07:59) debe clasificarse formalmente como `Madrugada` para que el mapa de calor circadiano 7×4 sea preciso.
+  - *Revisar redundancias:* Evaluar si marcar `🌳 Consolidado` y `🟢 Fácil` duplica información, y buscar una forma de medir el *progreso efectivo* realizado en el bloque para contrastarlo contra el tiempo invertido.
 
-### 🧩 Dilema de Taxonomía Rígida: Fricción y Ambigüedad al Clasificar Estudio Asistido por IA `[M · ⭐⭐⭐]`
+### 🧩 Caso Resuelto: Dilema de Taxonomía Rígida en Estudio con IA
 
-> **Problema raíz:** Las categorías actuales del tracker asumen decisiones binarias y mutuamente excluyentes, pero el estudio moderno con IA es **híbrido, iterativo y de andamiaje cognitivo**. Esto genera fatiga de decisión (*Taxonomy Fatigue*) y parálisis por análisis al guardar una sesión, con el riesgo latente de que el sistema deje de escalar cuando aumente la variedad de materias o tipos de estudio.
-
-#### 📖 Caso Testigo Real: Sesión de Preparación de Mesa Redonda sobre GANs
-
-Al estudiar un paper técnico en inglés sobre Redes Generativas Antagónicas (GANs) con apoyo de un LLM:
-
-- La IA tradujo y resumió el artículo para evitar la barrera del idioma.
-- Fue aclarando dudas sobre tecnicismos matemáticos y conceptuales conforme surgían.
-- El usuario redactaba sus propias explicaciones de los conceptos.
-- La IA revisaba esos borradores, señalaba errores de entendimiento y generaba explicaciones para corregirlos en un diálogo socrático continuo.
-- Aunque fue un aprendizaje de alto valor, **5 campos del formulario entraron en conflicto directo**:
-
-1. **`Tipo_Actividad` (`Teoría / Docs` vs. `Investigación / Diálogo`):**
-   - *El dilema:* Era el estudio de un documento teórico formal (paper/artículo), pero la dinámica real fue una exploración activa con preguntas y respuestas abiertas. Encajaba al 100% en ambos.
-2. **`Produccion_Propia` (`Reproducción` vs. `Generación propia`):**
-   - *El dilema:* El usuario redactó con sus propias palabras (generación propia), pero la IA generó correcciones masticadas y explicaciones de por qué estaba mal (asimilación/reproducción). No fue ni copia pasiva ni creación aislada: fue co-creación y corrección interactiva.
-3. **`Dominio_Previo` (`🌱 Nuevo` vs. `🌿 Con lagunas`):**
-   - *El dilema:* El tema específico (GANs y el artículo en cuestión) era nuevo, pero ya se tenían bases matemáticas y conceptuales previas que facilitaban entenderlo. ¿Se califica la novedad del tema o el estado general del andamiaje?
-4. **`Complejidad` (`🟡 Desafiante` vs. `🟢 Fácil`):**
-   - *El dilema:* La materia en sí es compleja/técnica, pero con el apoyo de la IA y el conocimiento previo la sesión no se sintió pesada. ¿La complejidad mide la dificultad intrínseca del material o la fricción subjetiva experimentada?
-5. **`Modo_IA` (`🛠️ Copiloto / Apoyo` vs. `💬 Diálogo / Tutoría`):**
-   - *El dilema:* La IA actuó como apoyo puntual (traducción de inglés y resumen de secciones), pero también como tutor de diálogo (discutiendo errores conceptuales). Son modos que hoy están separados en chips únicos.
-
-#### ⚠️ Riesgo Identificado a Futuro
-
-- **Inconsistencia y Ruido en Métricas:** Forzar una etiqueta artificialmente distorsiona los gráficos de asimilación y los cuadrantes cognitivos.
-- **Abandono por Fricción de Registro:** Si una sola sesión normal requiere un debate filosófico para elegir 5 dropdowns, a mayor volumen de estudio más probable será abandonar el registro.
-
-#### 💡 Posibles Soluciones a Evaluar
-
-- **Regla de Oro de la Intención Dominante:** Establecer una jerarquía clara (ej. *si hubo diálogo socrático para desbloquear comprensión, prima `Investigación / Diálogo` y `Tutoría` aunque la fuente sea un paper*).
-- **Taxonomía Flexible / Selección Múltiple:** Permitir etiquetas combinadas o modos híbridos en sesiones con IA.
-- **Registro Rápido Asistido por Texto:** Un campo libre ("¿Qué hiciste?") donde un prompt ligero sugiera la combinación adecuada sin obligar a pensar cada chip.
-- **Desacoplar Dificultad del Material vs. Esfuerzo Subjetivo.**
+> **Lección aprendida:** El estudio moderno con LLMs no es blanco o negro (consumo vs. producción pura), sino un proceso de **andamiaje cognitivo**.
+>
+> **Solución implementada en v3.0:**
+> 1. Fusión de `Teoría` e `Investigación` en **`📖 Estudio Teórico / Conceptual`** (resuelve la duda de si leer un paper o explorar dudas con IA es teoría o investigación).
+> 2. Fusión de `Producción Propia` y `Modo IA` en **4 Dinámicas Cognitivas**, incorporando explícitamente **`🔄 Andamiaje / Co-creación (+5% XP)`** para sesiones socráticas como la preparación de la mesa redonda sobre GANs.
+> 3. Sustitución de `Dominio Previo` subjetivo por la **Prueba Objetiva de 3 Niveles** (`🌱 Nuevo`, `🌿 En construcción`, `🌳 Consolidado`) y eliminación de `Dominio_Final`.
+> 4. Subtemas agrupados mediante corchetes `[Subtema]` en Notas.
 
 ---
 
 ## ⚡ Experiencia de uso (reducir fricción)
 
-- [ ] Modo oscuro `[S · ⭐⭐]`
+- [X] **Formulario en 2 Etapas Cognitivas** *(Implementado en v3.0: Bloque 1 Inicio + Bloque 2 Fin)*
+- [X] **Valores por defecto inteligentes y chips rápidos de materias** *(Implementado en v3.0)*
 - [ ] **Manejo Correcto de Pausas en el Cronómetro** `[S · ⭐⭐⭐]`
-  - *Problema actual:* Al pausar el cronómetro y luego dar en "Terminar", la duración se calcula restando `Hora_Fin - Hora_Inicio` de reloj real, ignorando el tiempo que estuvo en pausa e inflando artificialmente los minutos de estudio.
+  - *Problema actual:* Al pausar el cronómetro y luego pulsar "Terminar", la duración se calcula restando `Hora_Fin - Hora_Inicio` de reloj real, ignorando el tiempo que estuvo en pausa e inflando artificialmente los minutos de estudio.
   - *Corrección:* Descontar los minutos de pausa de la duración efectiva o ajustar la hora de inicio virtual.
+- [ ] Modo oscuro / temas visuales adicionales `[S · ⭐⭐]`
+- [ ] Atajos de teclado para inicio rápido (ej. `Espacio` para pausar/reanudar, `Ctrl+Enter` para guardar) `[S · ⭐⭐]`
 
 ---
 
 ## 💾 Datos y persistencia
 
-- [ ] ¿Cuándo mudar a otra base de datos?
+- [X] **Migrar a persistencia CSV pura sin SheetJS** *(Implementado)*
+- [X] **Respaldos automáticos diarios antes de escribir en disco** *(Implementado en v3.0 en server.js)*
+- [ ] ¿Cuándo mudar a SQLite / PostgreSQL local? *(Evaluar solo si el archivo supera los 10,000 registros)* `[L · ⭐]`
 
 ---
 
-## 🧱 Calidad técnica (ver sección de deuda técnica en PREGUNTAS)
+## 🧱 Calidad técnica y arquitectura
 
-- [ ] Documento corto de arquitectura/decisiones (`docs/DECISIONES.md`).
+- [X] **Documentación de arquitectura y decisiones en PREGUNTAS.md** *(Implementado)*
+- [ ] Documento corto de decisiones de arquitectura (`docs/DECISIONES.md`) `[S · ⭐⭐]`
 
 ---
 
-## 🗃️ Ideas sueltas / sin clasificar
+## 🗃️ Ideas en Exploración
 
-*(Bandeja de entrada vacía por ahora. Anota aquí cualquier idea rápida sin filtrar para procesarla y clasificarla después).*
+- [ ] **Productivity Tracker en lugar de solo Study Tracker** `[M · ⭐⭐⭐]`
+  - *Concepto:* Permitir documentar cuando se trabaja en proyectos personales, tareas de trabajo independiente o desarrollo de software sin que se sienta exclusivamente como "estudiar".
+  - *Enfoque:* Mantener la misma fórmula y KPIs pero adaptando etiquetas para abarcar *Deep Work* y construcción de proyectos.
 
-- Un Produnctuvity Tracker en lugar solo de Study Tracker, así podré documentar cuando trabajo en proyectos personales y no se sienta solo como estudio, incluso podría escalarse a otros tipos de actividades más adelante.
+---
 
 ## ❌ Descartadas
 
 | Idea                                       | Fecha      | Motivo                                                                                                                             |
 | ------------------------------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Actividad `🗂️ Preparación / Contexto` | 2026-10-20 | No es estudio real sino logística previa; se eliminó del sistema para no ensuciar las métricas cognitivas ni inflar minutos/XP. |
+| Actividad `🗂️ Preparación / Contexto`     | 2026-10-20 | No es estudio real sino logística previa; se eliminó del sistema para no ensuciar las métricas cognitivas ni inflar minutos/XP. |
+| Campo `Dominio_Final` en el formulario     | 2026-10-26 | Nadie domina un tema nuevo en 25 minutos; pedir calificar el dominio al final reintroducía fatiga de decisión y redundancia.     |
 
 ---
 
@@ -126,12 +109,20 @@ Al estudiar un paper técnico en inglés sobre Redes Generativas Antagónicas (G
 
 | Idea                                                                                                                                                                                                                                    | Fecha      | Commit/PR        |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------- |
-| Mostrar solo los últimos 5 registros en el historial (con botón *Ver todos*)                                                                                                                                                        | 2026-10-20 | Tanda 1          |
-| Redefinir *Objetivo Cumplido* a *Fluidez y Avance del Bloque* (`Sí = Flujo limpio +10%`, `Parcial = Con tropiezos +5%`, `No = Bloqueo`) con Regla de Oro para evitar malinterpretaciones                                     | 2026-10-20 | Tanda 1 / 2      |
-| Actividad `👨‍🏫 Clase / Cátedra` con ajuste automático de IA a 0% y escala enfocada en concentración e interés                                                                                                                  | 2026-10-20 | Tanda 1          |
-| Migrar persistencia de `.xlsx` (SheetJS + fórmulas de Excel duplicadas) a `.csv` puro (`data/study-tracker.csv`) con fórmulas 100% en JS                                                                                        | 2026-10-20 | CSV Refactor     |
-| Dashboard Analítico Interactivo en 4 pestañas (Evolución Día/Semana/Mes + Racha, Mapa de Calor Circadiano 7×4, Cuadrante Cognitivo IA en burbujas, Balance Consumo/Producción e Inspector de Subtemas/Notas con filtros cruzados) | 2026-10-20 | Analytics v2     |
-| **Refactor Tanda 2 — Nivel de Producción Propia (`👀 Consumo`, `📋 Reproducción`, `🧠 Generación propia`)** reemplaza medio digital/papel para capturar esfuerzo cognitivo real sin sesgo de soporte                    | 2026-10-20 | Tanda 2 Refactor |
-| **Refactor Tanda 2 — Dominio Previo en 3 niveles (`🌱 Nuevo`, `🌿 Con lagunas`, `🌳 Dominado`)** + Matriz de Fricción adaptada y Curva de Dominio en Inspector de Materia                                                 | 2026-10-20 | Tanda 2 Refactor |
-| **Reclasificación de sesiones históricas Cheatsheet (5 sesiones)** como `📋 Reproducción` y `🌿 Con lagunas` (material sintetizado por IA y reproducido a mano)                                                            | 2026-10-20 | Tanda 2 Refactor |
-| Rediseño completo de la **Guía de Referencia del Sistema** en 6 tarjetas temáticas dentro del Dashboard y en `README.md`                                                                                                     | 2026-10-20 | Tanda 2          |
+| **Refactor v3 — Esquema Canónico de 18 Columnas en CSV** con migración al vuelo retrocompatible en `excel-sync.js`                                                                                                                     | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Taxonomía Ortogonal:** 6 Actividades, 4 Dinámicas Cognitivas y Prueba Objetiva de Dominio Previo (3 niveles)                                                                                                           | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Formulario en 2 Etapas Cognitivas** (Punto de Partida al Iniciar vs. Evaluación del Bloque al Terminar)                                                                                                                | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Chips Rápidos de Materias Recientes** (1 clic para seleccionar materia o `[+ Nueva]`) + Pre-llenado inteligente por franja                                                                                             | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Franjas Horarias Circadianas Simétricas de 6h** (00:00–05:59 Madrugada, 06:00–11:59 Mañana, 12:00–17:59 Tarde, 18:00–23:59 Noche)                                                                                     | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Extracción Automática de Subtemas por `[Subtema]` en Notas** para el Inspector de Materia                                                                                                                               | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Respaldos Automáticos Diarios en Servidor** (`data/backups/YYYY-MM-DD.csv`) antes de sobrescribir el archivo                                                                                                            | 2026-10-26 | v3 Refactor      |
+| **Refactor v3 — Grid Fluido Responsivo y Text Wrap en Chips de Actividad** para evitar desbordamiento horizontal en tarjetas                                                                                                            | 2026-10-26 | v3 Bugfix        |
+| Mostrar solo los últimos 5 registros en el historial (con botón *Ver todos*)                                                                                                                                                            | 2026-10-20 | Tanda 1          |
+| Redefinir *Objetivo Cumplido* a *Fluidez y Avance del Bloque* (`Sí = Flujo limpio +10%`, `Parcial = Con tropiezos +5%`, `No = Bloqueo`) con Regla de Oro para evitar malinterpretaciones                                         | 2026-10-20 | Tanda 1 / 2      |
+| Actividad `👨‍🏫 Clase / Cátedra` con ajuste automático de IA a 0% y escala enfocada en concentración e interés                                                                                                                      | 2026-10-20 | Tanda 1          |
+| Migrar persistencia de `.xlsx` (SheetJS + fórmulas de Excel duplicadas) a `.csv` puro (`data/study-tracker.csv`) con fórmulas 100% en JS                                                                                            | 2026-10-20 | CSV Refactor     |
+| Dashboard Analítico Interactivo en 4 pestañas (Evolución Día/Semana/Mes + Racha, Mapa de Calor Circadiano 7×4, Cuadrante Cognitivo IA en burbujas, Balance Consumo/Producción e Inspector de Subtemas/Notas con filtros cruzados)     | 2026-10-20 | Analytics v2     |
+| **Refactor Tanda 2 — Nivel de Producción Propia (`👀 Consumo`, `📋 Reproducción`, `🧠 Generación propia`)** reemplaza medio digital/papel para capturar esfuerzo cognitivo real sin sesgo de soporte                                      | 2026-10-20 | Tanda 2 Refactor |
+| **Refactor Tanda 2 — Dominio Previo en 3 niveles (`🌱 Nuevo`, `🌿 Con lagunas`, `🌳 Dominado`)** + Matriz de Fricción adaptada y Curva de Dominio en Inspector de Materia                                                             | 2026-10-20 | Tanda 2 Refactor |
+| **Reclasificación de sesiones históricas Cheatsheet (5 sesiones)** como `📋 Reproducción` y `🌿 Con lagunas` (material sintetizado por IA y reproducido a mano)                                                                        | 2026-10-20 | Tanda 2 Refactor |
+| Rediseño completo de la **Guía de Referencia del Sistema** en 6 tarjetas temáticas dentro del Dashboard y en `README.md`                                                                                                         | 2026-10-20 | Tanda 2          |

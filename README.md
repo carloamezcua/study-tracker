@@ -1,6 +1,7 @@
 # ⚔️ StudyTracker v3 — Local-First Analytics & CSV Sync
 
-> 🌐 **Idioma / Language:** [🇪🇸 Español](#-español) | [🇬🇧 English](#-english)
+> 🌐 **Idioma / Language:** [🇪🇸 Español](#-español) | [🇬🇧 English](#-english)  
+> 📚 **Documentación / Docs:** [❓ Preguntas y Decisiones](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🗺️ Ruta v3](docs/ruta_refactorizaci%C3%B3n.md)
 
 ---
 
@@ -15,7 +16,7 @@ Aplicación web **Local-First** gamificada (estilo RPG) ultra-ligera con **micro
     $$\text{XP}(\text{Nivel } L) = \text{REDONDEAR}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
   - Subida rápida en los primeros niveles para motivar la constancia, progresión creciente (+10.4% por nivel) y propiedad matemática exacta donde el **Nivel 92 representa el 50% del XP total hacia el Nivel 99**.
 - **Formulario en 2 Etapas Cognitivas + Pre-llenado Inteligente (*Smart Defaults*):**
-  - **🎯 Etapa 1: Punto de Partida (Al Iniciar):** Pre-llena automáticamente la última materia, contexto, actividad y energía de la franja horaria actual. Incluye **Chips Rápidos de Materias Recientes** (1 clic para elegir materia o `[+ Nueva]`).
+  - **🎯 Etapa 1: Punto de Partida (Al Iniciar):** Pre-llena automáticamente la última materia, contexto, actividad y energía habitual para la franja horaria actual. Incluye **Chips Rápidos de Materias Recientes** (1 clic para elegir materia o `[+ Nueva]`).
   - **🏁 Etapa 2: Evaluación del Bloque (Al Terminar):** Evalúa la Dinámica Cognitiva, el `% IA`, la Fluidez del bloque, la Asimilación (1–5) y las Notas con `[Subtema]`.
 - **Taxonomía Ortogonal v3 (`4 Contextos` × `6 Actividades` × `4 Dinámicas Cognitivas` × `3 Niveles de Dominio Previo`):**
   - **Contexto / Propósito (4 chips):**
@@ -43,17 +44,71 @@ Aplicación web **Local-First** gamificada (estilo RPG) ultra-ligera con **micro
 | **`🧪 Práctica / Debugging`** | **Ejercitar o destrabar errores:** hacer laboratorios prácticos, ejercicios tipo kata/algoritmos o depurar (*debugging*) un bug hasta encontrar la causa. | Se enfoca en **entrenar destreza o arreglar fallos**, no en levantar funcionalidades nuevas desde cero (`💻 Desarrollo`). |
 | **`🔁 Repaso / Simulacro`** | **Consolidar memoria sobre algo ya visto:** repasar tus propios apuntes previos, flashcards, explicar un tema sin mirar o hacer exámenes de simulacro (*mock exams*). | Solo aplica a temas que **ya estudiaste antes** y estás reforzando para no olvidarlos o para medirte antes de un examen. |
 
-- **Franjas Horarias Circadianas de 6 Horas Exactas:**
+- **Franjas Horarias Circadianas Simétricas de 6 Horas:**
   - `00:00–05:59` → `Madrugada`
   - `06:00–11:59` → `Mañana`
   - `12:00–17:59` → `Tarde`
   - `18:00–23:59` → `Noche`
 - **Etiquetas de Subtema en Notas (`[Subtema] Nota`):**
   - Escribe `[Subtema]` al inicio de tus notas (ej. `[Mesa Redonda - GANs] Debate de arquitectura`) para agrupar automáticamente tus sesiones en el **Inspector de Subtemas** sin añadir campos obligatorios extra al formulario.
+- **Diseño Responsivo con Grid Fluido y Text Wrap:**
+  - Los grupos de chips utilizan `grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))` y ajuste de línea automático para garantizar **cero desbordamientos horizontales** en tarjetas y pantallas estrechas.
 - **Sincronización en Tiempo Real con CSV (`data/study-tracker.csv`) y Respaldos Automáticos:**
   - **Modo 1 (Servidor Local `server.js`):** Cada alta, edición (`✏️`) o eliminación (`✖`) actualiza directamente `data/study-tracker.csv` (`UTF-8 con BOM`) y crea un respaldo diario automático en `data/backups/YYYY-MM-DD.csv` antes de sobrescribir.
   - **Modo 2 (100% Navegador sin servidor):** Puedes vincular cualquier `.csv` local usando la *File System Access API* del navegador.
-  - Migración automática transparente si cargas un archivo CSV antiguo de 20 columnas (v2) al nuevo esquema de 18 columnas (v3).
+  - Migración automática transparente si cargas un archivo CSV antiguo de 20 columnas (v2) al nuevo esquema canónico de 18 columnas (v3).
+
+### 🏗️ Arquitectura del Proyecto (v3.0)
+
+```mermaid
+flowchart TD
+    subgraph UI["Capa de Presentación / Frontend Layer"]
+        HTML["index.html\n(2-Stage Form + Smart Chips)"]
+        CSS["css/styles.css\n(Fluid Grid & Responsive Chips)"]
+        I18N["js/ui/i18n.js\n(Bilingual ES / EN Engine)"]
+        TIMER["js/ui/timer.js\n(Stopwatch + Pomodoro)"]
+        DASH["js/ui/dashboard.js\n(Smart Defaults, Inspector & KPIs)"]
+        CHARTS["js/ui/charts.js\n(Quadrant, Heatmap & Evolution)"]
+    end
+
+    subgraph Controller["Controlador Principal / Main Controller"]
+        APP["js/app.js\n(Orchestrator & Form Events)"]
+    end
+
+    subgraph State["Capa de Estado / State Layer"]
+        STORE["js/state/store.js\n(18-col Normalizer & Pub/Sub)"]
+        LS[("LocalStorage")]
+    end
+
+    subgraph Domain["Capa de Dominio / Domain Layer"]
+        METRICS["js/domain/metrics.js\n(Lv.1-99 Curve, 6h Slots & Analytics)"]
+    end
+
+    subgraph Sync["Sincronización CSV & Respaldos"]
+        SYNC["js/services/excel-sync.js\n(18-col RFC 4180 CSV + On-the-fly Migration)"]
+        SERVER["server.js\n(Node.js HTTP + Native FS + Daily Backups)"]
+        CSV[("data/study-tracker.csv\n(UTF-8 BOM, Git-ignored)")]
+        BACKUPS[("data/backups/YYYY-MM-DD.csv\n(Automatic Daily Backups)")]
+    end
+
+    HTML --> APP
+    APP --> I18N
+    APP --> TIMER
+    TIMER --> DASH
+    APP --> STORE
+    STORE --> LS
+    STORE --> APP
+    APP --> DASH
+    DASH --> CHARTS
+    APP --> SYNC
+    SYNC <--> SERVER
+    SERVER <--> CSV
+    SERVER --> BACKUPS
+    STORE --> METRICS
+    DASH --> METRICS
+    CHARTS --> METRICS
+    SYNC --> METRICS
+```
 
 ### 🧮 Esquema de 18 Columnas en CSV (`data/study-tracker.csv`) y Fórmulas en JavaScript
 
@@ -67,12 +122,16 @@ El archivo `data/study-tracker.csv` se guarda en texto plano `UTF-8 con BOM` (es
 | **XP Ganados** | $\text{REDONDEAR}\Big(\text{Duración} \times \max(0.5,\ 1 + \text{Calidad}\times 0.2 + \text{BonoReto} + \text{BonoMeta} + \text{BonoDinamica})\Big)$ |
 | **Nivel Exponencial (1-99)** | $\text{XP}(L) = \text{REDONDEAR}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Nivel 92 = 50% de 99)* |
 | **Franja Horaria** | `00:00–05:59 Madrugada` · `06:00–11:59 Mañana` · `12:00–17:59 Tarde` · `18:00–23:59 Noche` |
+| **Bono Dinámica** | `Generación Propia (+10%)` · `Andamiaje (+5%)` · `Recepción Pasiva (0%)` · `Delegación (-15% si IA ≥ 50%)` |
 
 ### 🚀 Cómo Iniciar el Proyecto
+
+No requiere instalar paquetes externos (`node_modules`), ya que tanto el frontend como `server.js` usan código nativo:
 
 1. Haz doble clic en **`start.bat`** (o ejecuta `npm start` / `node server.js` en la terminal).
 2. Se abrirá automáticamente `http://localhost:3000`.
 3. El indicador superior mostrará **`🟢 Sincronizado en vivo: data/study-tracker.csv`**.
+4. Cada sesión que registres, edites (`✏️`) o elimines (`✖`) actualizará instantáneamente el archivo `data/study-tracker.csv` y generará un respaldo diario en `data/backups/`.
 
 ---
 
@@ -85,6 +144,7 @@ An ultra-lightweight gamified **Local-First** web application (RPG-style) powere
 - **Exponential RPG Level Curve (*"Level 92 is half of 99"*):**
   - Inspired by *Old School RuneScape*, required experience **doubles every 7 levels**:
     $$\text{XP}(\text{Level } L) = \text{ROUND}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
+  - Fast early leveling to reward consistency, progressive scaling (+10.4% per level), and the exact mathematical property where **Level 92 equals 50% of the total XP required for Level 99**.
 - **2-Stage Cognitive Form + Smart Defaults:**
   - **🎯 Stage 1: Starting Point (At Start):** Auto-prefills your latest subject, context, activity, and typical energy for the current time slot. Includes **Recent Subject Quick-Chips** (1 click to pick a subject or `[+ New]`).
   - **🏁 Stage 2: Block Evaluation (At End):** Rate the Cognitive Dynamic, `% AI`, Block Fluency, Assimilation (1–5), and Notes with `[Subtopic]`.
@@ -110,7 +170,26 @@ An ultra-lightweight gamified **Local-First** web application (RPG-style) powere
   - `06:00–11:59` → `Morning` (`Mañana`)
   - `12:00–17:59` → `Afternoon` (`Tarde`)
   - `18:00–23:59` → `Night` (`Noche`)
+- **Fluid Grid & Text Wrap (Zero Horizontal Overflow):**
+  - Chip groups use `repeat(auto-fit, minmax(150px, 1fr))` with natural wrapping to fit cards cleanly across all screen sizes.
 
-### 🧮 18-Column CSV Schema (`data/study-tracker.csv`)
+### 🧮 18-Column CSV Schema (`data/study-tracker.csv`) & JavaScript Formulas
+
+The generated `data/study-tracker.csv` file is stored in plain-text `UTF-8 with BOM` (RFC 4180 standard) with the following **18 columns**:
 
 `Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tipo_Actividad,Dinamica_Cognitiva,Uso_IA_Porcentaje,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,XP_Ganados,Notas`
+
+| Metric | Rule / Formula in JavaScript (`js/domain/metrics.js`) |
+| :--- | :--- |
+| **Duration (min)** | Difference between `Hora_Fin` and `Hora_Inicio` (supports midnight crossover by adding `1440` min). |
+| **XP Earned** | $\text{ROUND}\Big(\text{Duration} \times \max(0.5,\ 1 + \text{Quality}\times 0.2 + \text{ChallengeBonus} + \text{GoalBonus} + \text{DynamicBonus})\Big)$ |
+| **Exponential Level (1-99)** | $\text{XP}(L) = \text{ROUND}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Level 92 = 50% of 99)* |
+| **Circadian Slots** | `00:00–05:59 Early Morning` · `06:00–11:59 Morning` · `12:00–17:59 Afternoon` · `18:00–23:59 Night` |
+
+### 🚀 Getting Started
+
+No external `node_modules` installation is required:
+
+1. Double-click **`start.bat`** (or run `npm start` / `node server.js` in your terminal).
+2. `http://localhost:3000` will open automatically in your browser.
+3. The top status pill will display **`🟢 Live synced: data/study-tracker.csv`**.
