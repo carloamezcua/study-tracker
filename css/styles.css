@@ -464,22 +464,33 @@ textarea:focus {
 .chip-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .chip-btn {
   flex: 1 1 auto;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
   background: var(--bg);
   border: 1px solid var(--border);
   color: var(--muted);
-  padding: 6px 9px;
+  padding: 7px 9px;
   border-radius: 8px;
-  font-size: 0.78rem;
+  font-size: 0.77rem;
+  line-height: 1.25;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .chip-btn:hover {
@@ -497,8 +508,17 @@ textarea:focus {
 .chip-group.chip-grid-6,
 .chip-group.chip-grid-2 {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 380px) {
+  .chip-group.chip-grid-6,
+  .chip-group.chip-grid-2 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ia-slider-row {
@@ -537,6 +557,9 @@ textarea:focus {
   border-radius: 4px;
   font-size: 0.76rem;
   color: var(--muted);
+  box-sizing: border-box;
+  width: 100%;
+  overflow-wrap: break-word;
 }
 
 input[type="range"] {
@@ -1519,6 +1542,8 @@ tr.row-editing td {
   border-radius: 11px;
   padding: 12px 13px;
   margin-bottom: 14px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .form-stage-card.stage-start {
@@ -1559,6 +1584,8 @@ tr.row-editing td {
   flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 7px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .subject-chip-btn {
@@ -1572,6 +1599,7 @@ tr.row-editing td {
   cursor: pointer;
   transition: all 0.15s ease;
   max-width: 100%;
+  box-sizing: border-box;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
