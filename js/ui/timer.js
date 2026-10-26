@@ -381,15 +381,17 @@
   function tick() {
     const transcurridoMs = obtenerTranscurridoMs();
 
-    // Si es modo estudio (no descanso), actualizamos en vivo la hora fin proyectada cada minuto
+    // Si es modo estudio (no descanso), actualizamos en vivo la hora fin proyectada según el tiempo activo neto
     if (
       estado.corriendo &&
-      !(estado.modo === "pomodoro" && estado.fasePomodoro === "descanso")
+      !(estado.modo === "pomodoro" && estado.fasePomodoro === "descanso") &&
+      estado.horaInicioCapturada
     ) {
-      const horaActual = formatearHoraLocal();
+      const minTranscurridos = Math.max(1, Math.round(transcurridoMs / 60000));
+      const horaProyectada = sumarMinutosAHora(estado.horaInicioCapturada, minTranscurridos);
       const inputFin = document.getElementById("horaFin");
-      if (inputFin && inputFin.value !== horaActual) {
-        inputFin.value = horaActual;
+      if (inputFin && inputFin.value !== horaProyectada) {
+        inputFin.value = horaProyectada;
         if (StudyTracker.UI && typeof StudyTracker.UI.actualizarPreview === "function") {
           StudyTracker.UI.actualizarPreview();
         }
@@ -508,28 +510,9 @@
         estado.horaInicioCapturada = formatearHoraLocal(inicioEstimado);
       }
 
-      let horaFin = formatearHoraLocal(ahora);
-
-      // Si fue un bloque Pomodoro completado o si el reloj corrió y coincide en el mismo minuto (ej. prueba rápida),
-      // garantizamos que Hora Fin refleje al menos 1 minuto (o los minutos del Pomodoro si hubo pausas).
-      if (automaticoPorPomodoro && estado.modo === "pomodoro") {
-        const minReales = StudyTracker.RPG.calcularMinutos(
-          estado.horaInicioCapturada,
-          horaFin
-        );
-        if (minReales === 0) {
-          horaFin = sumarMinutosAHora(
-            estado.horaInicioCapturada,
-            estado.minutosPomodoro
-          );
-        }
-      } else if (
-        horaFin === estado.horaInicioCapturada &&
-        transcurridoMs >= 1000
-      ) {
-        const minTranscurridos = Math.max(1, Math.round(transcurridoMs / 60000));
-        horaFin = sumarMinutosAHora(estado.horaInicioCapturada, minTranscurridos);
-      }
+      // El tiempo neto de estudio activo acumulado (excluyendo pausas)
+      const minTranscurridos = Math.max(1, Math.round(transcurridoMs / 60000));
+      const horaFin = sumarMinutosAHora(estado.horaInicioCapturada, minTranscurridos);
 
       estado.horaFinCapturada = horaFin;
       sincronizarInputsFormulario({ resaltar: true });

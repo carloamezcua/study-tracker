@@ -11,6 +11,7 @@
     migrarTipoActividad,
     migrarDominioPrevio,
     migrarDinamicaCognitiva,
+    migrarEstadoObjetivo,
     formatearNotasConTema,
     extraerSubtemaDeNotas,
     calcularMinutos,
@@ -70,7 +71,7 @@
           : calcularMinutos(s.horaInicio, s.horaFin);
       const calidad = Math.min(5, Math.max(1, Number(s.calidad) || 3));
       const complejidad = s.complejidad || "Desafiante";
-      const objetivoCumplido = s.objetivoCumplido || "Sí";
+      const objetivoCumplido = migrarEstadoObjetivo(s.objetivoCumplido);
       const usoIA = Math.min(100, Math.max(0, Math.round(Number(s.usoIA) || 0)));
       const tipoActividad = migrarTipoActividad(s.tipoActividad);
       const dinamicaCognitiva = migrarDinamicaCognitiva(
@@ -229,7 +230,7 @@
       );
       const energiaPrevia = r.Energia_Previa || r.energiaPrevia || "Media";
       const complejidad = r.Complejidad || r.complejidad || "Desafiante";
-      const objetivoCumplido = r.Objetivo_Cumplido || r.objetivoCumplido || "Sí";
+      const objetivoCumplido = migrarEstadoObjetivo(r.Objetivo_Cumplido || r.objetivoCumplido);
 
       const duracion = calcularMinutos(horaInicio, horaFin) || Number(r.Duracion_Minutos || 0);
       const calidad = Math.min(5, Math.max(1, Number(r.Calidad || 3)));

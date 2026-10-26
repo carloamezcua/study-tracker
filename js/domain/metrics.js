@@ -152,28 +152,36 @@
 
   const ESTADOS_OBJETIVO = [
     {
-      valor: "Sí",
+      valor: "Flujo limpio",
       icono: "✅",
-      etiqueta: "Sí (Flujo limpio +10%)",
+      etiqueta: "Flujo limpio (+10%)",
       bonoXP: 0.1,
       ayuda:
-        "✅ Flujo limpio (+10% XP): Evalúa ESTE bloque, no si acabaste toda la tarea/proyecto. Úsalo si avanzaste a buen ritmo en lo planeado para esta sesión sin quedarte estancado."
+        "✅ Flujo limpio (+10% XP): Avanzaste a buen ritmo en este bloque. Aplica también si tuviste que retirarte antes por un factor externo pero tu foco fue bueno."
     },
     {
-      valor: "Parcial",
+      valor: "Lucha productiva",
+      icono: "🧠",
+      etiqueta: "Lucha productiva (+10%)",
+      bonoXP: 0.1,
+      ayuda:
+        "🧠 Lucha productiva (+10% XP): Batallaste con un reto difícil, probaste hipótesis y descartaste caminos sin llegar al resultado final. ¡Aprendizaje por ensayo y error!"
+    },
+    {
+      valor: "Con fricción",
       icono: "⚠️",
-      etiqueta: "Parcial (Con tropiezos +5%)",
+      etiqueta: "Con fricción (+5%)",
       bonoXP: 0.05,
       ayuda:
-        "⚠️ Con tropiezos / Fricción (+5% XP): Sí avanzaste, pero perdiste parte importante del bloque atorado en un bug, distracción, cansancio o confusión y el ritmo fue accidentado."
+        "⚠️ Con fricción (+5% XP): Hubo avance, pero accidentado por distracciones, interrupciones o prisa de entrega de última hora."
     },
     {
-      valor: "No",
-      icono: "❌",
-      etiqueta: "No (Bloqueo / Sin avance)",
+      valor: "Parálisis / Abandono",
+      icono: "🔴",
+      etiqueta: "Parálisis / Abandono (0%)",
       bonoXP: 0,
       ayuda:
-        "❌ Bloqueo real (0% bono): Te quedaste trabado casi toda la sesión en un obstáculo técnico/conceptual sin lograr destrabarlo, o tuviste que abortar la sesión sin avance efectivo."
+        "🔴 Parálisis / Abandono (0% bono): Sesión en blanco: bloqueo pasivo, procrastinación o abandono sin procesamiento mental activo."
     }
   ];
 
@@ -198,6 +206,7 @@
   const VALORES_ACTIVIDAD_SET = new Set(TIPOS_ACTIVIDAD.map((a) => a.valor));
   const VALORES_DINAMICA_SET = new Set(DINAMICAS_COGNITIVAS.map((d) => d.valor));
   const VALORES_DOMINIO_SET = new Set(NIVELES_DOMINIO.map((d) => d.valor));
+  const VALORES_OBJETIVO_SET = new Set(ESTADOS_OBJETIVO.map((o) => o.valor));
 
   /**
    * Migra nombres antiguos de Tipo de Actividad al catálogo v3 de 6 opciones.
@@ -266,6 +275,22 @@
     if (pctIA === 0) return "Generación Propia";
     if (pctIA >= 75) return "Delegación / Reproducción";
     return "Andamiaje / Co-creación";
+  }
+
+  /**
+   * Migra valores antiguos de Objetivo Cumplido ("Sí", "Parcial", "No") a la escala v3.1
+   * (Flujo limpio, Lucha productiva, Con fricción, Parálisis / Abandono).
+   */
+  function migrarEstadoObjetivo(objetivoRaw) {
+    const val = String(objetivoRaw || "").trim();
+    if (VALORES_OBJETIVO_SET.has(val)) return val;
+    if (val === "Sí" || val === "Si" || val === "Flujo") return "Flujo limpio";
+    if (val === "Lucha") return "Lucha productiva";
+    if (val === "Parcial" || val === "Fricción" || val === "Friccion") return "Con fricción";
+    if (val === "No" || val === "Bloqueo" || val === "Parálisis" || val === "Paralisis") {
+      return "Parálisis / Abandono";
+    }
+    return "Flujo limpio";
   }
 
   /**
@@ -364,10 +389,11 @@
   }
 
   /**
-   * Devuelve el bono multiplicador por cumplimiento de objetivo (+10% Sí, +5% Parcial, 0% No).
+   * Devuelve el bono multiplicador por cumplimiento de objetivo (+10% Flujo/Lucha, +5% Fricción, 0% Parálisis).
    */
   function obtenerBonoObjetivo(objetivoCumplido) {
-    const item = ESTADOS_OBJETIVO.find((o) => o.valor === objetivoCumplido);
+    const canon = migrarEstadoObjetivo(objetivoCumplido);
+    const item = ESTADOS_OBJETIVO.find((o) => o.valor === canon);
     return item ? item.bonoXP : 0;
   }
 
@@ -487,10 +513,21 @@
       ? Math.round(lista.reduce((acc, s) => acc + (Number(s.usoIA) || 0), 0) / totalSesiones)
       : 0;
 
-    const cumplidosSi = lista.filter((s) => s.objetivoCumplido === "Sí").length;
-    const cumplidosParcial = lista.filter((s) => s.objetivoCumplido === "Parcial").length;
-    const bloqueosNo = lista.filter((s) => s.objetivoCumplido === "No").length;
-    const tasaObjetivos = totalSesiones ? Math.round((cumplidosSi / totalSesiones) * 100) : 0;
+    const cumplidosFlujo = lista.filter(
+      (s) => migrarEstadoObjetivo(s.objetivoCumplido) === "Flujo limpio"
+    ).length;
+    const cumplidosLucha = lista.filter(
+      (s) => migrarEstadoObjetivo(s.objetivoCumplido) === "Lucha productiva"
+    ).length;
+    const cumplidosFriccion = lista.filter(
+      (s) => migrarEstadoObjetivo(s.objetivoCumplido) === "Con fricción"
+    ).length;
+    const bloqueosParalisis = lista.filter(
+      (s) => migrarEstadoObjetivo(s.objetivoCumplido) === "Parálisis / Abandono"
+    ).length;
+    const tasaObjetivos = totalSesiones
+      ? Math.round(((cumplidosFlujo + cumplidosLucha) / totalSesiones) * 100)
+      : 0;
 
     // Desglose por Dinámica Cognitiva
     const dinGeneracion = lista.filter(
@@ -514,9 +551,13 @@
       promedioMinutos,
       promedioCalidad,
       promedioIA,
-      cumplidosSi,
-      cumplidosParcial,
-      bloqueosNo,
+      cumplidosFlujo,
+      cumplidosLucha,
+      cumplidosFriccion,
+      bloqueosParalisis,
+      cumplidosSi: cumplidosFlujo, // Alias retrocompatible
+      cumplidosParcial: cumplidosFriccion, // Alias retrocompatible
+      bloqueosNo: bloqueosParalisis, // Alias retrocompatible
       tasaObjetivos,
       dinGeneracion,
       dinAndamiaje,
@@ -678,7 +719,7 @@
 
     // 4. Resumen de Objetivos Cumplidos
     const resumenObjetivos = ESTADOS_OBJETIVO.map((est) => {
-      const conteo = lista.filter((s) => s.objetivoCumplido === est.valor).length;
+      const conteo = lista.filter((s) => migrarEstadoObjetivo(s.objetivoCumplido) === est.valor).length;
       return {
         ...est,
         conteo
@@ -693,7 +734,9 @@
       const calidadProm = conteo
         ? +(filtradas.reduce((acc, s) => acc + (Number(s.calidad) || 0), 0) / conteo).toFixed(1)
         : 0;
-      const bloqueos = filtradas.filter((s) => s.objetivoCumplido === "No").length;
+      const bloqueos = filtradas.filter(
+        (s) => migrarEstadoObjetivo(s.objetivoCumplido) === "Parálisis / Abandono"
+      ).length;
       return {
         ...comp,
         conteo,
@@ -761,7 +804,10 @@
       const iaProm = conteo
         ? Math.round(filtradas.reduce((acc, s) => acc + (Number(s.usoIA) || 0), 0) / conteo)
         : 0;
-      const fluidos = filtradas.filter((s) => s.objetivoCumplido === "Sí").length;
+      const fluidos = filtradas.filter((s) => {
+        const est = migrarEstadoObjetivo(s.objetivoCumplido);
+        return est === "Flujo limpio" || est === "Lucha productiva";
+      }).length;
       const pctFluidez = conteo ? Math.round((fluidos / conteo) * 100) : 0;
       return {
         ...fam,
@@ -773,7 +819,7 @@
       };
     });
 
-    // 9. Matriz de Fricción: distribución Sí / Parcial / No por Complejidad y Dominio Previo
+    // 9. Matriz de Fricción: distribución Flujo / Lucha / Fricción / Parálisis por Complejidad y Dominio Previo
     const categoriasFriccion = [
       { clave: "Fácil", tipo: "complejidad", etiqueta: "🟢 Fácil" },
       { clave: "Desafiante", tipo: "complejidad", etiqueta: "🟡 Desafiante" },
@@ -790,18 +836,28 @@
           : migrarDominioPrevio(s.dominioPrevio) === cat.clave
       );
       const total = sub.length;
-      const si = sub.filter((s) => s.objetivoCumplido === "Sí").length;
-      const parcial = sub.filter((s) => s.objetivoCumplido === "Parcial").length;
-      const no = sub.filter((s) => s.objetivoCumplido === "No").length;
+      const flujo = sub.filter((s) => migrarEstadoObjetivo(s.objetivoCumplido) === "Flujo limpio").length;
+      const lucha = sub.filter((s) => migrarEstadoObjetivo(s.objetivoCumplido) === "Lucha productiva").length;
+      const friccion = sub.filter((s) => migrarEstadoObjetivo(s.objetivoCumplido) === "Con fricción").length;
+      const paralisis = sub.filter((s) => migrarEstadoObjetivo(s.objetivoCumplido) === "Parálisis / Abandono").length;
       return {
         ...cat,
         total,
-        si,
-        parcial,
-        no,
-        pctSi: total ? Math.round((si / total) * 100) : 0,
-        pctParcial: total ? Math.round((parcial / total) * 100) : 0,
-        pctNo: total ? Math.round((no / total) * 100) : 0
+        flujo,
+        lucha,
+        friccion,
+        paralisis,
+        // Aliases retrocompatibles para código existente
+        si: flujo,
+        parcial: friccion,
+        no: paralisis,
+        pctFlujo: total ? Math.round((flujo / total) * 100) : 0,
+        pctLucha: total ? Math.round((lucha / total) * 100) : 0,
+        pctFriccion: total ? Math.round((friccion / total) * 100) : 0,
+        pctParalisis: total ? Math.round((paralisis / total) * 100) : 0,
+        pctSi: total ? Math.round((flujo / total) * 100) : 0,
+        pctParcial: total ? Math.round((friccion / total) * 100) : 0,
+        pctNo: total ? Math.round((paralisis / total) * 100) : 0
       };
     });
 
@@ -1184,10 +1240,11 @@
   }
 
   /**
-   * Devuelve el texto explicativo para un estado de Objetivo Cumplido (Sí, Parcial, No).
+   * Devuelve el texto explicativo para un estado de Fluidez y Avance del Bloque.
    */
   function obtenerTextoAyudaObjetivo(objetivoCumplido) {
-    const item = ESTADOS_OBJETIVO.find((o) => o.valor === objetivoCumplido);
+    const canon = migrarEstadoObjetivo(objetivoCumplido);
+    const item = ESTADOS_OBJETIVO.find((o) => o.valor === canon);
     return item ? item.ayuda : ESTADOS_OBJETIVO[0].ayuda;
   }
 
@@ -1241,6 +1298,7 @@
     migrarTipoActividad,
     migrarDominioPrevio,
     migrarDinamicaCognitiva,
+    migrarEstadoObjetivo,
     formatearNotasConTema,
     extraerSubtemaDeNotas,
     calcularMinutos,

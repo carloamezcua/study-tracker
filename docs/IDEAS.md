@@ -92,9 +92,7 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 
 - [X] **Formulario en 2 Etapas Cognitivas** *(Implementado en v3.0: Bloque 1 Inicio + Bloque 2 Fin)*
 - [X] **Valores por defecto inteligentes y chips rápidos de materias** *(Implementado en v3.0)*
-- [ ] **Manejo Correcto de Pausas en el Cronómetro** `[S · ⭐⭐⭐]`
-  - *Problema actual:* Al pausar el cronómetro y luego pulsar "Terminar", la duración se calcula restando `Hora_Fin - Hora_Inicio` de reloj real, ignorando el tiempo que estuvo en pausa e inflando artificialmente los minutos de estudio.
-  - *Corrección:* Descontar los minutos de pausa de la duración efectiva o ajustar la hora de inicio virtual.
+- [X] **Manejo Correcto de Pausas y Retiro Temprano en el Cronómetro** *(Implementado en v3.1: se calcula Hora_Fin desde tiempo activo neto transcurridoMs, excluyendo pausas y sin distorsión al salir antes)*
 - [ ] Modo oscuro / temas visuales adicionales `[S · ⭐⭐]`
 - [ ] Atajos de teclado para inicio rápido (ej. `Espacio` para pausar/reanudar, `Ctrl+Enter` para guardar) `[S · ⭐⭐]`
 
@@ -120,8 +118,6 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 - [ ] **Productivity Tracker en lugar de solo Study Tracker** `[M · ⭐⭐⭐]`
   - *Concepto:* Permitir documentar cuando se trabaja en proyectos personales, tareas de trabajo independiente o desarrollo de software sin que se sienta exclusivamente como "estudiar".
   - *Enfoque:* Mantener la misma fórmula y KPIs pero adaptando etiquetas para abarcar *Deep Work* y construcción de proyectos.
-- [ ] **Rediseño de Fluidez del Bloque y Prevención de Sesgo Punitivo en XP** `[S · ⭐⭐⭐]`
-  - *(Ver análisis detallado y propuestas arriba en la sección `### 🧩 Rediseño de Fluidez del Bloque`)*.
 - [ ] **Rediseño del Layout del Formulario (Evitar columna izquierda alargada)** `[M · ⭐⭐]`
   - *Problema:* El formulario ocupa una columna lateral fija de 420px a la izquierda, lo que alarga mucho la página verticalmente cuando hay varias opciones en pantalla.
   - *Objetivo:* Explorar layouts alternativos (ej. formulario horizontal colapsable, vista compacta por pestañas o disposición balanceada) para que no canse visualmente.
@@ -141,6 +137,8 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 
 | Idea                                                                                                                                                                                                                                    | Fecha      | Commit/PR        |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------- |
+| **Lucha Productiva y Rediseño de Fluidez del Bloque sin Sesgo Punitivo en XP (v3.1)**: Escala de 4 estados (`Flujo limpio`, `Lucha productiva`, `Con fricción`, `Parálisis / Abandono`) con +10% de bono para lucha cognitiva | 2026-10-26 | v3.1 Feature     |
+| **Cálculo Exacto de Tiempo al Retirarse o Pausar en Cronómetro/Pomodoro (v3.1)**: `Hora_Fin` proyectada a partir del tiempo neto activo real, sin distorsión de duración | 2026-10-26 | v3.1 Feature     |
 | **Documento de Decisiones de Arquitectura e Historial de Versiones (`docs/DECISIONES.md`)**                                                                                                                                             | 2026-10-26 | Docs             |
 | **Refactor v3 — Esquema Canónico de 18 Columnas en CSV** con migración al vuelo retrocompatible en `excel-sync.js`                                                                                                           | 2026-10-26 | v3 Refactor      |
 | **Refactor v3 — Taxonomía Ortogonal:** 6 Actividades, 4 Dinámicas Cognitivas y Prueba Objetiva de Dominio Previo (3 niveles)                                                                                                   | 2026-10-26 | v3 Refactor      |

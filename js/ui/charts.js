@@ -524,7 +524,7 @@
   }
 
   /**
-   * 6. Gráfico de Matriz de Fricción (Barras Apiladas Sí / Parcial / No por Complejidad y Dominio Previo).
+   * 6. Gráfico de Matriz de Fricción (Barras Apiladas de 4 niveles por Complejidad y Dominio Previo).
    */
   function actualizarGraficoMatrizFriccion(datosHabitos) {
     const canvas = document.getElementById("chartMatrizFriccion");
@@ -536,21 +536,29 @@
         ? trVal("complejidad", f.clave)
         : trVal("dominioPrevio", f.clave)
     );
-    const dataSi = filas.map((f) => f.si);
-    const dataParcial = filas.map((f) => f.parcial);
-    const dataNo = filas.map((f) => f.no);
+    const dataFlujo = filas.map((f) => f.flujo ?? f.si);
+    const dataLucha = filas.map((f) => f.lucha ?? 0);
+    const dataFriccion = filas.map((f) => f.friccion ?? f.parcial);
+    const dataParalisis = filas.map((f) => f.paralisis ?? f.no);
 
-    if (chartFriccionInstance) {
+    if (chartFriccionInstance && chartFriccionInstance.data.datasets.length === 4) {
       chartFriccionInstance.data.labels = labels;
-      chartFriccionInstance.data.datasets[0].label = t("frictionDsYes");
-      chartFriccionInstance.data.datasets[0].data = dataSi;
-      chartFriccionInstance.data.datasets[1].label = t("frictionDsPartial");
-      chartFriccionInstance.data.datasets[1].data = dataParcial;
-      chartFriccionInstance.data.datasets[2].label = t("frictionDsNo");
-      chartFriccionInstance.data.datasets[2].data = dataNo;
+      chartFriccionInstance.data.datasets[0].label = t("frictionDsFlow");
+      chartFriccionInstance.data.datasets[0].data = dataFlujo;
+      chartFriccionInstance.data.datasets[1].label = t("frictionDsStruggle");
+      chartFriccionInstance.data.datasets[1].data = dataLucha;
+      chartFriccionInstance.data.datasets[2].label = t("frictionDsFriction");
+      chartFriccionInstance.data.datasets[2].data = dataFriccion;
+      chartFriccionInstance.data.datasets[3].label = t("frictionDsFreeze");
+      chartFriccionInstance.data.datasets[3].data = dataParalisis;
       chartFriccionInstance.options.scales.y.title.text = t("frictionAxisSessions");
       chartFriccionInstance.update();
       return;
+    }
+
+    if (chartFriccionInstance) {
+      chartFriccionInstance.destroy();
+      chartFriccionInstance = null;
     }
 
     const ctxFric = canvas.getContext("2d");
@@ -560,22 +568,29 @@
         labels,
         datasets: [
           {
-            label: t("frictionDsYes"),
-            data: dataSi,
+            label: t("frictionDsFlow"),
+            data: dataFlujo,
             backgroundColor: "rgba(16, 185, 129, 0.78)",
             borderRadius: 5,
             stack: "friccion"
           },
           {
-            label: t("frictionDsPartial"),
-            data: dataParcial,
+            label: t("frictionDsStruggle"),
+            data: dataLucha,
+            backgroundColor: "rgba(139, 92, 246, 0.82)",
+            borderRadius: 5,
+            stack: "friccion"
+          },
+          {
+            label: t("frictionDsFriction"),
+            data: dataFriccion,
             backgroundColor: "rgba(245, 158, 11, 0.82)",
             borderRadius: 5,
             stack: "friccion"
           },
           {
-            label: t("frictionDsNo"),
-            data: dataNo,
+            label: t("frictionDsFreeze"),
+            data: dataParalisis,
             backgroundColor: "rgba(239, 68, 68, 0.82)",
             borderRadius: 5,
             stack: "friccion"

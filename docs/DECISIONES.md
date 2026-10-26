@@ -145,3 +145,20 @@ timeline
 * **Contexto:** Modificar el CSV directamente mediante llamadas HTTP de sobrescritura creaba un riesgo potencial de pérdida de datos por cortes de energía o bugs.
 * **Decisión:** En `server.js`, antes de ejecutar `fs.writeFileSync(CSV_PATH)`, el servidor verifica y copia automáticamente el archivo a `data/backups/YYYY-MM-DD.csv` si aún no existe un respaldo para el día en curso.
 * **Consecuencias:** Seguridad de datos nivel producción con cero intervención del usuario.
+
+
+---
+
+### ADR-009: Lucha Productiva y Rediseño de Fluidez del Bloque sin Sesgo Punitivo en XP
+* **Fecha:** 2026-10-26 | **Estado:** Aceptado
+* **Contexto:** La escala binaria previa de objetivo cumplido (`Sí` / `Parcial` / `No`) generaba dos problemas:
+  1. **Sesgo punitivo ante retos cognitivos altos:** Un estudiante que pasa 30 minutos intentando resolver una derivada o cazar un bug complejo y descarta hipótesis aprende activamente de la frustración y la experimentación, pero al no completar la meta tangible marcaba `Parcial` o `No`, perdiendo XP.
+  2. **Confusión ante interrupciones externas o retiros tempranos:** Si el estudiante debía retirarse antes por un imprevisto o entregar un avance urgente pero su ritmo fue enfocado y de calidad, se sentía tentado a castigarse como `Parcial`.
+* **Decisión:** 
+  1. Rediseñar la escala de `Objetivo_Cumplido` en 4 estados cognitivos claros:
+     - `✅ Flujo limpio (+10% XP)`: Ritmo constante y sin tropiezos graves. Válido también si el usuario debió retirarse antes por causas externas pero el tiempo dedicado fluyó enfocado.
+     - `🧠 Lucha productiva (+10% XP)`: Duelo mental activo contra un bug o concepto duro; se descartaron hipótesis y se aprendió qué caminos no tomar, otorgando el mismo bono del 10% que el flujo limpio.
+     - `⚠️ Con fricción (+5% XP)`: Hubo progreso pero con distracciones, cansancio, tropiezos o velocidad irregular.
+     - `🔴 Parálisis / Abandono (0% bono)`: Bloqueo pasivo, dar vueltas en círculos sin probar caminos, procrastinación o sesión en blanco (conserva la XP base intacta).
+  2. Ajustar el cronómetro / pomodoro para calcular la `Hora_Fin` a partir del tiempo neto activo transcurrido (`transcurridoMs`), excluyendo pausas y registrando la duración real sin distorsión.
+* **Consecuencias:** Se elimina el sesgo punitivo de la gamificación, se alinea la experiencia RPG con el esfuerzo cognitivo real y la Matriz de Fricción ahora visualiza 4 niveles apilados por materia y dominio previo.

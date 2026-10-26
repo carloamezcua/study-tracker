@@ -326,12 +326,13 @@
             <div class="form-group">
               <label><span data-i18n="labelGoal">¿Fluidez y Avance del Bloque?</span> <span class="label-hint" data-i18n="labelGoalHint">(Evalúa este bloque, no si terminaste todo el entregable)</span></label>
               <div class="chip-group" data-group="objetivoCumplido">
-                <button type="button" class="chip-btn active" data-value="Sí">✅ Sí (Flujo limpio +10%)</button>
-                <button type="button" class="chip-btn" data-value="Parcial">⚠️ Parcial (Con tropiezos +5%)</button>
-                <button type="button" class="chip-btn" data-value="No">❌ No (Bloqueo)</button>
+                <button type="button" class="chip-btn active" data-value="Flujo limpio">✅ Flujo limpio (+10%)</button>
+                <button type="button" class="chip-btn" data-value="Lucha productiva">🧠 Lucha productiva (+10%)</button>
+                <button type="button" class="chip-btn" data-value="Con fricción">⚠️ Con fricción (+5%)</button>
+                <button type="button" class="chip-btn" data-value="Parálisis / Abandono">🔴 Parálisis / Abandono</button>
               </div>
               <div id="ayudaObjetivo" class="helper-box">
-                ✅ Flujo limpio (+10% XP): Evalúa ESTE bloque, no si acabaste toda la tarea/proyecto. Úsalo si avanzaste a buen ritmo en lo planeado para esta sesión sin quedarte estancado.
+                ✅ Flujo limpio (+10% XP): Ritmo constante y sin tropiezos graves. Válido también si te retiraste antes por causas externas pero el tiempo dedicado fluyó impecable.
               </div>
             </div>
 
@@ -582,14 +583,15 @@
           </ul>
         </div>
 
-        <!-- TARJETA 2: SÍ VS PARCIAL VS NO (REGLA DE ORO DEL AVANCE) -->
+        <!-- TARJETA 2: FLUIDEZ Y AVANCE DEL BLOQUE (REGLA DE ORO) -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard2Title">🎯 2. ¿Cuándo elegir Sí, Parcial o Bloqueo?</h4>
+          <h4 data-i18n="guideCard2Title">🎯 2. Fluidez y Avance del Bloque</h4>
           <ul>
-            <li data-i18n-html="guideCard2Li1"><strong>Regla de Oro:</strong> Evalúa <strong>la fluidez de este bloque de tiempo</strong>, nunca si ya terminaste el proyecto o entregable completo.</li>
-            <li data-i18n-html="guideCard2Li2"><strong>✅ Sí — Flujo limpio (+10% XP):</strong> Avanzaste a buen ritmo en la parte que tocabas hoy (ej. escribir 1 página de tu Cheatsheet o programar un módulo), aunque la tarea total continúe mañana.</li>
-            <li data-i18n-html="guideCard2Li3"><strong>⚠️ Parcial — Con tropiezos (+5% XP):</strong> Sí hubo progreso, pero perdiste buena parte del bloque atorado en un bug, con distracciones, cansancio o yendo a la mitad de velocidad.</li>
-            <li data-i18n-html="guideCard2Li4"><strong>❌ No — Bloqueo real (0% bono):</strong> Te quedaste estancado casi toda la sesión en un obstáculo técnico/conceptual sin destrabarlo, o abortaste la sesión sin avance efectivo.</li>
+            <li data-i18n-html="guideCard2Li1"><strong>Regla de Oro:</strong> Evalúa <strong>la fluidez de este bloque de tiempo</strong>, no si ya terminaste todo el proyecto. Si tuviste que retirarte antes por causas externas pero tu tiempo fue enfocado, es <em>Flujo limpio</em>.</li>
+            <li data-i18n-html="guideCard2Li2"><strong>✅ Flujo limpio (+10% XP):</strong> Ritmo constante y sin tropiezos graves en lo planeado para esta sesión.</li>
+            <li data-i18n-html="guideCard2Li3"><strong>🧠 Lucha productiva (+10% XP):</strong> Duelo mental activo contra un bug o concepto duro; descartaste hipótesis y aprendiste qué no funciona aunque el avance visible sea poco.</li>
+            <li data-i18n-html="guideCard2Li4"><strong>⚠️ Con fricción (+5% XP):</strong> Hubo avance pero con tropiezos, distracciones, cansancio o velocidad irregular.</li>
+            <li data-i18n-html="guideCard2Li5"><strong>🔴 Parálisis / Abandono (0% bono):</strong> Bloqueo pasivo, dar vueltas en círculos sin probar caminos, procrastinación o sesión en blanco.</li>
           </ul>
         </div>
 

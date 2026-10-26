@@ -13,6 +13,7 @@
     migrarTipoActividad,
     migrarDominioPrevio,
     migrarDinamicaCognitiva,
+    migrarEstadoObjetivo,
     formatearNotasConTema,
     extraerSubtemaDeNotas,
     calcularMinutos,
@@ -47,7 +48,7 @@
       dominioPrevio: "En construcción",
       energiaPrevia: "Alta",
       complejidad: "Desafiante",
-      objetivoCumplido: "Sí",
+      objetivoCumplido: "Flujo limpio",
       duracion: 90,
       calidad: 4,
       notas: "[Normalización 3FN y Modelo ER] Diseño de modelo entidad-relación y debate de reglas 3FN"
@@ -64,7 +65,7 @@
       dominioPrevio: "Nuevo",
       energiaPrevia: "Media",
       complejidad: "Muy difícil",
-      objetivoCumplido: "Sí",
+      objetivoCumplido: "Flujo limpio",
       duracion: 135,
       calidad: 5,
       notas: "[Arquitectura de Virtual Warehouses] Estudio para certificación SnowPro Core reforzando conceptos con preguntas"
@@ -81,7 +82,7 @@
       dominioPrevio: "En construcción",
       energiaPrevia: "Baja",
       complejidad: "Desafiante",
-      objetivoCumplido: "Parcial",
+      objetivoCumplido: "Con fricción",
       duracion: 45,
       calidad: 3,
       notas: "[Rutas y Controladores MVC] Configuración inicial de endpoints para proyecto en equipo"
@@ -138,9 +139,7 @@
       ? raw.complejidad
       : "Desafiante";
 
-    const objetivoCumplido = VALORES_OBJETIVO.has(raw.objetivoCumplido)
-      ? raw.objetivoCumplido
-      : "Sí";
+    const objetivoCumplido = migrarEstadoObjetivo(raw.objetivoCumplido);
 
     const notasUnificadas = formatearNotasConTema(raw.notas || "", raw.tema || "");
     const { subtema } = extraerSubtemaDeNotas(notasUnificadas, raw.tema || "");

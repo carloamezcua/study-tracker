@@ -10,6 +10,7 @@
     migrarTipoActividad,
     migrarDominioPrevio,
     migrarDinamicaCognitiva,
+    migrarEstadoObjetivo,
     extraerSubtemaDeNotas,
     calcularMinutos,
     calcularXP,
@@ -31,7 +32,7 @@
     dominioPrevio: "En construcción",
     energiaPrevia: "Media",
     complejidad: "Desafiante",
-    objetivoCumplido: "Sí"
+    objetivoCumplido: "Flujo limpio"
   };
 
   // ID de la sesión que se está editando actualmente (null si es registro nuevo)
@@ -93,9 +94,13 @@
   };
 
   const ICONOS_OBJETIVO = {
+    "Flujo limpio": "✅",
+    "Lucha productiva": "🧠",
+    "Con fricción": "⚠️",
+    "Parálisis / Abandono": "🔴",
     Sí: "✅",
     Parcial: "⚠️",
-    No: "❌"
+    No: "🔴"
   };
 
   const MATERIAS_BASE = [
@@ -427,7 +432,7 @@
     seleccionarChip("dominioPrevio", sesion.dominioPrevio || "En construcción");
     seleccionarChip("energiaPrevia", sesion.energiaPrevia || "Media");
     seleccionarChip("complejidad", sesion.complejidad || "Desafiante");
-    seleccionarChip("objetivoCumplido", sesion.objetivoCumplido || "Sí");
+    seleccionarChip("objetivoCumplido", migrarEstadoObjetivo(sesion.objetivoCumplido));
     document.getElementById("usoIA").value = String(sesion.usoIA);
 
     // Sincronizar chip visual de materia
@@ -599,15 +604,20 @@
   function actualizarAyudaObjetivo() {
     const boxAyuda = document.getElementById("ayudaObjetivo");
     if (!boxAyuda) return;
+    const canon = migrarEstadoObjetivo(estadoChips.objetivoCumplido);
     if (StudyTracker.I18n) {
       const mapaKey = {
-        Sí: "helpGoalYes",
-        Parcial: "helpGoalPartial",
-        No: "helpGoalNo"
+        "Flujo limpio": "helpGoalFlow",
+        "Lucha productiva": "helpGoalStruggle",
+        "Con fricción": "helpGoalFriction",
+        "Parálisis / Abandono": "helpGoalFreeze",
+        Sí: "helpGoalFlow",
+        Parcial: "helpGoalFriction",
+        No: "helpGoalFreeze"
       };
-      boxAyuda.textContent = t(mapaKey[estadoChips.objetivoCumplido] || "helpGoalYes");
+      boxAyuda.textContent = t(mapaKey[canon] || "helpGoalFlow");
     } else {
-      boxAyuda.textContent = obtenerTextoAyudaObjetivo(estadoChips.objetivoCumplido);
+      boxAyuda.textContent = obtenerTextoAyudaObjetivo(canon);
     }
   }
 
@@ -721,8 +731,10 @@
     const bonosActivos = [];
     if (estadoChips.complejidad === "Desafiante") bonosActivos.push(t("bonusChallenge"));
     if (estadoChips.complejidad === "Muy difícil") bonosActivos.push(t("bonusHard"));
-    if (estadoChips.objetivoCumplido === "Sí") bonosActivos.push(t("bonusGoalYes"));
-    if (estadoChips.objetivoCumplido === "Parcial") bonosActivos.push(t("bonusGoalPartial"));
+    const canonObj = migrarEstadoObjetivo(estadoChips.objetivoCumplido);
+    if (canonObj === "Flujo limpio") bonosActivos.push(t("bonusGoalFlow"));
+    if (canonObj === "Lucha productiva") bonosActivos.push(t("bonusGoalStruggle"));
+    if (canonObj === "Con fricción") bonosActivos.push(t("bonusGoalFriction"));
     if (estadoChips.dinamicaCognitiva === "Generación Propia") {
       bonosActivos.push(usoIA === 0 ? t("bonusDinOwnAuton") : t("bonusAiAuton"));
     }
@@ -1251,13 +1263,14 @@
     spanContexto.className = "context-badges";
     const icEnergia = ICONOS_ENERGIA[sesion.energiaPrevia] || "⚡";
     const icComp = ICONOS_COMPLEJIDAD[sesion.complejidad] || "🟡";
-    const icObj = ICONOS_OBJETIVO[sesion.objetivoCumplido] || "✅";
+    const canonObj = migrarEstadoObjetivo(sesion.objetivoCumplido);
+    const icObj = ICONOS_OBJETIVO[canonObj] || "✅";
     spanContexto.textContent = `${icEnergia} ${trVal(
       "energiaPrevia",
       sesion.energiaPrevia
     )} · ${icComp} ${trVal("complejidad", sesion.complejidad)} · ${icObj} ${trVal(
       "objetivoCumplido",
-      sesion.objetivoCumplido
+      canonObj
     )}`;
     tdContexto.appendChild(spanContexto);
 
@@ -1398,9 +1411,13 @@
     if (elKpiObjetivos) elKpiObjetivos.textContent = `${kpis.tasaObjetivos}%`;
     if (elKpiObjetivosSub) {
       elKpiObjetivosSub.textContent = t("kpiGoalsSub", {
-        yes: kpis.cumplidosSi,
-        partial: kpis.cumplidosParcial,
-        no: kpis.bloqueosNo
+        flow: kpis.cumplidosFlujo ?? kpis.cumplidosSi,
+        struggle: kpis.cumplidosLucha ?? 0,
+        friction: kpis.cumplidosFriccion ?? kpis.cumplidosParcial,
+        freeze: kpis.bloqueosParalisis ?? kpis.bloqueosNo,
+        yes: kpis.cumplidosFlujo ?? kpis.cumplidosSi,
+        partial: kpis.cumplidosFriccion ?? kpis.cumplidosParcial,
+        no: kpis.bloqueosParalisis ?? kpis.bloqueosNo
       });
     }
 

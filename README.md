@@ -118,10 +118,11 @@ El archivo `data/study-tracker.csv` se guarda en texto plano `UTF-8 con BOM` (es
 
 | Métrica | Regla / Fórmula en JavaScript (`js/domain/metrics.js`) |
 | :--- | :--- |
-| **Duración (min)** | Diferencia entre `Hora_Fin` y `Hora_Inicio` (soporta cruce de medianoche sumando `1440` min). |
-| **XP Ganados** | $\text{REDONDEAR}\Big(\text{Duración} \times \max(0.5,\ 1 + \text{Calidad}\times 0.2 + \text{BonoReto} + \text{BonoMeta} + \text{BonoDinamica})\Big)$ |
+| **Duración (min)** | Diferencia entre `Hora_Fin` y `Hora_Inicio` (soporta cruce de medianoche sumando `1440` min). En cronómetro/pomodoro se calcula a partir del tiempo neto activo transcurrido (excluyendo pausas). |
+| **XP Ganados** | $\text{REDONDEAR}\Big(\text{Duración} \times \max(0.5,\ 1 + \text{Calidad}\times 0.2 + \text{BonoReto} + \text{BonoFluidez} + \text{BonoDinamica})\Big)$ |
 | **Nivel Exponencial (1-99)** | $\text{XP}(L) = \text{REDONDEAR}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Nivel 92 = 50% de 99)* |
 | **Franja Horaria** | `00:00–05:59 Madrugada` · `06:00–11:59 Mañana` · `12:00–17:59 Tarde` · `18:00–23:59 Noche` |
+| **Fluidez del Bloque** | `Flujo limpio (+10%)` · `Lucha productiva (+10%)` · `Con fricción (+5%)` · `Parálisis / Abandono (0% bono)` |
 | **Bono Dinámica** | `Generación Propia (+10%)` · `Andamiaje (+5%)` · `Recepción Pasiva (0%)` · `Delegación (-15% si IA ≥ 50%)` |
 
 ### 🚀 Cómo Iniciar el Proyecto
@@ -181,10 +182,11 @@ The generated `data/study-tracker.csv` file is stored in plain-text `UTF-8 with 
 
 | Metric | Rule / Formula in JavaScript (`js/domain/metrics.js`) |
 | :--- | :--- |
-| **Duration (min)** | Difference between `Hora_Fin` and `Hora_Inicio` (supports midnight crossover by adding `1440` min). |
+| **Duration (min)** | Difference between `Hora_Fin` and `Hora_Inicio` (supports midnight crossover by adding `1440` min). In timer/pomodoro it is computed from active net elapsed time (excluding pauses). |
 | **XP Earned** | $\text{ROUND}\Big(\text{Duration} \times \max(0.5,\ 1 + \text{Quality}\times 0.2 + \text{ChallengeBonus} + \text{GoalBonus} + \text{DynamicBonus})\Big)$ |
 | **Exponential Level (1-99)** | $\text{XP}(L) = \text{ROUND}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Level 92 = 50% of 99)* |
 | **Circadian Slots** | `00:00–05:59 Early Morning` · `06:00–11:59 Morning` · `12:00–17:59 Afternoon` · `18:00–23:59 Night` |
+| **Block Fluency** | `Clean flow (+10%)` · `Productive struggle (+10%)` · `With friction (+5%)` · `Paralysis / Quit (0% bonus)` |
 
 ### 🚀 Getting Started
 

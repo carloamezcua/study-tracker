@@ -65,7 +65,7 @@
       kpiBestHourNone: "Mejor hora: --:--",
       kpiBestHourPeak: "Pico de foco: ~{hour} (⭐️ {quality})",
       kpiGoalsLabel: "Objetivos Cumplidos",
-      kpiGoalsSub: "{yes} sí · {partial} parc. · {no} bloq.",
+      kpiGoalsSub: "{flow} flujo · {struggle} lucha · {friction} fricc. · {freeze} parál.",
       kpiAiImpactLabel: "Impacto y Uso de IA",
       kpiAiSub: "🔄 {dial} andamiaje · 🧠 {auton} gen. propia · 🤖 {mech} deleg.",
 
@@ -106,8 +106,11 @@
       previewDurationBonuses: "⏱️ {min} min ({bonuses})",
       bonusChallenge: "+10% reto",
       bonusHard: "+20% difícil",
-      bonusGoalYes: "+10% buen avance",
-      bonusGoalPartial: "+5% con tropiezos",
+      bonusGoalFlow: "+10% flujo limpio",
+      bonusGoalStruggle: "+10% lucha productiva",
+      bonusGoalFriction: "+5% con fricción",
+      bonusGoalYes: "+10% flujo limpio",
+      bonusGoalPartial: "+5% con fricción",
       bonusDinOwnAuton: "+10% Gen. Propia",
       bonusAiAuton: "+5% Gen. Propia",
       bonusAiDialogue: "+5% Andamiaje",
@@ -183,12 +186,20 @@
         "🔄 Andamiaje / Co-creación (+5% XP): Pensaste con apoyo; usaste la IA como tutor socrático (debatiendo el '¿por qué?'), copiloto de sintaxis o estructurador de tus propias ideas.",
       helpDinOwnGen:
         "🧠 Generación Propia (+10% XP con 0% IA, +5% con consulta mínima): El esfuerzo mental pesado salió de tu cabeza (redactar con tus palabras, resolver o programar con tu propia lógica).",
+      helpGoalFlow:
+        "✅ Flujo limpio (+10% XP): Ritmo constante y sin tropiezos graves. Válido también si te retiraste antes por causas externas pero el tiempo dedicado fluyó impecable.",
+      helpGoalStruggle:
+        "🧠 Lucha productiva (+10% XP): Duelo mental activo contra un bug o concepto duro; descartaste hipótesis y aprendiste qué no funciona aunque el avance visible sea poco.",
+      helpGoalFriction:
+        "⚠️ Con fricción (+5% XP): Hubo avance pero con tropiezos, distracciones, cansancio o velocidad irregular.",
+      helpGoalFreeze:
+        "🔴 Parálisis / Abandono (0% bono): Bloqueo pasivo, dar vueltas en círculos sin probar caminos, procrastinación o sesión en blanco.",
       helpGoalYes:
-        "✅ Flujo limpio (+10% XP): Evalúa ESTE bloque, no si acabaste toda la tarea/proyecto. Úsalo si avanzaste a buen ritmo en lo planeado para esta sesión sin quedarte estancado.",
+        "✅ Flujo limpio (+10% XP): Ritmo constante y sin tropiezos graves. Válido también si te retiraste antes por causas externas pero el tiempo dedicado fluyó impecable.",
       helpGoalPartial:
-        "⚠️ Con tropiezos / Fricción (+5% XP): Sí avanzaste, pero perdiste parte importante del bloque atorado en un bug, distracción, cansancio o confusión y el ritmo fue accidentado.",
+        "⚠️ Con fricción (+5% XP): Hubo avance pero con tropiezos, distracciones, cansancio o velocidad irregular.",
       helpGoalNo:
-        "❌ Bloqueo real (0% bono): Te quedaste trabado casi toda la sesión en un obstáculo técnico/conceptual sin lograr destrabarlo, o tuviste que abortar la sesión sin avance efectivo.",
+        "🔴 Parálisis / Abandono (0% bono): Bloqueo pasivo, dar vueltas en círculos sin probar caminos, procrastinación o sesión en blanco.",
       helpQualityClassNote:
         " 👨‍🏫 En Clase: evalúa aquí tu nivel de concentración, interés y retención de la cátedra.",
       helpQualityClassAiDialogue:
@@ -263,9 +274,13 @@
       frictionChartHint: "Por Complejidad y Dominio Previo",
       frictionChartSubtitle:
         "Proporción de bloques con flujo limpio (✅ Sí), con tropiezos (⚠️ Parcial) o bloqueos (❌ No) según el nivel de reto y tu dominio previo del concepto.",
-      frictionDsYes: "✅ Sí (Flujo limpio)",
-      frictionDsPartial: "⚠️ Parcial (Con tropiezos)",
-      frictionDsNo: "❌ No (Bloqueo)",
+      frictionDsFlow: "✅ Flujo limpio",
+      frictionDsStruggle: "🧠 Lucha productiva",
+      frictionDsFriction: "⚠️ Con fricción",
+      frictionDsFreeze: "🔴 Parálisis / Abandono",
+      frictionDsYes: "✅ Flujo limpio",
+      frictionDsPartial: "⚠️ Con fricción",
+      frictionDsNo: "🔴 Parálisis / Abandono",
       frictionAxisSessions: "Sesiones",
       habitMatrixTitle: "🧠 Impacto de Dinámica Cognitiva, Dominio Previo, Energía y Reto",
       habitMatrixSubtitle:
@@ -332,15 +347,17 @@
         "<strong>💻 Desarrollo / Código vs. 🧪 Práctica / Debugging:</strong> <code>Desarrollo</code> es construir funcionalidades o scripts; <code>Práctica / Debugging</code> es resolver ejercicios o cazar un bug.",
       guideCard1Li5:
         "<strong>🔁 Repaso / Simulacro:</strong> Estudiar de tus propios apuntes previos, flashcards o exámenes de prueba.",
-      guideCard2Title: "🎯 2. ¿Cuándo elegir Sí, Parcial o Bloqueo?",
+      guideCard2Title: "🎯 2. Fluidez y Avance del Bloque",
       guideCard2Li1:
-        "<strong>Regla de Oro:</strong> Evalúa <strong>la fluidez de este bloque de tiempo</strong>, nunca si ya terminaste el proyecto o entregable completo.",
+        "<strong>Regla de Oro:</strong> Evalúa <strong>la fluidez de este bloque de tiempo</strong>, no si ya terminaste todo el proyecto. Si tuviste que retirarte antes por causas externas pero tu tiempo fue enfocado, es <em>Flujo limpio</em>.",
       guideCard2Li2:
-        "<strong>✅ Sí — Flujo limpio (+10% XP):</strong> Avanzaste a buen ritmo en la parte que tocabas hoy, aunque la tarea total continúe mañana.",
+        "<strong>✅ Flujo limpio (+10% XP):</strong> Ritmo constante y sin tropiezos graves en lo planeado para esta sesión.",
       guideCard2Li3:
-        "<strong>⚠️ Parcial — Con tropiezos (+5% XP):</strong> Sí hubo progreso, pero perdiste buena parte del bloque atorado en un bug, distracción o cansancio.",
+        "<strong>🧠 Lucha productiva (+10% XP):</strong> Duelo mental activo contra un bug o concepto duro; descartaste hipótesis y aprendiste qué no funciona aunque el avance visible sea poco.",
       guideCard2Li4:
-        "<strong>❌ No — Bloqueo real (0% bono):</strong> Te quedaste estancado casi toda la sesión sin destrabarlo, o abortaste la sesión sin avance efectivo.",
+        "<strong>⚠️ Con fricción (+5% XP):</strong> Hubo avance pero con tropiezos, distracciones, cansancio o velocidad irregular.",
+      guideCard2Li5:
+        "<strong>🔴 Parálisis / Abandono (0% bono):</strong> Bloqueo pasivo, dar vueltas en círculos sin probar caminos, procrastinación o sesión en blanco.",
       guideCard3Title: "🌱 3. La Prueba Objetiva de Dominio Previo",
       guideCard3Li1:
         "<strong>🌱 Nuevo (0 contactos previos):</strong> Nunca has estudiado este concepto/herramienta específica. Si te pidieran explicarlo o escribir código ahorita mismo, no sabrías por dónde empezar.",
@@ -443,7 +460,7 @@
       kpiBestHourNone: "Best hour: --:--",
       kpiBestHourPeak: "Focus peak: ~{hour} (⭐️ {quality})",
       kpiGoalsLabel: "Goals Achieved",
-      kpiGoalsSub: "{yes} yes · {partial} part. · {no} block.",
+      kpiGoalsSub: "{flow} flow · {struggle} struggle · {friction} frict. · {freeze} freeze",
       kpiAiImpactLabel: "AI Impact & Usage",
       kpiAiSub: "🔄 {dial} scaffolding · 🧠 {auton} own gen. · 🤖 {mech} deleg.",
 
@@ -484,8 +501,11 @@
       previewDurationBonuses: "⏱️ {min} min ({bonuses})",
       bonusChallenge: "+10% challenge",
       bonusHard: "+20% hard",
-      bonusGoalYes: "+10% solid progress",
-      bonusGoalPartial: "+5% rough progress",
+      bonusGoalFlow: "+10% clean flow",
+      bonusGoalStruggle: "+10% productive struggle",
+      bonusGoalFriction: "+5% with friction",
+      bonusGoalYes: "+10% clean flow",
+      bonusGoalPartial: "+5% with friction",
       bonusDinOwnAuton: "+10% Own Gen.",
       bonusAiAuton: "+5% Own Gen.",
       bonusAiDialogue: "+5% Scaffolding",
@@ -561,12 +581,20 @@
         "🔄 Scaffolding / Co-creation (+5% XP): You thought with support; used AI as a Socratic tutor (debating 'why?'), syntax copilot, or structurer of your own ideas.",
       helpDinOwnGen:
         "🧠 Own Generation (+10% XP at 0% AI, +5% with minor lookup): The heavy mental effort came from your own head (writing in your own words, solving, or coding with your own logic).",
+      helpGoalFlow:
+        "✅ Clean flow (+10% XP): Steady pace without major hiccups. Also valid if you had to leave early due to external causes but your time spent was focused.",
+      helpGoalStruggle:
+        "🧠 Productive struggle (+10% XP): Active mental battle against a tough bug or concept; discarded hypotheses and learned what fails even if visible progress is small.",
+      helpGoalFriction:
+        "⚠️ With friction (+5% XP): Progress made but with hurdles, distractions, fatigue, or uneven pace.",
+      helpGoalFreeze:
+        "🔴 Paralysis / Quit (0% bonus): Passive freeze, spinning wheels in circles, procrastination, or blank session.",
       helpGoalYes:
-        "✅ Clean flow (+10% XP): Evaluate THIS block, not whether the entire deliverable is finished. Use it if you progressed smoothly on what you planned for this session.",
+        "✅ Clean flow (+10% XP): Steady pace without major hiccups. Also valid if you had to leave early due to external causes but your time spent was focused.",
       helpGoalPartial:
-        "⚠️ With hurdles / Friction (+5% XP): You made progress, but lost significant time stuck on a bug, distraction, fatigue, or confusion.",
+        "⚠️ With friction (+5% XP): Progress made but with hurdles, distractions, fatigue, or uneven pace.",
       helpGoalNo:
-        "❌ Real blocker (0% bonus): Stuck for almost the entire session on a technical/conceptual obstacle without unblocking it, or aborted with no effective progress.",
+        "🔴 Paralysis / Quit (0% bonus): Passive freeze, spinning wheels in circles, procrastination, or blank session.",
       helpQualityClassNote:
         " 👨‍🏫 In Class: use this scale to rate your focus, interest, and retention during the lecture.",
       helpQualityClassAiDialogue:
@@ -641,9 +669,13 @@
       frictionChartHint: "By Topic Complexity and Prior Mastery",
       frictionChartSubtitle:
         "Proportion of blocks with clean flow (✅ Yes), hurdles (⚠️ Partial), or blockers (❌ No) by challenge level and your prior mastery of the concept.",
-      frictionDsYes: "✅ Yes (Clean flow)",
-      frictionDsPartial: "⚠️ Partial (With hurdles)",
-      frictionDsNo: "❌ No (Blocker)",
+      frictionDsFlow: "✅ Clean flow",
+      frictionDsStruggle: "🧠 Productive struggle",
+      frictionDsFriction: "⚠️ With friction",
+      frictionDsFreeze: "🔴 Paralysis / Quit",
+      frictionDsYes: "✅ Clean flow",
+      frictionDsPartial: "⚠️ With friction",
+      frictionDsNo: "🔴 Paralysis / Quit",
       frictionAxisSessions: "Sessions",
       habitMatrixTitle: "🧠 Cognitive Dynamic, Prior Mastery, Energy & Challenge Impact",
       habitMatrixSubtitle:
@@ -710,15 +742,17 @@
         "<strong>💻 Dev / Code vs. 🧪 Practice / Debug:</strong> <code>Dev / Code</code> is building features or scripts; <code>Practice / Debug</code> is solving exercises or hunting down a bug.",
       guideCard1Li5:
         "<strong>🔁 Review / Mock:</strong> Studying from your own prior notes, flashcards, or mock exams.",
-      guideCard2Title: "🎯 2. When to Pick Yes, Partial, or Blocked?",
+      guideCard2Title: "🎯 2. Block Fluency and Progress",
       guideCard2Li1:
-        "<strong>Golden Rule:</strong> Evaluate <strong>the fluency of this time block</strong>, never whether the entire project/deliverable is finished.",
+        "<strong>Golden Rule:</strong> Evaluate <strong>the fluency of this time block</strong>, not whether the entire project is finished. If you had to leave early due to external reasons but your time was focused, it is <em>Clean flow</em>.",
       guideCard2Li2:
-        "<strong>✅ Yes — Clean flow (+10% XP):</strong> You progressed at a good pace on today's slice, even if the overall assignment continues tomorrow.",
+        "<strong>✅ Clean flow (+10% XP):</strong> Steady pace without major hiccups on today's session goals.",
       guideCard2Li3:
-        "<strong>⚠️ Partial — With hurdles (+5% XP):</strong> You made progress, but lost significant time stuck on a bug, distraction, or fatigue.",
+        "<strong>🧠 Productive struggle (+10% XP):</strong> Active mental duel against a hard bug or tough concept; discarded hypotheses and learned what fails even with minimal visible code.",
       guideCard2Li4:
-        "<strong>❌ No — Real blocker (0% bonus):</strong> Stuck for almost the whole session without unblocking it, or aborted with no effective progress.",
+        "<strong>⚠️ With friction (+5% XP):</strong> Progress made but with hurdles, distractions, fatigue, or uneven pace.",
+      guideCard2Li5:
+        "<strong>🔴 Paralysis / Quit (0% bonus):</strong> Passive freeze, spinning wheels in circles without testing paths, procrastination, or blank session.",
       guideCard3Title: "🌱 3. The Objective Prior Mastery Test",
       guideCard3Li1:
         "<strong>🌱 New (0 prior contacts):</strong> You have never studied this specific concept/tool. If asked to explain it or write code right now, you wouldn't know where to start.",
@@ -881,19 +915,43 @@
       en: { Fácil: "🟢 Easy", Desafiante: "🟡 Challenge", "Muy difícil": "🔴 Hard" }
     },
     objetivoCumplido: {
-      es: { Sí: "Sí", Parcial: "Parcial", No: "No" },
-      en: { Sí: "Yes", Parcial: "Partial", No: "No" }
+      es: {
+        "Flujo limpio": "Flujo limpio",
+        "Lucha productiva": "Lucha productiva",
+        "Con fricción": "Con fricción",
+        "Parálisis / Abandono": "Parálisis / Abandono",
+        Sí: "Flujo limpio",
+        Parcial: "Con fricción",
+        No: "Parálisis / Abandono"
+      },
+      en: {
+        "Flujo limpio": "Clean flow",
+        "Lucha productiva": "Productive struggle",
+        "Con fricción": "With friction",
+        "Parálisis / Abandono": "Paralysis / Quit",
+        Sí: "Clean flow",
+        Parcial: "With friction",
+        No: "Paralysis / Quit"
+      }
     },
     objetivoChip: {
       es: {
-        Sí: "✅ Sí (Flujo limpio +10%)",
-        Parcial: "⚠️ Parcial (Con tropiezos +5%)",
-        No: "❌ No (Bloqueo)"
+        "Flujo limpio": "✅ Flujo limpio (+10%)",
+        "Lucha productiva": "🧠 Lucha productiva (+10%)",
+        "Con fricción": "⚠️ Con fricción (+5%)",
+        "Parálisis / Abandono": "🔴 Parálisis / Abandono",
+        Sí: "✅ Flujo limpio (+10%)",
+        Parcial: "⚠️ Con fricción (+5%)",
+        No: "🔴 Parálisis / Abandono"
       },
       en: {
-        Sí: "✅ Yes (Clean flow +10%)",
-        Parcial: "⚠️ Partial (With hurdles +5%)",
-        No: "❌ No (Blocked)"
+        "Flujo limpio": "✅ Clean flow (+10%)",
+        "Lucha productiva": "🧠 Productive struggle (+10%)",
+        "Con fricción": "⚠️ With friction (+5%)",
+        "Parálisis / Abandono": "🔴 Paralysis / Quit",
+        Sí: "✅ Clean flow (+10%)",
+        Parcial: "⚠️ With friction (+5%)",
+        No: "🔴 Paralysis / Quit"
       }
     },
     diaSemana: {
