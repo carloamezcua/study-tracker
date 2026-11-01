@@ -165,15 +165,46 @@
       btnSubmitEdit: "💾 Actualizar Sesión y Sincronizar CSV",
       btnCancelEdit: "✖ Cancelar edición",
 
+      // Acordeón explicativo de Regla de Oro / Brecha de Intención
+      formHelpSummary: "💡 Regla de Oro: Auditar la Brecha de Intención",
+      formHelpContent:
+        "<strong>No intentes que Tiempo 1 y 2 coincidan:</strong> Tiempo 1 es tu <em>intención</em> y Tiempo 2 es la <em>realidad</em>. Si planeabas programar (<em>Construcción</em>) pero un error te forzó a copiar la solución de ChatGPT, mantén Tiempo 1 como Construcción y Tiempo 2 como Delegación / Copia Pasiva. ¡Esa discrepancia calcula tu <strong>Deuda Cognitiva</strong> real!",
+
       // Textos dinámicos de ayuda en el formulario
       helpStrategyActiveRecall:
-        "🧠 Recuperación Activa: Recordar y codificar a ciegas (flashcards, ejercicios sin ayuda, autoexplicación).",
+        "🧠 Recuperación Activa: Recordar o resolver problemas cerrados a ciegas (flashcards, ejercicios, o depurar un bug existente aislando variables).",
       helpStrategyGenerativeBuild:
-        "🛠️ Construcción Generativa: Creación propia (redacción de arquitectura, apuntes estructurados, lógica desde cero).",
+        "🛠️ Construcción Generativa: Producir un artefacto nuevo desde cero (código nuevo, notas estructuradas o arquitectura; no para arreglar bugs existentes).",
       helpStrategyReceptiveConsume:
-        "📖 Consumo Receptivo: Lectura de documentación, videos, clases grabadas o revisión de código ajeno.",
+        "📖 Consumo Receptivo: Absorber información (leer documentación oficial, papers, videos o clases; aún sin producir artefactos).",
       helpStrategyExecutiveDelegation:
-        "⚡ Delegación Ejecutiva: Uso de IA o generadores para resolver scripts, entregables o tareas contra reloj.",
+        "⚡ Delegación Ejecutiva: Usar herramientas o IA para automatizar la creación de un entregable contra reloj.",
+      helpPracticeStructureBlocked:
+        "🧱 Bloqueado (Default 90%): Estudiar 1 solo tema continuo durante todo el bloque (ej. 1 hora entera de React Hooks).",
+      helpPracticeStructureInterleaved:
+        "🔀 Intercalado: Mezcla intencional de temas para forzar al cerebro a cambiar de contexto y discriminar (habilita evaluación de Fricción).",
+      helpAiDesignSinIA:
+        "🚫 Sin IA: Sesión autónoma planificada sin asistencia artificial.",
+      helpAiDesignTutor:
+        "🦉 Tutor Andamiaje: La IA te guía socráticamente con preguntas y pistas conceptuales sin darte el código directo.",
+      helpAiDesignCoDisenador:
+        "👥 Co-Diseñador: Intercambio de ideas en pareja (diseño de arquitectura, lluvia de ideas o debate crítico).",
+      helpAiDesignGenerador:
+        "🤖 Generación Automática: Automatización de código base, boilerplate, mocks o resúmenes rápidos.",
+      helpAiDesignSocratico:
+        "🔍 Evaluador Socrático: La IA pone a prueba tu comprensión haciéndote preguntas desafiantes.",
+      helpProcessingExtraction:
+        "🔥 Extracción Esforzada: Sacaste el conocimiento de tu propia memoria o dedujiste la lógica con esfuerzo cognitivo real.",
+      helpProcessingRecognition:
+        "👀 Reconocimiento Fluido: Sensación de familiaridad al leer o ver la solución ('ah, sí, claro'), pero sin extraerlo a ciegas.",
+      helpProcessingCopy:
+        "📋 Copia Pasiva: Transcribir, copiar y pegar código o respuestas sin procesar el trasfondo conceptual.",
+      helpInterleavedFrictionNone:
+        "🟢 Sin Fricción: El cambio de contexto no causó tropiezos ni interferencia entre temas.",
+      helpInterleavedFrictionProductive:
+        "🧠 Fricción Productiva (+5% XP): Confundir temas al inicio forzó a tu cerebro a diferenciarlos, consolidando tu aprendizaje.",
+      helpInterleavedFrictionExcessive:
+        "🔴 Confusión Excesiva: La mezcla fue caótica o prematura y terminó perjudicando la asimilación de ambos temas.",
       helpActClass:
         "👨‍🏫 En vivo con profesor: mide tu atención e interés. Por defecto elige Recepción Pasiva (0% IA), pero si hiciste actividades o usaste IA en clase, ajusta abajo la Dinámica Cognitiva.",
       helpActTheory:
@@ -187,19 +218,19 @@
       helpActReview:
         "🔁 Repaso / Simulacro: Consolidar memoria repasando apuntes previos, flashcards, explicando un tema sin mirar o haciendo exámenes de simulacro.",
       helpDomNew:
-        "🌱 Nuevo (0 contactos previos): Nunca has estudiado este concepto/herramienta específica. Si te pidieran explicarlo o escribir código ahorita mismo, no sabrías por dónde empezar.",
+        "🌱 Nuevo (Autonomía actual: 0): Cero contactos previos o conocimiento borrado; si te pidieran programar o explicarlo ahorita, no sabrías por dónde empezar.",
       helpDomBuilding:
-        "🌿 En construcción (Necesitas apoyo/consulta): Ya lo viste antes (en clase, ayer o en el Pomodoro pasado), pero todavía necesitas mirar tus apuntes, la documentación o apoyarte en la IA para avanzar sin trabarte.",
+        "🌿 En construcción (Dependencia externa): Entiendes la noción, pero si cierras la documentación o la IA, te quedas atascado.",
       helpDomConsolidated:
-        "🌳 Consolidado (Autónomo): Puedes explicarlo, resolver problemas o programar sobre esto sin mirar el manual ni depender de la IA, o solo estás haciendo un bloque de repaso/mantenimiento veloz.",
+        "🌳 Consolidado (Autonomía total): Puedes explicarlo o programarlo sin manuales ni IA, o es una sesión de mantenimiento rápido.",
       helpDinPassive:
         "👀 Recepción Pasiva (0% ajuste): Leer, escuchar cátedra o ver videos sin producir ni debatir activamente todavía.",
       helpDinDelegation:
-        "🤖 Delegación / Reproducción (-15% XP si IA ≥50%): La IA o la fuente hizo el trabajo pesado y tú copiaste, transcribiste o seguiste pasos sin construirlo desde tu mente.",
+        "🤖 Delegación / Reproducción (-15% XP si IA ≥50%): La IA o fuente hizo el trabajo pesado y copiaste o seguiste pasos sin deducir el porqué.",
       helpDinScaffolding:
-        "🔄 Andamiaje / Co-creación (+5% XP): Pensaste con apoyo; usaste la IA como tutor socrático (debatiendo el '¿por qué?'), copiloto de sintaxis o estructurador de tus propias ideas.",
+        "🔄 Andamiaje / Co-creación (+5% XP): Pensar en equipo con la IA; tú propones o deduces y la IA da pistas o aclara conceptos.",
       helpDinOwnGen:
-        "🧠 Generación Propia (+10% XP con 0% IA, +5% con consulta mínima): El esfuerzo mental pesado salió de tu cabeza (redactar con tus palabras, resolver o programar con tu propia lógica).",
+        "🧠 Generación Propia (+10% con 0% IA · +5% base): El esfuerzo mental pesado salió de tu cabeza (la IA se usó 0% o solo para un dummy text mínimo).",
       helpGoalFlow:
         "✅ Flujo limpio (+10% XP): Ritmo constante y sin tropiezos graves. Válido también si te retiraste antes por causas externas pero el tiempo dedicado fluyó impecable.",
       helpGoalStruggle:
@@ -221,13 +252,13 @@
       helpQualityClassAiMech:
         " ⚠️ Clase + Delegación: si usaste IA solo para acabar rápido una actividad de clase sin procesarla, considera nivel 1 o 2.",
       helpQuality1:
-        "1 · Again (Olvido / Bloqueo): No se pudo recuperar sin mirar la solución.",
+        "1 · Again (Olvido / Bloqueo): Bloqueo total; si me preguntan mañana no me acordaré sin mirar la solución.",
       helpQuality2:
-        "2 · Hard (Esfuerzo extremo): Vacilación prolongada y alto esfuerzo para resolver o razonar.",
+        "2 · Hard (Esfuerzo extremo): 'Lo saqué, pero sudé sangre'; máxima fatiga cognitiva y vacilación prolongada.",
       helpQuality3:
-        "3 · Good (Recuerdo normal): Comprensión y recuerdo dentro de lo esperado con esfuerzo moderado.",
+        "3 · Good (Recuerdo normal): 'Lo resolví bien, tuve que pensarlo un poco, pero todo en orden' (esfuerzo moderado).",
       helpQuality4:
-        "4 · Easy (Fluido / Inmediato): Fluido, directo y dominio consolidado sin dudas.",
+        "4 · Easy (Fluido / Inmediato): 'Un paseo por el parque'; directo, sin dudas y con dominio total.",
       helpQuality5:
         "4 · Easy (Fluido / Inmediato): Dominio consolidado sin dudas.",
       helpQualityWarnMech:
@@ -346,21 +377,21 @@
       btnEditSessionTitle: "Editar esta sesión",
       btnDeleteSessionTitle: "Eliminar esta sesión",
 
-      // Guía de Referencia inferior (6 tarjetas v3)
-      guideMainTitle: "📖 Guía de Referencia y Criterios del Sistema (v3)",
+      // Guía de Referencia inferior (6 tarjetas v3.2)
+      guideMainTitle: "📖 Guía de Referencia y Criterios del Sistema (v3.2)",
       guideMainSubtitle:
-        "Manual rápido para elegir la actividad correcta, la dinámica cognitiva, el dominio previo objetivo y cómo interpretar los gráficos.",
-      guideCard1Title: "🧭 1. Las 6 Actividades (¿Qué hiciste?)",
+        "Manual rápido para elegir la estrategia correcta, auditar la brecha de intención y entender las fórmulas cognitivas.",
+      guideCard1Title: "🧭 1. Estrategias Planificadas (Tiempo 1)",
       guideCard1Li1:
-        "<strong>👨‍🏫 Clase / Cátedra:</strong> Sesión en vivo con profesor o ponente.",
+        "<strong>🧠 Recuperación Activa:</strong> Recordar y resolver a ciegas (flashcards, ejercicios, o depurar un bug existente aislando variables).",
       guideCard1Li2:
-        '<strong>📖 Estudio Teórico / Conceptual:</strong> Comprender el <em>qué</em> o el <em>porqué</em> (leer documentación/papers, ver un curso o debatir teoría con IA).',
+        "<strong>🛠️ Construcción Generativa:</strong> Producir un artefacto nuevo desde cero (código inédito, notas estructuradas, arquitectura propia).",
       guideCard1Li3:
-        "<strong>✍️ Síntesis / Documentación:</strong> Traducir ideas a un artefacto propio (apuntes, cheatsheets, resúmenes, diagramas o arquitectura).",
+        "<strong>📖 Consumo Receptivo:</strong> Absorber información (documentación oficial, papers, libros, videocursos grabados o clases).",
       guideCard1Li4:
-        "<strong>💻 Desarrollo / Código vs. 🧪 Práctica / Debugging:</strong> <code>Desarrollo</code> es construir funcionalidades o scripts; <code>Práctica / Debugging</code> es resolver ejercicios o cazar un bug.",
+        "<strong>⚡ Delegación Ejecutiva:</strong> Automatizar entregables o scripts usando IA o generadores contra reloj.",
       guideCard1Li5:
-        "<strong>🔁 Repaso / Simulacro:</strong> Estudiar de tus propios apuntes previos, flashcards o exámenes de prueba.",
+        "<strong>Histórico v3:</strong> Las 6 actividades anteriores siguen siendo 100% compatibles en reportes e historial.",
       guideCard2Title: "🎯 2. Fluidez y Avance del Bloque",
       guideCard2Li1:
         "<strong>Regla de Oro:</strong> Evalúa <strong>la fluidez de este bloque de tiempo</strong>, no si ya terminaste todo el proyecto. Si tuviste que retirarte antes por causas externas pero tu tiempo fue enfocado, es <em>Flujo limpio</em>.",
@@ -374,40 +405,42 @@
         "<strong>🔴 Parálisis / Abandono (0% bono):</strong> Bloqueo pasivo, dar vueltas en círculos sin probar caminos, procrastinación o sesión en blanco.",
       guideCard3Title: "🌱 3. La Prueba Objetiva de Dominio Previo",
       guideCard3Li1:
-        "<strong>🌱 Nuevo (0 contactos previos):</strong> Nunca has estudiado este concepto/herramienta específica. Si te pidieran explicarlo o escribir código ahorita mismo, no sabrías por dónde empezar.",
+        "<strong>🌱 Nuevo (Autonomía: 0):</strong> Nunca has estudiado este concepto; si te pidieran explicarlo o programarlo ahorita, no sabrías por dónde empezar.",
       guideCard3Li2:
-        "<strong>🌿 En construcción (Necesitas apoyo/consulta):</strong> Ya lo viste antes (en clase, ayer o en el Pomodoro pasado), pero todavía necesitas mirar apuntes, documentación o apoyarte en la IA para avanzar sin trabarte.",
+        "<strong>🌿 En construcción (Dependencia externa):</strong> Entiendes la noción, pero si cierras la documentación o la IA, te quedas atascado.",
       guideCard3Li3:
-        "<strong>🌳 Consolidado (Autónomo):</strong> Puedes explicarlo, resolver problemas o programar sobre esto sin mirar el manual ni depender de la IA, o solo haces un repaso veloz.",
+        "<strong>🌳 Consolidado (Autonomía total):</strong> Puedes explicarlo o programarlo sin manuales ni IA, o es una sesión de mantenimiento rápido.",
       guideCard3Li4:
-        "<strong>Energía y Reto:</strong> <code>🔋 Alta / ⚡ Media / 🪫 Baja</code> al iniciar + Complejidad <code>🟢 Fácil (0%) / 🟡 Reto (+10%) / 🔴 Difícil (+20%)</code>.",
-      guideCard4Title: "⭐️ 4. Escala de Asimilación (1 al 5)",
+        "<strong>Franjas Horarias (6h):</strong> <code>00:00–05:59 Madrugada</code> · <code>06:00–11:59 Mañana</code> · <code>12:00–17:59 Tarde</code> · <code>18:00–23:59 Noche</code>.",
+      guideCard4Title: "⭐️ 4. Calificación FSRS (1–4) y Modalidad",
       guideCard4Li1:
-        "<strong>1 (Mecánico / Sin retención):</strong> Solo copié/pegué respuestas por prisa o estuve distraído; no asimilé el tema.",
+        "<strong>1 · Again (Olvido / Bloqueo):</strong> Bloqueo total; si me preguntan mañana no me acordaré sin mirar la solución.",
       guideCard4Li2:
-        "<strong>2 (Superficial / Pasivo):</strong> Seguí pasos o código generado entendiendo solo por encima; poca retención a largo plazo.",
+        "<strong>2 · Hard (Esfuerzo extremo):</strong> 'Lo saqué, pero sudé sangre'; fatiga cognitiva intensa y vacilación prolongada.",
       guideCard4Li3:
-        "<strong>3 (Comprensión estándar):</strong> Entendí la lógica general de lo realizado y resolví partes por mi cuenta.",
+        "<strong>3 · Good (Recuerdo normal):</strong> 'Todo en orden con esfuerzo moderado'; comprensión esperada (Default).",
       guideCard4Li4:
-        "<strong>4 (Aprendizaje sólido):</strong> Razoné activamente el problema, sinteticé los conceptos y puedo replicarlo.",
+        "<strong>4 · Easy (Fluido / Inmediato):</strong> 'Un paseo por el parque'; dominio total y respuesta inmediata sin titubeos.",
       guideCard4Li5:
-        "<strong>5 (Asimilación profunda):</strong> Dominio total; puedo explicar el tema o escribir la solución desde cero sin ayuda.",
-      guideCard5Title: "🧠 5. Las 4 Dinámicas Cognitivas (¿Cómo trabajaste?)",
+        "<strong>Modalidad:</strong> 🔥 <em>Extracción Esforzada</em> (retención alta), 👀 <em>Reconocimiento Fluido</em> (familiaridad) o 📋 <em>Copia Pasiva</em>.",
+      guideCard5Title: "🔄 5. Dinámicas Cognitivas y Deuda Cognitiva",
       guideCard5Li1:
-        "<strong>👀 Recepción Pasiva (0% ajuste):</strong> Leer, escuchar clase o ver un video sin producir ni interactuar activamente aún.",
+        "<strong>👀 Recepción Pasiva (0% ajuste):</strong> Leer, escuchar clase o ver un video sin producir aún entregables propios.",
       guideCard5Li2:
-        "<strong>🤖 Delegación / Reproducción (-15% XP si IA &ge;50%):</strong> La IA o la fuente hizo el trabajo pesado y tú solo copiaste, transcribiste o seguiste pasos mecánicamente.",
+        "<strong>🤖 Delegación / Reproducción (-15% XP si IA &ge;50%):</strong> Copiar o transcribir algo ya resuelto por la IA sin razonar el porqué.",
       guideCard5Li3:
-        "<strong>🔄 Andamiaje / Co-creación (+5% XP):</strong> Pensaste con apoyo; usaste la IA como tutor socrático, copiloto de sintaxis o estructurador de tus propias ideas.",
+        "<strong>🔄 Andamiaje / Co-creación (+5% XP):</strong> Pensar en equipo con la IA debatiendo y deduciendo la lógica.",
       guideCard5Li4:
-        "<strong>🧠 Generación Propia (+10% XP sin IA / +5% con consulta mínima):</strong> El esfuerzo mental pesado salió de tu propia cabeza.",
+        "<strong>🧠 Generación Propia (+10% XP sin IA / +5% con consulta mínima):</strong> El esfuerzo mental pesado salió de tu propia mente.",
+      guideCard5Li5:
+        "<strong>Deuda Cognitiva:</strong> Audita la brecha entre intención y realidad. <strong>Intercalado</strong> otorga +5% XP en <em>Fricción Productiva</em>.",
       guideCard6Title: "📊 6. Franjas Horarias (6h) y Fórmulas RPG",
       guideCard6Li1:
         "<strong>Franjas Circadianas (6h):</strong> <code>00:00–05:59 Madrugada</code> · <code>06:00–11:59 Mañana</code> · <code>12:00–17:59 Tarde</code> · <code>18:00–23:59 Noche</code>.",
       guideCard6Li2:
         "<strong>Subtemas en Notas:</strong> Escribe <code>[Subtema] Tu nota</code> (ej. <code>[Mesa Redonda - GANs] Debate de arquitectura</code>) para agrupar en el Inspector.",
       guideCard6Li3:
-        "<strong>Fórmula XP:</strong> <code>ROUND(Minutos * MAX(0.5, 1 + Calidad*0.2 + BonoReto + BonoAvance + BonoDinamica))</code>.",
+        "<strong>Fórmula XP (v3.2):</strong> <code>ROUND(Minutos * MAX(0.5, 1 + Calidad*0.25 + BonoReto + BonoAvance + BonoDinamica + BonoFriccion))</code>.",
       guideCard6Li4:
         "<strong>Curva Exponencial (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code>.",
 
@@ -574,15 +607,46 @@
       btnSubmitEdit: "💾 Update Session & Sync CSV",
       btnCancelEdit: "✖ Cancel edit",
 
+      // Form Help Golden Rule Accordion
+      formHelpSummary: "💡 Golden Rule: Audit the Intention Gap",
+      formHelpContent:
+        "<strong>Do not try to force Stage 1 and 2 to match:</strong> Stage 1 represents your <em>intention</em> and Stage 2 represents <em>reality</em>. If you planned to write code (<em>Generative Build</em>) but a bug forced you to copy a ChatGPT snippet, keep Stage 1 as Generative Build and Stage 2 as Delegation / Passive Copy. That exact discrepancy computes your real <strong>Cognitive Debt</strong>!",
+
       // Textos dinámicos de ayuda en el formulario
       helpStrategyActiveRecall:
-        "🧠 Active Recall: Blind retrieval and coding (flashcards, exercises unaided, self-explanation).",
+        "🧠 Active Recall: Blind retrieval or debugging bounded problems (flashcards, exercises, or isolating bugs in existing code).",
       helpStrategyGenerativeBuild:
-        "🛠️ Generative Build: Original creation (architecture design, structured notes, coding from scratch).",
+        "🛠️ Generative Build: Creating a new artifact from scratch (original code, structured notes, or architecture; not for fixing existing bugs).",
       helpStrategyReceptiveConsume:
-        "📖 Receptive Consumption: Reading docs, watching videos/lectures, or reviewing existing code.",
+        "📖 Receptive Consumption: Absorbing information (reading docs/papers, watching courses/lectures; before producing artifacts).",
       helpStrategyExecutiveDelegation:
-        "⚡ Executive Delegation: Using AI or generators to deliver scripts or urgent deliverables.",
+        "⚡ Executive Delegation: Using AI or automated generators to deliver scripts or time-sensitive deliverables.",
+      helpPracticeStructureBlocked:
+        "🧱 Blocked (Default 90%): Studying 1 single domain continuously throughout the block (e.g. 1 continuous hour of React Hooks).",
+      helpPracticeStructureInterleaved:
+        "🔀 Interleaved: Intentionally mixing disparate topics to force the brain to switch context and discriminate (enables Friction evaluation).",
+      helpAiDesignSinIA:
+        "🚫 No AI: Autonomous planned session without artificial assistance.",
+      helpAiDesignTutor:
+        "🦉 Scaffolding Tutor: AI guides you Socratically with questions and hints without handing over direct solutions.",
+      helpAiDesignCoDisenador:
+        "👥 Co-Designer: Peer brainstorming and design iteration (architecture, ideation, or critical debate).",
+      helpAiDesignGenerador:
+        "🤖 Content Generator: Rapid boilerplate, mocks, base code, or quick summaries.",
+      helpAiDesignSocratico:
+        "🔍 Socratic Evaluator: AI tests your understanding by asking challenging counter-questions.",
+      helpProcessingExtraction:
+        "🔥 Effortful Extraction: Retrieved knowledge from your own memory or deduced logic with genuine cognitive effort.",
+      helpProcessingRecognition:
+        "👀 Fluent Recognition: Feeling of familiarity while reading or seeing the answer ('oh yeah, of course'), but unable to retrieve blind.",
+      helpProcessingCopy:
+        "📋 Passive Copy: Transcribing, copy-pasting code or answers without processing the conceptual core.",
+      helpInterleavedFrictionNone:
+        "🟢 No Friction: Context switching caused no confusion or topic interference.",
+      helpInterleavedFrictionProductive:
+        "🧠 Productive Friction (+5% XP): Initial confusion forced your brain to discriminate, deepening retention.",
+      helpInterleavedFrictionExcessive:
+        "🔴 Excessive Confusion: The mixture was chaotic or premature, harming assimilation of both topics.",
       helpActClass:
         "👨‍🏫 Live with professor: measures your focus and interest. Defaults to Passive Reception (0% AI), or adjust the Cognitive Dynamic below if you used AI in class.",
       helpActTheory:
@@ -596,19 +660,19 @@
       helpActReview:
         "🔁 Review / Mock: Consolidating memory by reviewing past notes, flashcards, explaining a topic unaided, or taking mock exams.",
       helpDomNew:
-        "🌱 New (0 prior contacts): You have never studied this specific concept/tool. If asked to explain it or write code right now, you wouldn't know where to start.",
+        "🌱 New (Current autonomy: 0): Zero prior contacts or erased knowledge; if asked to code or explain it right now, you wouldn't know where to start.",
       helpDomBuilding:
-        "🌿 In progress (Needs support/lookup): You saw it before (in class, yesterday, or last Pomodoro), but still need notes, docs, or AI to progress without getting stuck.",
+        "🌿 In progress (External dependency): You understand the notion, but if you close docs or AI, you get stuck.",
       helpDomConsolidated:
-        "🌳 Consolidated (Autonomous): You can explain it, solve problems, or code without looking at the manual or relying on AI, or you are doing a fast review/maintenance block.",
+        "🌳 Consolidated (Total autonomy): You can explain or code without manuals or AI, or it's a fast maintenance block.",
       helpDinPassive:
         "👀 Passive Reception (0% adj.): Reading, listening to a lecture, or watching videos without actively producing or debating yet.",
       helpDinDelegation:
-        "🤖 Delegation / Reproduction (-15% XP if AI ≥50%): AI or the source did the heavy lifting and you copied, transcribed, or followed steps without building it from your own mind.",
+        "🤖 Delegation / Reproduction (-15% if AI ≥50%): The source or AI did the heavy lifting and you copied without deducing why.",
       helpDinScaffolding:
-        "🔄 Scaffolding / Co-creation (+5% XP): You thought with support; used AI as a Socratic tutor (debating 'why?'), syntax copilot, or structurer of your own ideas.",
+        "🔄 Scaffolding / Co-creation (+5% XP): Thinking as a team with AI; you propose or deduce, and AI gives hints or clarifies concepts.",
       helpDinOwnGen:
-        "🧠 Own Generation (+10% XP at 0% AI, +5% with minor lookup): The heavy mental effort came from your own head (writing in your own words, solving, or coding with your own logic).",
+        "🧠 Own Generation (+10% at 0% AI · +5% base): Heavy mental effort came from your head (0% AI or minimal dummy text).",
       helpGoalFlow:
         "✅ Clean flow (+10% XP): Steady pace without major hiccups. Also valid if you had to leave early due to external causes but your time spent was focused.",
       helpGoalStruggle:
@@ -630,15 +694,15 @@
       helpQualityClassAiMech:
         " ⚠️ Class + Delegation: if you used AI just to finish an in-class activity quickly without processing it, consider level 1 or 2.",
       helpQuality1:
-        "1 · Again (Blackout / Forgot): Could not retrieve without looking at the answer.",
+        "1 · Again (Blackout / Forgot): Total blackout; if asked tomorrow I won't remember without looking at the answer.",
       helpQuality2:
-        "2 · Hard (Extreme effort): Prolonged hesitation and high effort to retrieve or reason.",
+        "2 · Hard (Extreme effort): 'Got it, but sweated blood'; high cognitive fatigue and prolonged hesitation.",
       helpQuality3:
-        "3 · Good (Normal recall): Accurate recall with expected moderate effort.",
+        "3 · Good (Normal recall): 'Solved it well, had to think a bit, but all in order' (expected moderate effort).",
       helpQuality4:
-        "4 · Easy (Instant / Fluid): Effortless and immediate recall; fully consolidated.",
+        "4 · Easy (Instant / Fluid): 'A walk in the park'; instant, direct, and fully mastered without hesitation.",
       helpQuality5:
-        "4 · Easy (Instant / Fluid): Fully consolidated.",
+        "4 · Easy (Instant / Fluid): Fully mastered without hesitation.",
       helpQualityWarnMech:
         " ⚠️ Note: you selected 'Delegation / Reproduction'; if you only copied without reading deeply, consider level 1 or 2 (or switch to 'Scaffolding / Co-creation' if you learned by debating with AI).",
       helpQualityWarnHighAi:
@@ -755,21 +819,21 @@
       btnEditSessionTitle: "Edit this session",
       btnDeleteSessionTitle: "Delete this session",
 
-      // Guía de Referencia inferior (6 tarjetas v3)
-      guideMainTitle: "📖 System Reference Guide & Criteria (v3)",
+      // Guía de Referencia inferior (6 tarjetas v3.2)
+      guideMainTitle: "📖 System Reference Guide & Criteria (v3.2)",
       guideMainSubtitle:
-        "Quick pocket manual to pick the right activity, cognitive dynamic, objective prior mastery, and read the analytics charts.",
-      guideCard1Title: "🧭 1. The 6 Activities (What did you do?)",
+        "Quick manual to choose the right strategy, audit the intention gap, and master cognitive formulas.",
+      guideCard1Title: "🧭 1. Planned Strategies (Stage 1)",
       guideCard1Li1:
-        "<strong>👨‍🏫 Class / Lecture:</strong> Live session with a professor or speaker.",
+        "<strong>🧠 Active Recall:</strong> Blind retrieval and testing (flashcards, exercises, or isolating a bug in existing code).",
       guideCard1Li2:
-        '<strong>📖 Theoretical / Conceptual Study:</strong> Understanding the <em>what</em> or <em>why</em> (reading docs/papers, watching a course, or debating theory with AI).',
+        "<strong>🛠️ Generative Build:</strong> Creating a new artifact from scratch (original code, structured notes, or architecture).",
       guideCard1Li3:
-        "<strong>✍️ Synthesis / Documentation:</strong> Translating ideas into your own artifact (notes, cheatsheets, summaries, diagrams, or architecture).",
+        "<strong>📖 Receptive Consumption:</strong> Absorbing information (official docs, papers, books, video lectures, or classes).",
       guideCard1Li4:
-        "<strong>💻 Dev / Code vs. 🧪 Practice / Debug:</strong> <code>Dev / Code</code> is building features or scripts; <code>Practice / Debug</code> is solving exercises or hunting down a bug.",
+        "<strong>⚡ Executive Delegation:</strong> Automating deliverables or scripts using AI under time constraints.",
       guideCard1Li5:
-        "<strong>🔁 Review / Mock:</strong> Studying from your own prior notes, flashcards, or mock exams.",
+        "<strong>v3 Legacy Compatibility:</strong> The 6 historical activities remain 100% supported across reports and filters.",
       guideCard2Title: "🎯 2. Block Fluency and Progress",
       guideCard2Li1:
         "<strong>Golden Rule:</strong> Evaluate <strong>the fluency of this time block</strong>, not whether the entire project is finished. If you had to leave early due to external reasons but your time was focused, it is <em>Clean flow</em>.",
@@ -783,40 +847,42 @@
         "<strong>🔴 Paralysis / Quit (0% bonus):</strong> Passive freeze, spinning wheels in circles without testing paths, procrastination, or blank session.",
       guideCard3Title: "🌱 3. The Objective Prior Mastery Test",
       guideCard3Li1:
-        "<strong>🌱 New (0 prior contacts):</strong> You have never studied this specific concept/tool. If asked to explain it or write code right now, you wouldn't know where to start.",
+        "<strong>🌱 New (Current autonomy: 0):</strong> Zero prior contacts or wiped memory; if asked to code or explain it right now, you wouldn't know where to start.",
       guideCard3Li2:
-        "<strong>🌿 In progress (Needs support/lookup):</strong> You saw it before (in class, yesterday, or last Pomodoro), but still need notes, docs, or AI to progress without getting stuck.",
+        "<strong>🌿 In progress (External dependency):</strong> You understand the notion, but if you close docs or AI, you get stuck.",
       guideCard3Li3:
-        "<strong>🌳 Consolidated (Autonomous):</strong> You can explain it, solve problems, or code without looking at the manual or relying on AI, or you are doing a fast review block.",
+        "<strong>🌳 Consolidated (Total autonomy):</strong> You can explain or code without manuals or AI, or it's a fast maintenance block.",
       guideCard3Li4:
-        "<strong>Energy & Challenge:</strong> <code>🔋 High / ⚡ Medium / 🪫 Low</code> at start + Complexity <code>🟢 Easy (0%) / 🟡 Challenge (+10%) / 🔴 Hard (+20%)</code>.",
-      guideCard4Title: "⭐️ 4. Assimilation Scale (1 to 5)",
+        "<strong>Circadian Slots (6h):</strong> <code>00:00–05:59 Early Morning</code> · <code>06:00–11:59 Morning</code> · <code>12:00–17:59 Afternoon</code> · <code>18:00–23:59 Night</code>.",
+      guideCard4Title: "⭐️ 4. FSRS Rating (1–4) & Modality",
       guideCard4Li1:
-        "<strong>1 (Mechanical / No retention):</strong> Only copied/pasted answers in a rush or was distracted; did not assimilate.",
+        "<strong>1 · Again (Blackout / Forgot):</strong> Total blackout; if asked tomorrow I won't remember without looking at the answer.",
       guideCard4Li2:
-        "<strong>2 (Superficial / Passive):</strong> Followed steps or generated code with surface understanding; low long-term retention.",
+        "<strong>2 · Hard (Extreme effort):</strong> 'Got it, but sweated blood'; high cognitive fatigue and prolonged hesitation.",
       guideCard4Li3:
-        "<strong>3 (Standard comprehension):</strong> Understood the general logic and solved parts on my own.",
+        "<strong>3 · Good (Normal recall):</strong> 'Solved it well, had to think a bit, but all in order' (expected moderate effort).",
       guideCard4Li4:
-        "<strong>4 (Solid learning):</strong> Actively reasoned through the problem, synthesized concepts, and can replicate it.",
+        "<strong>4 · Easy (Instant / Fluid):</strong> 'A walk in the park'; instant, direct, and fully mastered without hesitation.",
       guideCard4Li5:
-        "<strong>5 (Deep assimilation):</strong> Full mastery; can explain the topic or write the solution from scratch unaided.",
-      guideCard5Title: "🧠 5. The 4 Cognitive Dynamics (How did you work?)",
+        "<strong>Modality:</strong> 🔥 <em>Effortful Extraction</em> (high retention), 👀 <em>Fluent Recognition</em> (surface familiarity) or 📋 <em>Passive Copy</em>.",
+      guideCard5Title: "🔄 5. Cognitive Dynamics & Cognitive Debt",
       guideCard5Li1:
         "<strong>👀 Passive Reception (0% adj.):</strong> Reading, listening to a lecture, or watching a video without actively producing or debating yet.",
       guideCard5Li2:
-        "<strong>🤖 Delegation / Reproduction (-15% XP if AI &ge;50%):</strong> AI or the source did the heavy lifting and you copied, transcribed, or followed steps mechanically.",
+        "<strong>🤖 Delegation / Reproduction (-15% XP if AI &ge;50%):</strong> Transcribing or following AI solutions without internalizing why.",
       guideCard5Li3:
-        "<strong>🔄 Scaffolding / Co-creation (+5% XP):</strong> You thought with support; used AI as a Socratic tutor, syntax copilot, or structurer of your own ideas.",
+        "<strong>🔄 Scaffolding / Co-creation (+5% XP):</strong> Thinking as a team with AI, actively debating hypotheses and deducing the logic.",
       guideCard5Li4:
         "<strong>🧠 Own Generation (+10% XP no AI / +5% minor lookup):</strong> The heavy mental effort came from your own head.",
+      guideCard5Li5:
+        "<strong>Cognitive Debt:</strong> Audits the intention gap. <strong>Interleaving</strong> grants +5% XP on <em>Productive Friction</em>.",
       guideCard6Title: "📊 6. Time Slots (6h) & RPG Formulas",
       guideCard6Li1:
         "<strong>Circadian Slots (6h):</strong> <code>00:00–05:59 Early Morning</code> · <code>06:00–11:59 Morning</code> · <code>12:00–17:59 Afternoon</code> · <code>18:00–23:59 Night</code>.",
       guideCard6Li2:
         "<strong>Subtopics in Notes:</strong> Write <code>[Subtopic] Your note</code> (e.g. <code>[Roundtable - GANs] Architecture debate</code>) to group in the Inspector.",
       guideCard6Li3:
-        "<strong>XP Formula:</strong> <code>ROUND(Minutes * MAX(0.5, 1 + Quality*0.2 + ChallengeBonus + ProgressBonus + DynamicBonus))</code>.",
+        "<strong>XP Formula (v3.2):</strong> <code>ROUND(Minutes * MAX(0.5, 1 + Quality*0.25 + ChallengeBonus + ProgressBonus + DynamicBonus + FrictionBonus))</code>.",
       guideCard6Li4:
         "<strong>Exponential Curve (Lv. 92 = 50% of 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code>.",
 

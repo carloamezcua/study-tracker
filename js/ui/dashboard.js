@@ -304,6 +304,7 @@
           pintarGrupoChip("friccionIntercalada", valFriccion);
           const inputFric = document.getElementById("friccion-intercalada");
           if (inputFric) inputFric.value = valFriccion;
+          actualizarAyudaFriccionIntercalada();
         } else {
           contFriccion.style.display = "none";
           estadoChips.friccionIntercalada = "";
@@ -312,6 +313,7 @@
           if (inputFric) inputFric.value = "";
         }
       }
+      actualizarAyudaEstructuraPractica();
     }
 
     // 5.2 Independencia entre Modo_Diseno_IA y Dinamica_Cognitiva:
@@ -319,16 +321,19 @@
     if (grupo === "modoDisenoIA") {
       const inputModo = document.getElementById("modo-diseno-ia");
       if (inputModo) inputModo.value = valor;
+      actualizarAyudaModoDisenoIA();
     }
 
     if (grupo === "modalidadProcesamiento") {
       const inputMod = document.getElementById("modalidad-procesamiento");
       if (inputMod) inputMod.value = valor;
+      actualizarAyudaModalidadProcesamiento();
     }
 
     if (grupo === "friccionIntercalada") {
       const inputFric = document.getElementById("friccion-intercalada");
       if (inputFric) inputFric.value = valor;
+      actualizarAyudaFriccionIntercalada();
     }
 
     if (grupo === "tipoActividad") {
@@ -538,6 +543,10 @@
 
     actualizarAyudaDominio();
     actualizarAyudaActividad();
+    actualizarAyudaEstructuraPractica();
+    actualizarAyudaModoDisenoIA();
+    actualizarAyudaModalidadProcesamiento();
+    actualizarAyudaFriccionIntercalada();
     actualizarAyudaObjetivo();
     actualizarAyudaIA({ desdeChip: true });
     actualizarAyudaCalidad();
@@ -601,6 +610,10 @@
     }
     actualizarAyudaDominio();
     actualizarAyudaActividad();
+    actualizarAyudaEstructuraPractica();
+    actualizarAyudaModoDisenoIA();
+    actualizarAyudaModalidadProcesamiento();
+    actualizarAyudaFriccionIntercalada();
     actualizarAyudaObjetivo();
     actualizarAyudaIA({ desdeChip: true });
     actualizarAyudaCalidad();
@@ -642,6 +655,10 @@
 
     actualizarAyudaDominio();
     actualizarAyudaActividad();
+    actualizarAyudaEstructuraPractica();
+    actualizarAyudaModoDisenoIA();
+    actualizarAyudaModalidadProcesamiento();
+    actualizarAyudaFriccionIntercalada();
     actualizarAyudaObjetivo();
     actualizarAyudaIA({ desdeChip: true });
     actualizarAyudaCalidad();
@@ -699,6 +716,64 @@
     } else if (typeof obtenerTextoAyudaActividad === "function") {
       boxAyuda.textContent = obtenerTextoAyudaActividad(estadoChips.tipoActividad);
     }
+  }
+
+  /**
+   * Actualiza la caja de ayuda según la Estructura de Práctica seleccionada.
+   */
+  function actualizarAyudaEstructuraPractica() {
+    const box = document.getElementById("ayudaEstructuraPractica");
+    if (!box) return;
+    const mapa = {
+      Bloqueado: "helpPracticeStructureBlocked",
+      Intercalado: "helpPracticeStructureInterleaved"
+    };
+    box.textContent = t(mapa[estadoChips.estructuraPractica] || "helpPracticeStructureBlocked");
+  }
+
+  /**
+   * Actualiza la caja de ayuda según el Modo de Diseño con IA seleccionado.
+   */
+  function actualizarAyudaModoDisenoIA() {
+    const box = document.getElementById("ayudaModoDisenoIA");
+    if (!box) return;
+    const mapa = {
+      Sin_IA: "helpAiDesignSinIA",
+      Tutor_Andamiaje: "helpAiDesignTutor",
+      Co_Disenador: "helpAiDesignCoDisenador",
+      Generacion_Automatica: "helpAiDesignGenerador",
+      Generador_Contenido: "helpAiDesignGenerador",
+      Evaluador_Socratico: "helpAiDesignSocratico"
+    };
+    box.textContent = t(mapa[estadoChips.modoDisenoIA] || "helpAiDesignTutor");
+  }
+
+  /**
+   * Actualiza la caja de ayuda según la Modalidad de Procesamiento Efectiva seleccionada.
+   */
+  function actualizarAyudaModalidadProcesamiento() {
+    const box = document.getElementById("ayudaModalidadProcesamiento");
+    if (!box) return;
+    const mapa = {
+      Extraccion_Esforzada: "helpProcessingExtraction",
+      Reconocimiento_Fluido: "helpProcessingRecognition",
+      Copia_Pasiva: "helpProcessingCopy"
+    };
+    box.textContent = t(mapa[estadoChips.modalidadProcesamiento] || "helpProcessingExtraction");
+  }
+
+  /**
+   * Actualiza la caja de ayuda según la Fricción de Discriminación Intercalada seleccionada.
+   */
+  function actualizarAyudaFriccionIntercalada() {
+    const box = document.getElementById("ayudaFriccionIntercalada");
+    if (!box) return;
+    const mapa = {
+      Sin_Friccion: "helpInterleavedFrictionNone",
+      Friccion_Productiva: "helpInterleavedFrictionProductive",
+      Confusion_Excesiva: "helpInterleavedFrictionExcessive"
+    };
+    box.textContent = t(mapa[estadoChips.friccionIntercalada] || "helpInterleavedFrictionProductive");
   }
 
   /**
@@ -1665,6 +1740,10 @@
     ponerHoraActual,
     actualizarAyudaDominio,
     actualizarAyudaActividad,
+    actualizarAyudaEstructuraPractica,
+    actualizarAyudaModoDisenoIA,
+    actualizarAyudaModalidadProcesamiento,
+    actualizarAyudaFriccionIntercalada,
     actualizarAyudaObjetivo,
     actualizarAyudaCalidad,
     actualizarAyudaIA,
