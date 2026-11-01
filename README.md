@@ -5,7 +5,7 @@
 # ⚔️ StudyTracker v3.2 — Local-First Analytics & CSV Sync
 
 > 🌐 **Idioma / Language:** [🇪🇸 Español](#-español) | [🇬🇧 English](#-english)  
-> 📚 **Documentación / Docs:** [📐 Decisiones & Versiones](docs/DECISIONES.md) · [❓ Preguntas Guía](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🌉 Especificación Puente v3.2](docs/especificaci_n_puente_v3_2_para_agente_antigravity.md) · [🗺️ Ruta v4.0](docs/ruta_de_refactorizaci_n_quir_rgica_v4_0.md)
+> 📚 **Documentación / Docs:** [📐 Decisiones & Versiones](docs/DECISIONES.md) · [❓ Preguntas Guía](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🌉 Especificación Puente v3.2](docs/especificaci_n_puente_v3_2_para_agente_antigravity.md) · [📋 Reglas del Formulario](docs/contexto_para_formulario.md) · [🗺️ Ruta v4.0](docs/ruta_de_refactorizaci_n_quir_rgica_v4_0.md)
 
 ---
 
@@ -24,18 +24,18 @@ La v3.2 sigue siendo Vanilla JS + CSV, pero captura desde ya los datos que neces
 - **Modalidad de Procesamiento Efectiva:** `Extraccion_Esforzada` *(por defecto)*, `Reconocimiento_Fluido`, `Copia_Pasiva`.
 - **Calificación FSRS (1–4):** `1 · Again`, `2 · Hard`, `3 · Good` *(por defecto)*, `4 · Easy`. Las sesiones antiguas con calidad 5 se tratan como 4 (mismo XP que antes).
 - **Índice de Deuda Cognitiva en vivo (`Nulo` · `Bajo` · `Moderado` · `Critico`):** fórmula determinista a partir de `% IA`, Dinámica y Modalidad, visible como píldora en la vista previa de XP.
-- **Formulario simplificado:** `Contexto`, `Energía Previa` y `Complejidad` quedan ocultos con valores neutros por defecto.
+- **Formulario simplificado con Guía de Brecha de Intención:** `Contexto`, `Energía Previa` y `Complejidad` quedan ocultos con valores neutros por defecto. Incluye un acordeón de la *Regla de Oro* (auditar la brecha entre intención y realidad) y micro-helpers interactivos en cada campo.
 - **Retrocompatibilidad:** un CSV de 18 columnas se lee sin pérdida (`Estructura_Practica = Bloqueado`, resto vacío) y se reescribe con 22 columnas al guardar. Respaldo previo al puente en `data/backups/study-tracker-v3.1-pre-bridge.csv`.
 
-### ✨ Características Principales (v3.0)
+### ✨ Características Principales
 
 - **Curva Exponencial de Nivel RPG (*"Level 92 is half of 99"*):**
   - Inspirada en *Old School RuneScape*, la experiencia requerida **se duplica cada 7 niveles**:
     $$\text{XP}(\text{Nivel } L) = \text{REDONDEAR}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
   - Subida rápida en los primeros niveles para motivar la constancia, progresión creciente (+10.4% por nivel) y propiedad matemática exacta donde el **Nivel 92 representa el 50% del XP total hacia el Nivel 99**.
 - **Formulario en 2 Etapas Cognitivas + Pre-llenado Inteligente (*Smart Defaults*):**
-  - **🎯 Etapa 1: Punto de Partida (Al Iniciar):** Pre-llena automáticamente la última materia, contexto, actividad y energía habitual para la franja horaria actual. Incluye **Chips Rápidos de Materias Recientes** (1 clic para elegir materia o `[+ Nueva]`).
-  - **🏁 Etapa 2: Evaluación del Bloque (Al Terminar):** Evalúa la Dinámica Cognitiva, el `% IA`, la Fluidez del bloque, la Asimilación (1–5) y las Notas con `[Subtema]`.
+  - **🎯 Etapa 1: Punto de Partida (Al Iniciar):** Pre-llena automáticamente la última materia, estrategia habitual y estructura de práctica. Incluye **Chips Rápidos de Materias Recientes** (1 clic para elegir materia o `[+ Nueva]`).
+  - **🏁 Etapa 2: Evaluación del Bloque (Al Terminar):** Evalúa la Dinámica Cognitiva, el `% IA`, la Fluidez del bloque, la Calificación FSRS (1–4), la Modalidad de Procesamiento y las Notas con `[Subtema]`.
 - **Taxonomía Ortogonal v3 (`4 Contextos` × `6 Actividades` × `4 Dinámicas Cognitivas` × `3 Niveles de Dominio Previo`):**
   - **Contexto / Propósito (4 chips):**
     - `🎓 Académico`: Materias universitarias/escolares, tareas y exámenes de carrera.
@@ -74,7 +74,7 @@ La v3.2 sigue siendo Vanilla JS + CSV, pero captura desde ya los datos que neces
 - **Sincronización en Tiempo Real con CSV (`data/study-tracker.csv`) y Respaldos Automáticos:**
   - **Modo 1 (Servidor Local `server.js`):** Cada alta, edición (`✏️`) o eliminación (`✖`) actualiza directamente `data/study-tracker.csv` (`UTF-8 con BOM`) y crea un respaldo diario automático en `data/backups/YYYY-MM-DD.csv` antes de sobrescribir.
   - **Modo 2 (100% Navegador sin servidor):** Puedes vincular cualquier `.csv` local usando la *File System Access API* del navegador.
-  - Migración automática transparente si cargas un archivo CSV antiguo de 20 columnas (v2) al nuevo esquema canónico de 18 columnas (v3).
+  - Migración automática transparente si cargas un archivo CSV antiguo de 18 o 20 columnas al nuevo esquema canónico de 22 columnas (v3.2).
 
 ### 🏗️ Arquitectura del Proyecto (v3.2)
 
@@ -170,18 +170,18 @@ v3.2 remains Vanilla JS + CSV, but already captures the data v4.0 (FSRS & Cognit
 - **Effective Processing Modality:** `Extraccion_Esforzada` *(default)*, `Reconocimiento_Fluido`, `Copia_Pasiva`.
 - **FSRS Grade (1–4):** `1 · Again`, `2 · Hard`, `3 · Good` *(default)*, `4 · Easy`. Legacy sessions with quality 5 are treated as 4 (same XP as before).
 - **Live Cognitive Debt Index (`Nulo` · `Bajo` · `Moderado` · `Critico`):** deterministic formula from `% AI`, Dynamic and Modality, shown as a pill in the XP preview.
-- **Simplified form:** `Contexto`, `Energia Previa` and `Complejidad` are hidden with neutral defaults.
+- **Simplified Form with Intention Gap Guidance:** `Contexto`, `Energia Previa` and `Complejidad` are hidden with neutral defaults. Includes a *Golden Rule* accordion (auditing intention vs. reality gap) and interactive micro-helpers on each field.
 - **Backward compatible:** an 18-column CSV loads losslessly (`Estructura_Practica = Bloqueado`, the rest empty) and is rewritten with 22 columns on save. Pre-bridge backup at `data/backups/study-tracker-v3.1-pre-bridge.csv`.
 
-### ✨ Key Features (v3.0)
+### ✨ Key Features
 
 - **Exponential RPG Level Curve (*"Level 92 is half of 99"*):**
   - Inspired by *Old School RuneScape*, required experience **doubles every 7 levels**:
     $$\text{XP}(\text{Level } L) = \text{ROUND}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
   - Fast early leveling to reward consistency, progressive scaling (+10.4% per level), and the exact mathematical property where **Level 92 equals 50% of the total XP required for Level 99**.
 - **2-Stage Cognitive Form + Smart Defaults:**
-  - **🎯 Stage 1: Starting Point (At Start):** Auto-prefills your latest subject, context, activity, and typical energy for the current time slot. Includes **Recent Subject Quick-Chips** (1 click to pick a subject or `[+ New]`).
-  - **🏁 Stage 2: Block Evaluation (At End):** Rate the Cognitive Dynamic, `% AI`, Block Fluency, Assimilation (1–5), and Notes with `[Subtopic]`.
+  - **🎯 Stage 1: Starting Point (At Start):** Auto-prefills your latest subject, planned strategy, and practice structure for the current time slot. Includes **Recent Subject Quick-Chips** (1 click to pick a subject or `[+ New]`).
+  - **🏁 Stage 2: Block Evaluation (At End):** Rate the Cognitive Dynamic, `% AI`, Block Fluency, FSRS Rating (1–4), Processing Modality, and Notes with `[Subtopic]`.
 - **v3 Orthogonal Taxonomy (`4 Contexts` × `6 Activities` × `4 Cognitive Dynamics` × `3 Objective Prior Mastery Levels`):**
   - **The Objective Prior Mastery Test (`Dominio_Previo`):**
     - `🌱 New` (`Nuevo` — *0 prior contacts*): You have never studied this specific concept/tool. If asked to explain it or write code right now, you wouldn't know where to start.
@@ -221,6 +221,7 @@ The generated `data/study-tracker.csv` file is stored in plain-text `UTF-8 with 
 | **Exponential Level (1-99)** | $\text{XP}(L) = \text{ROUND}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Level 92 = 50% of 99)* |
 | **Circadian Slots** | `00:00–05:59 Early Morning` · `06:00–11:59 Morning` · `12:00–17:59 Afternoon` · `18:00–23:59 Night` |
 | **Block Fluency** | `Clean flow (+10%)` · `Productive struggle (+10%)` · `With friction (+5%)` · `Paralysis / Quit (0% bonus)` |
+| **Dynamic Bonus** | `Own Generation (+10%)` · `Scaffolding (+5%)` · `Passive Reception (0%)` · `Delegation (-15% if AI ≥ 50%)` |
 
 ### 🚀 Getting Started
 
