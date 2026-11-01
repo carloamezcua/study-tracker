@@ -23,8 +23,9 @@
   let servidorLocalActivo = false;
   let archivoLocalHandle = null; // FileSystemFileHandle cuando se usa sin server.js
 
-  // Esquema oficial v3 de 18 columnas limpias
-  const ENCABEZADOS_CSV = [
+  // Esquema canónico v3.2 (22 columnas: 18 originales v3.1 + 4 nuevas v4.0)
+  const CSV_HEADERS_V3_2 = [
+    // --- 18 Columnas Originales (v3.1) ---
     "Fecha",
     "Dia_Semana",
     "Hora_Inicio",
@@ -42,8 +43,14 @@
     "Duracion_Minutos",
     "Calidad",
     "XP_Ganados",
-    "Notas"
+    "Notas",
+    // --- 4 Columnas Nuevas (Puente v3.2 -> v4.0) ---
+    "Estructura_Practica",
+    "Modo_Diseno_IA",
+    "Modalidad_Procesamiento_Efectiva",
+    "Friccion_Discriminacion_Intercalada"
   ];
+  const ENCABEZADOS_CSV = CSV_HEADERS_V3_2; // Alias retrocompatible
 
   /**
    * Escapa un valor individual según el estándar RFC 4180 para CSV.
@@ -57,59 +64,80 @@
   }
 
   /**
-   * Construye el texto CSV completo de 18 columnas (con firma UTF-8 BOM para compatibilidad de acentos y emojis).
+   * Construye el texto CSV completo de 22 columnas (con firma UTF-8 BOM para compatibilidad de acentos y emojis).
    * Todas las métricas (Duración, Franja Horaria de 6h y XP) se guardan ya calculadas por JavaScript.
    */
   function construirContenidoCSV(sesiones) {
     const lista = Array.isArray(sesiones) ? sesiones : [];
-    const lineas = [ENCABEZADOS_CSV.join(",")];
+    const lineas = [CSV_HEADERS_V3_2.join(",")];
 
     lista.forEach((s) => {
       const duracion =
-        Number(s.duracion) > 0
-          ? Number(s.duracion)
-          : calcularMinutos(s.horaInicio, s.horaFin);
-      const calidad = Math.min(5, Math.max(1, Number(s.calidad) || 3));
-      const complejidad = s.complejidad || "Desafiante";
-      const objetivoCumplido = migrarEstadoObjetivo(s.objetivoCumplido);
-      const usoIA = Math.min(100, Math.max(0, Math.round(Number(s.usoIA) || 0)));
-      const tipoActividad = migrarTipoActividad(s.tipoActividad);
+        Number(s.duracion || s.Duracion_Minutos) > 0
+          ? Number(s.duracion || s.Duracion_Minutos)
+          : calcularMinutos(s.horaInicio || s.Hora_Inicio, s.horaFin || s.Hora_Fin);
+      const calidad = Math.min(4, Math.max(1, Number(s.calidad || s.Calidad) || 3));
+      const complejidad = s.complejidad || s.Complejidad || "Desafiante";
+      const objetivoCumplido = migrarEstadoObjetivo(s.objetivoCumplido || s.Objetivo_Cumplido);
+      const usoIA = Math.min(100, Math.max(0, Math.round(Number(s.usoIA !== undefined ? s.usoIA : s.Uso_IA_Porcentaje) || 0)));
+      const tipoActividad = migrarTipoActividad(s.tipoActividad || s.Tipo_Actividad);
       const dinamicaCognitiva = migrarDinamicaCognitiva(
-        s.dinamicaCognitiva,
-        s.produccion,
-        s.modoIA,
+        s.dinamicaCognitiva || s.Dinamica_Cognitiva,
+        s.produccion || s.Produccion_Propia,
+        s.modoIA || s.Modo_IA,
         usoIA
       );
-      const dominioPrevio = migrarDominioPrevio(s.dominioPrevio, tipoActividad);
-      const notas = formatearNotasConTema(s.notas, s.tema);
+      const dominioPrevio = migrarDominioPrevio(s.dominioPrevio || s.Dominio_Previo, tipoActividad);
+      const notas = formatearNotasConTema(s.notas || s.Notas, s.tema || s.Tema);
+
+      const estructuraPractica = s.Estructura_Practica || s.estructuraPractica || "Bloqueado";
+      const modoDisenoIA = s.Modo_Diseno_IA || s.modoDisenoIA || s.modoDisenoIa || "Sin_IA";
+      const modalidadProcesamiento =
+        s.Modalidad_Procesamiento_Efectiva ||
+        s.modalidadProcesamiento ||
+        s.modalidadProcesamientoEfectiva ||
+        "Extraccion_Esforzada";
+      const friccionIntercalada =
+        estructuraPractica === "Intercalado"
+          ? (s.Friccion_Discriminacion_Intercalada ||
+             s.friccionIntercalada ||
+             s.friccionDiscriminacionIntercalada ||
+             "Sin_Friccion")
+          : "";
+
       const xp = calcularXP(
         duracion,
         calidad,
         complejidad,
         objetivoCumplido,
         dinamicaCognitiva,
-        usoIA
+        usoIA,
+        friccionIntercalada
       );
 
       const fila = [
-        s.fecha || "",
-        calcularDiaSemana(s.fecha),
-        s.horaInicio || "",
-        s.horaFin || "",
-        calcularFranjaHoraria(s.horaInicio),
-        s.contexto || "Académico",
-        s.materia || "General",
+        s.fecha || s.Fecha || "",
+        calcularDiaSemana(s.fecha || s.Fecha),
+        s.horaInicio || s.Hora_Inicio || "",
+        s.horaFin || s.Hora_Fin || "",
+        calcularFranjaHoraria(s.horaInicio || s.Hora_Inicio),
+        s.contexto || s.Contexto || "Académico",
+        s.materia || s.Materia || "General",
         tipoActividad,
         dinamicaCognitiva,
         usoIA,
         dominioPrevio,
-        s.energiaPrevia || "Media",
+        s.energiaPrevia || s.Energia_Previa || "Media",
         complejidad,
         objetivoCumplido,
         duracion,
         calidad,
         xp,
-        notas
+        notas,
+        estructuraPractica,
+        modoDisenoIA,
+        modalidadProcesamiento,
+        friccionIntercalada
       ];
 
       lineas.push(fila.map(escaparCeldaCSV).join(","));
@@ -233,10 +261,20 @@
       const objetivoCumplido = migrarEstadoObjetivo(r.Objetivo_Cumplido || r.objetivoCumplido);
 
       const duracion = calcularMinutos(horaInicio, horaFin) || Number(r.Duracion_Minutos || 0);
-      const calidad = Math.min(5, Math.max(1, Number(r.Calidad || 3)));
+      const calidad = Math.min(4, Math.max(1, Number(r.Calidad || 3)));
 
       const notasUnificadas = formatearNotasConTema(r.Notas || r.notas || "", temaLegacy);
       const { subtema } = extraerSubtemaDeNotas(notasUnificadas, temaLegacy);
+
+      // --- Soporte retrocompatible de 18 y 22 columnas (Puente v3.2 -> v4.0) ---
+      const estructuraPractica = r.Estructura_Practica || r.estructuraPractica || "Bloqueado";
+      const modoDisenoIA = r.Modo_Diseno_IA || r.modoDisenoIA || "";
+      const modalidadProcesamiento =
+        r.Modalidad_Procesamiento_Efectiva || r.modalidadProcesamiento || "";
+      const friccionIntercalada =
+        estructuraPractica === "Intercalado"
+          ? (r.Friccion_Discriminacion_Intercalada || r.friccionIntercalada || "")
+          : "";
 
       const xp = calcularXP(
         duracion,
@@ -244,7 +282,8 @@
         complejidad,
         objetivoCumplido,
         dinamicaCognitiva,
-        rawIA
+        rawIA,
+        friccionIntercalada
       );
 
       nuevas.push({
@@ -252,21 +291,45 @@
         horaInicio: String(horaInicio).slice(0, 5),
         horaFin: String(horaFin).slice(0, 5),
         contexto,
+        Contexto: contexto,
         materia,
+        Materia: materia,
         tema: subtema,
         tipoActividad,
+        Tipo_Actividad: tipoActividad,
         dinamicaCognitiva,
+        Dinamica_Cognitiva: dinamicaCognitiva,
         produccion: dinamicaCognitiva,
         modoIA: dinamicaCognitiva,
         dominioPrevio,
+        Dominio_Previo: dominioPrevio,
         energiaPrevia,
+        Energia_Previa: energiaPrevia,
         complejidad,
+        Complejidad: complejidad,
         objetivoCumplido,
+        Objetivo_Cumplido: objetivoCumplido,
         duracion,
+        Duracion_Minutos: duracion,
         calidad,
+        Calidad: calidad,
         usoIA: rawIA,
+        Uso_IA_Porcentaje: rawIA,
         xp,
-        notas: notasUnificadas
+        XP_Ganados: xp,
+        notas: notasUnificadas,
+        Notas: notasUnificadas,
+        Estructura_Practica: estructuraPractica,
+        Modo_Diseno_IA: modoDisenoIA,
+        Modalidad_Procesamiento_Efectiva: modalidadProcesamiento,
+        Friccion_Discriminacion_Intercalada: friccionIntercalada,
+        estructuraPractica,
+        modoDisenoIA,
+        modoDisenoIa: modoDisenoIA,
+        modalidadProcesamiento,
+        modalidadProcesamientoEfectiva: modalidadProcesamiento,
+        friccionIntercalada,
+        friccionDiscriminacionIntercalada: friccionIntercalada
       });
     }
 
@@ -511,9 +574,12 @@
   }
 
   const servicio = {
+    CSV_HEADERS_V3_2,
     ENCABEZADOS_CSV,
     construirContenidoCSV,
+    toCSV: construirContenidoCSV,
     extraerSesionesDesdeCSV,
+    fromCSV: extraerSesionesDesdeCSV,
     inicializarConexionServidor,
     vincularArchivoLocalNavegador,
     guardarEnServidorLocal,
@@ -525,4 +591,8 @@
 
   StudyTracker.CsvService = servicio;
   StudyTracker.ExcelService = servicio;
-})(window);
+
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = servicio;
+  }
+})(typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : this));

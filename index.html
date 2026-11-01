@@ -203,6 +203,7 @@
         <div class="preview-pill">
           <span id="previewDuracion">⏱️ Duración: 25 min</span>
           <strong id="previewXP">+45 XP</strong>
+          <span id="badge-deuda-cognitiva" class="status-pill connected" style="margin-left: 6px;">Deuda Cognitiva: Nulo</span>
         </div>
 
         <form id="studyForm">
@@ -213,14 +214,16 @@
               <span class="form-stage-badge" data-i18n="stageStartBadge">Al iniciar sesión</span>
             </div>
 
-            <!-- CONTEXTO / PROPÓSITO (4 CHIPS DE 1 CLIC) -->
-            <div class="form-group">
-              <label data-i18n="labelContext">Contexto / Propósito</label>
-              <div class="chip-group" data-group="contexto">
-                <button type="button" class="chip-btn active" data-value="Académico">🎓 Académico</button>
-                <button type="button" class="chip-btn" data-value="Certificación">🏅 Certificación</button>
-                <button type="button" class="chip-btn" data-value="Proyecto Propio">🚀 Proyecto Propio</button>
-                <button type="button" class="chip-btn" data-value="Externo">🤝 Externo</button>
+            <!-- CONTEXTO / PROPÓSITO (OCULTO EN V3.2 / VALOR POR DEFECTO NEUTRO ACADÉMICO/GENERAL) -->
+            <div style="display: none;">
+              <div class="form-group">
+                <label data-i18n="labelContext">Contexto / Propósito</label>
+                <div class="chip-group" data-group="contexto">
+                  <button type="button" class="chip-btn active" data-value="Académico">🎓 Académico</button>
+                  <button type="button" class="chip-btn" data-value="Certificación">🏅 Certificación</button>
+                  <button type="button" class="chip-btn" data-value="Proyecto Propio">🚀 Proyecto Propio</button>
+                  <button type="button" class="chip-btn" data-value="Externo">🤝 Externo</button>
+                </div>
               </div>
             </div>
 
@@ -237,12 +240,15 @@
                 <label for="fecha" data-i18n="labelDate">Fecha</label>
                 <input type="date" id="fecha" required>
               </div>
-              <div class="form-group">
-                <label data-i18n="labelEnergy">Energía Previa</label>
-                <div class="chip-group" data-group="energiaPrevia">
-                  <button type="button" class="chip-btn" data-value="Alta">🔋 Alta</button>
-                  <button type="button" class="chip-btn active" data-value="Media">⚡ Media</button>
-                  <button type="button" class="chip-btn" data-value="Baja">🪫 Baja</button>
+              <!-- ENERGÍA PREVIA (OCULTA EN V3.2 / VALOR POR DEFECTO NEUTRO 3 / MEDIA) -->
+              <div style="display: none;">
+                <div class="form-group">
+                  <label data-i18n="labelEnergy">Energía Previa</label>
+                  <div class="chip-group" data-group="energiaPrevia">
+                    <button type="button" class="chip-btn" data-value="Alta">🔋 Alta</button>
+                    <button type="button" class="chip-btn active" data-value="Media">⚡ Media</button>
+                    <button type="button" class="chip-btn" data-value="Baja">🪫 Baja</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -260,16 +266,21 @@
               </div>
             </div>
 
-            <!-- DOMINIO PREVIO OBJETIVO Y COMPLEJIDAD -->
-            <div class="row">
-              <div class="form-group">
-                <label data-i18n="labelMastery">Dominio Previo del Tema</label>
-                <div class="chip-group" data-group="dominioPrevio">
-                  <button type="button" class="chip-btn" data-value="Nuevo">🌱 Nuevo</button>
-                  <button type="button" class="chip-btn active" data-value="En construcción">🌿 En construcción</button>
-                  <button type="button" class="chip-btn" data-value="Consolidado">🌳 Consolidado</button>
-                </div>
+            <!-- DOMINIO PREVIO OBJETIVO -->
+            <div class="form-group">
+              <label data-i18n="labelMastery">Dominio Previo del Tema</label>
+              <div class="chip-group" data-group="dominioPrevio">
+                <button type="button" class="chip-btn" data-value="Nuevo">🌱 Nuevo</button>
+                <button type="button" class="chip-btn active" data-value="En construcción">🌿 En construcción</button>
+                <button type="button" class="chip-btn" data-value="Consolidado">🌳 Consolidado</button>
               </div>
+              <div id="ayudaDominio" class="helper-box">
+                🌿 En construcción (Necesitas apoyo / consulta): Ya lo viste antes (en clase, ayer o en el Pomodoro pasado), pero todavía necesitas mirar tus apuntes, la documentación o apoyarte en la IA para avanzar sin trabarte.
+              </div>
+            </div>
+
+            <!-- COMPLEJIDAD (OCULTA EN V3.2 / VALOR POR DEFECTO NEUTRO 3 / DESAFIANTE) -->
+            <div style="display: none;">
               <div class="form-group">
                 <label><span data-i18n="labelComplexity">Complejidad</span> <span class="label-hint" data-i18n="labelComplexityHint">(+XP)</span></label>
                 <div class="chip-group" data-group="complejidad">
@@ -279,8 +290,40 @@
                 </div>
               </div>
             </div>
-            <div id="ayudaDominio" class="helper-box">
-              🌿 En construcción (Necesitas apoyo / consulta): Ya lo viste antes (en clase, ayer o en el Pomodoro pasado), pero todavía necesitas mirar tus apuntes, la documentación o apoyarte en la IA para avanzar sin trabarte.
+
+            <!-- ESTRATEGIA TÉCNICA PLANIFICADA (Campo Tipo_Actividad en CSV) -->
+            <div class="form-group">
+              <label data-i18n="labelStrategy">Estrategia Planificada</label>
+              <div class="chip-group chip-grid-2" data-group="tipoActividad">
+                <button type="button" class="chip-btn" data-value="Recuperacion_Activa">🧠 Recuperación Activa</button>
+                <button type="button" class="chip-btn active" data-value="Construccion_Generativa">🛠️ Construcción Generativa</button>
+                <button type="button" class="chip-btn" data-value="Consumo_Receptivo">📖 Consumo Receptivo</button>
+                <button type="button" class="chip-btn" data-value="Delegacion_Ejecutiva">⚡ Delegación Ejecutiva</button>
+              </div>
+              <div id="ayudaActividad" class="helper-box">
+                🛠️ Construcción Generativa: Creación propia (redacción de arquitectura, apuntes estructurados, lógica desde cero).
+              </div>
+            </div>
+
+            <!-- ESTRUCTURA DE PRÁCTICA -->
+            <div class="form-group">
+              <label data-i18n="labelPracticeStructure">Estructura de Práctica</label>
+              <input type="hidden" id="estructura-practica" value="Bloqueado">
+              <div class="chip-group" data-group="estructuraPractica">
+                <button type="button" class="chip-btn active" data-value="Bloqueado">🧱 Bloqueado (1 solo tema)</button>
+                <button type="button" class="chip-btn" data-value="Intercalado">🔀 Intercalado (Problemas mixtos)</button>
+              </div>
+            </div>
+
+            <!-- MODO DE DISEÑO CON IA -->
+            <div class="form-group">
+              <label data-i18n="labelAiDesignMode">Modo Diseño IA</label>
+              <input type="hidden" id="modo-diseno-ia" value="Tutor_Andamiaje">
+              <div class="chip-group" data-group="modoDisenoIA">
+                <button type="button" class="chip-btn" data-value="Sin_IA">🚫 Sin IA</button>
+                <button type="button" class="chip-btn active" data-value="Tutor_Andamiaje">🦉 Tutor Andamiaje</button>
+                <button type="button" class="chip-btn" data-value="Generacion_Automatica">🤖 Generación Automática</button>
+              </div>
             </div>
           </div>
 
@@ -291,23 +334,7 @@
               <span class="form-stage-badge" data-i18n="stageEndBadge">Al terminar</span>
             </div>
 
-            <!-- 1. TIPO DE ACTIVIDAD / TAREA COGNITIVA (6 CHIPS LIMPIOS) -->
-            <div class="form-group">
-              <label data-i18n="labelActivity">Tipo de Actividad</label>
-              <div class="chip-group chip-grid-6" data-group="tipoActividad">
-                <button type="button" class="chip-btn" data-value="Clase / Cátedra">👨‍🏫 Clase / Cátedra</button>
-                <button type="button" class="chip-btn" data-value="Estudio Teórico / Conceptual">📖 Estudio Teórico / Conceptual</button>
-                <button type="button" class="chip-btn" data-value="Síntesis / Documentación">✍️ Síntesis / Documentación</button>
-                <button type="button" class="chip-btn active" data-value="Desarrollo / Código">💻 Desarrollo / Código</button>
-                <button type="button" class="chip-btn" data-value="Práctica / Debugging">🧪 Práctica / Debugging</button>
-                <button type="button" class="chip-btn" data-value="Repaso / Simulacro">🔁 Repaso / Simulacro</button>
-              </div>
-              <div id="ayudaActividad" class="helper-box">
-                💻 Desarrollo / Código: Construir e implementar (escribir código, notebooks, consultas SQL, scripts o desarrollar funcionalidades de un proyecto o entregable).
-              </div>
-            </div>
-
-            <!-- 2. DINÁMICA COGNITIVA UNIFICADA (4 CHIPS) + PORCENTAJE IA -->
+            <!-- 1. DINÁMICA COGNITIVA UNIFICADA (4 CHIPS) + PORCENTAJE IA -->
             <div class="form-group">
               <label><span data-i18n="labelCognitiveDynamic">Dinámica Cognitiva e IA</span> <span class="label-hint" data-i18n="labelCognitiveDynamicHint">(+10% Gen. Propia · +5% Co-creación · -15% Delegación)</span></label>
               <div class="chip-group chip-grid-2" data-group="dinamicaCognitiva">
@@ -325,7 +352,7 @@
               </div>
             </div>
 
-            <!-- 3. OBJETIVO CUMPLIDO / AVANCE DEL BLOQUE -->
+            <!-- 2. OBJETIVO CUMPLIDO / AVANCE DEL BLOQUE -->
             <div class="form-group">
               <label><span data-i18n="labelGoal">¿Fluidez y Avance del Bloque?</span> <span class="label-hint" data-i18n="labelGoalHint">(Evalúa este bloque, no si terminaste todo el entregable)</span></label>
               <div class="chip-group" data-group="objetivoCumplido">
@@ -339,22 +366,44 @@
               </div>
             </div>
 
-            <!-- 4. CALIDAD DE APRENDIZAJE / ASIMILACIÓN REAL -->
+            <!-- 3. CALIFICACIÓN FSRS (Grade 1 al 4) -->
             <div class="form-group">
-              <label for="calidad" data-i18n="labelQuality">Calidad de Aprendizaje / Asimilación (1 al 5)</label>
-              <select id="calidad">
-                <option value="1" data-i18n="qualityOpt1">1 - ⭐️ Mecánico / Sin retención (Solo copié o distraído)</option>
-                <option value="2" data-i18n="qualityOpt2">2 - ⭐️⭐️ Superficial / Pasivo (Entendí por encima)</option>
-                <option value="3" selected data-i18n="qualityOpt3">3 - ⭐️⭐️⭐️ Comprensión estándar (Entendí la lógica)</option>
-                <option value="4" data-i18n="qualityOpt4">4 - ⭐️⭐️⭐️⭐️ Aprendizaje sólido (Razoné y puedo replicarlo)</option>
-                <option value="5" data-i18n="qualityOpt5">5 - ⭐️⭐️⭐️⭐️⭐️ Asimilación profunda (Dominio total)</option>
-              </select>
+              <label for="calidad" data-i18n="labelQuality">Calificación FSRS (Grade 1–4)</label>
+              <input type="hidden" id="calidad" value="3">
+              <div class="chip-group chip-grid-2" data-group="calidad">
+                <button type="button" class="chip-btn" data-value="1">1 · Again (Olvido / Bloqueo)</button>
+                <button type="button" class="chip-btn" data-value="2">2 · Hard (Esfuerzo extremo)</button>
+                <button type="button" class="chip-btn active" data-value="3">3 · Good (Recuerdo normal)</button>
+                <button type="button" class="chip-btn" data-value="4">4 · Easy (Fluido / Inmediato)</button>
+              </div>
               <div id="ayudaCalidad" class="helper-box">
-                Comprensión estándar: Entendí la lógica general de lo realizado y resolví partes por mi cuenta.
+                3 · Good (Recuerdo normal): Comprensión y recuerdo dentro de lo esperado con esfuerzo moderado.
               </div>
             </div>
 
-            <!-- 5. NOTAS Y SUBTEMA UNIFICADOS -->
+            <!-- 4. MODALIDAD DE PROCESAMIENTO EFECTIVA -->
+            <div class="form-group">
+              <label data-i18n="labelProcessingModality">Modalidad de Procesamiento Efectiva</label>
+              <input type="hidden" id="modalidad-procesamiento" value="Extraccion_Esforzada">
+              <div class="chip-group" data-group="modalidadProcesamiento">
+                <button type="button" class="chip-btn active" data-value="Extraccion_Esforzada">🔥 Extracción Esforzada</button>
+                <button type="button" class="chip-btn" data-value="Reconocimiento_Fluido">👀 Reconocimiento Fluido</button>
+                <button type="button" class="chip-btn" data-value="Copia_Pasiva">📋 Copia Pasiva</button>
+              </div>
+            </div>
+
+            <!-- 5. FRICCIÓN DE DISCRIMINACIÓN INTERCALADA (Condicional si Estructura_Practica === 'Intercalado') -->
+            <div class="form-group" id="contenedor-friccion-intercalada" style="display: none;">
+              <label data-i18n="labelInterleavedFriction">Fricción de Discriminación Intercalada</label>
+              <input type="hidden" id="friccion-intercalada" value="">
+              <div class="chip-group" data-group="friccionIntercalada">
+                <button type="button" class="chip-btn" data-value="Sin_Friccion">🟢 Sin Fricción</button>
+                <button type="button" class="chip-btn active" data-value="Friccion_Productiva">🧠 Fricción Productiva (+5% XP)</button>
+                <button type="button" class="chip-btn" data-value="Confusion_Excesiva">🔴 Confusión Excesiva</button>
+              </div>
+            </div>
+
+            <!-- 6. NOTAS Y SUBTEMA UNIFICADOS -->
             <div class="form-group" style="margin-bottom:0;">
               <label for="notas"><span data-i18n="labelNotes">Notas y Subtema</span> <span class="label-hint" data-i18n="labelNotesHint">(Ej. [GANs] Lo que aprendiste o dónde te trabaste)</span></label>
               <textarea id="notas" rows="2" data-i18n-placeholder="placeholderNotes" placeholder="[Subtema opcional] ¿Qué aprendiste, debatiste o qué te trabó?"></textarea>

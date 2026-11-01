@@ -101,54 +101,93 @@
 
   /**
    * Normaliza y garantiza la integridad de una sesión de estudio,
-   * migrando nombres antiguos e inyectando campos automáticos (diaSemana y franjaHoraria).
+   * migrando nombres antiguos, inyectando campos automáticos (diaSemana y franjaHoraria)
+   * y soportando las 4 nuevas variables del Puente v3.2 -> v4.0.
    */
   function normalizarSesion(raw) {
-    const fecha = String(raw.fecha || "").slice(0, 10);
-    const horaInicio = String(raw.horaInicio || "").slice(0, 5);
-    const horaFin = String(raw.horaFin || "").slice(0, 5);
-    const materia = String(raw.materia || "General").trim() || "General";
-    const calidad = Math.min(5, Math.max(1, Number(raw.calidad) || 3));
+    const fecha = String(raw.fecha || raw.Fecha || "").slice(0, 10);
+    const horaInicio = String(raw.horaInicio || raw.Hora_Inicio || "").slice(0, 5);
+    const horaFin = String(raw.horaFin || raw.Hora_Fin || "").slice(0, 5);
+    const materia = String(raw.materia || raw.Materia || "General").trim() || "General";
+    // Calidad FSRS 1 a 4 (topado en 4 si viene 5 de sesiones históricas)
+    const calidad = Math.min(4, Math.max(1, Number(raw.calidad || raw.Calidad) || 3));
 
-    const ctxCandidato = MAPA_MIGRACION_CONTEXTO[raw.contexto] || raw.contexto;
-    const contexto = VALORES_CONTEXTO.has(ctxCandidato) ? ctxCandidato : "Académico";
+    const rawCtx = raw.contexto || raw.Contexto;
+    const ctxCandidato = MAPA_MIGRACION_CONTEXTO[rawCtx] || rawCtx;
+    const contexto = VALORES_CONTEXTO.has(ctxCandidato) ? ctxCandidato : (rawCtx || "General");
 
-    const tipoActividad = migrarTipoActividad(raw.tipoActividad);
+    const tipoActividad = migrarTipoActividad(raw.tipoActividad || raw.Tipo_Actividad);
 
-    let usoIA = raw.usoIA !== undefined ? Number(raw.usoIA) : 0;
+    let usoIA = raw.usoIA !== undefined ? raw.usoIA : (raw.Uso_IA_Porcentaje !== undefined ? raw.Uso_IA_Porcentaje : 0);
+    usoIA = Number(usoIA);
     if (Number.isNaN(usoIA)) usoIA = 0;
     usoIA = Math.min(100, Math.max(0, Math.round(usoIA)));
 
     const dinamicaCognitiva = migrarDinamicaCognitiva(
-      raw.dinamicaCognitiva,
-      raw.produccion,
-      raw.modoIA,
+      raw.dinamicaCognitiva || raw.Dinamica_Cognitiva,
+      raw.produccion || raw.Produccion_Propia,
+      raw.modoIA || raw.Modo_IA,
       usoIA
     );
 
     const dominioPrevio = migrarDominioPrevio(
-      raw.dominioPrevio || raw.familiaridad,
+      raw.dominioPrevio || raw.Dominio_Previo || raw.familiaridad,
       tipoActividad
     );
 
-    const energiaPrevia = VALORES_ENERGIA.has(raw.energiaPrevia)
-      ? raw.energiaPrevia
-      : "Media";
+    // Fallbacks para campos ocultos en la UI
+    const rawEnergia = raw.energiaPrevia !== undefined ? raw.energiaPrevia : raw.Energia_Previa;
+    let energiaPrevia = "Media";
+    if (VALORES_ENERGIA.has(rawEnergia)) {
+      energiaPrevia = rawEnergia;
+    } else if (rawEnergia === 1 || rawEnergia === "1" || rawEnergia === "Baja") {
+      energiaPrevia = "Baja";
+    } else if (rawEnergia === 2 || rawEnergia === "2" || rawEnergia === 3 || rawEnergia === "3" || rawEnergia === "Media") {
+      energiaPrevia = "Media";
+    } else if (rawEnergia === "Alta") {
+      energiaPrevia = "Alta";
+    }
 
-    const complejidad = VALORES_COMPLEJIDAD.has(raw.complejidad)
-      ? raw.complejidad
-      : "Desafiante";
+    const rawComplejidad = raw.complejidad !== undefined ? raw.complejidad : raw.Complejidad;
+    let complejidad = "Desafiante";
+    if (VALORES_COMPLEJIDAD.has(rawComplejidad)) {
+      complejidad = rawComplejidad;
+    } else if (rawComplejidad === 1 || rawComplejidad === "1" || rawComplejidad === "Fácil") {
+      complejidad = "Fácil";
+    } else if (rawComplejidad === 2 || rawComplejidad === "2" || rawComplejidad === 3 || rawComplejidad === "3" || rawComplejidad === "Desafiante") {
+      complejidad = "Desafiante";
+    } else if (rawComplejidad === "Muy difícil") {
+      complejidad = "Muy difícil";
+    }
 
-    const objetivoCumplido = migrarEstadoObjetivo(raw.objetivoCumplido);
+    const objetivoCumplido = migrarEstadoObjetivo(raw.objetivoCumplido || raw.Objetivo_Cumplido);
 
-    const notasUnificadas = formatearNotasConTema(raw.notas || "", raw.tema || "");
-    const { subtema } = extraerSubtemaDeNotas(notasUnificadas, raw.tema || "");
+    const notasUnificadas = formatearNotasConTema(raw.notas || raw.Notas || "", raw.tema || raw.Tema || "");
+    const { subtema } = extraerSubtemaDeNotas(notasUnificadas, raw.tema || raw.Tema || "");
 
     const duracionCalculada = calcularMinutos(horaInicio, horaFin);
     const duracion =
-      raw.duracion !== undefined && Number(raw.duracion) > 0 && !raw.recalcularDuracion
+      (raw.duracion !== undefined && Number(raw.duracion) > 0 && !raw.recalcularDuracion)
         ? Number(raw.duracion)
-        : duracionCalculada;
+        : ((raw.Duracion_Minutos !== undefined && Number(raw.Duracion_Minutos) > 0)
+          ? Number(raw.Duracion_Minutos)
+          : duracionCalculada);
+
+    // --- 4 Propiedades Nuevas (Puente v3.2 -> v4.0) ---
+    const estructuraPractica = raw.Estructura_Practica || raw.estructuraPractica || "Bloqueado";
+    const modoDisenoIA = raw.Modo_Diseno_IA || raw.modoDisenoIA || raw.modoDisenoIa || "Sin_IA";
+    const modalidadProcesamiento =
+      raw.Modalidad_Procesamiento_Efectiva ||
+      raw.modalidadProcesamiento ||
+      raw.modalidadProcesamientoEfectiva ||
+      "Extraccion_Esforzada";
+    const friccionIntercalada =
+      estructuraPractica === "Intercalado"
+        ? (raw.Friccion_Discriminacion_Intercalada ||
+           raw.friccionIntercalada ||
+           raw.friccionDiscriminacionIntercalada ||
+           "Sin_Friccion")
+        : "";
 
     const xp = calcularXP(
       duracion,
@@ -156,32 +195,63 @@
       complejidad,
       objetivoCumplido,
       dinamicaCognitiva,
-      usoIA
+      usoIA,
+      friccionIntercalada
     );
 
     return {
       id: raw.id ? String(raw.id) : generarId(),
       fecha,
+      Fecha: fecha,
       diaSemana: calcularDiaSemana(fecha),
+      Dia_Semana: calcularDiaSemana(fecha),
       horaInicio,
+      Hora_Inicio: horaInicio,
       horaFin,
+      Hora_Fin: horaFin,
       franjaHoraria: calcularFranjaHoraria(horaInicio),
+      Franja_Horaria: calcularFranjaHoraria(horaInicio),
       contexto,
+      Contexto: raw.Contexto || contexto || "General",
       materia,
+      Materia: materia,
       tema: subtema,
       tipoActividad,
+      Tipo_Actividad: tipoActividad,
       dinamicaCognitiva,
+      Dinamica_Cognitiva: dinamicaCognitiva,
       produccion: dinamicaCognitiva, // Alias retrocompatible
       modoIA: dinamicaCognitiva, // Alias retrocompatible
       dominioPrevio,
+      Dominio_Previo: dominioPrevio,
       energiaPrevia,
+      Energia_Previa: Number(raw.Energia_Previa) || 3,
       complejidad,
+      Complejidad: Number(raw.Complejidad) || 3,
       objetivoCumplido,
+      Objetivo_Cumplido: objetivoCumplido,
       duracion,
+      Duracion_Minutos: duracion,
       calidad,
+      Calidad: calidad,
       usoIA,
+      Uso_IA_Porcentaje: usoIA,
       xp,
-      notas: notasUnificadas
+      XP_Ganados: xp,
+      notas: notasUnificadas,
+      Notas: notasUnificadas,
+      // Columnas 19-22
+      Estructura_Practica: estructuraPractica,
+      Modo_Diseno_IA: modoDisenoIA,
+      Modalidad_Procesamiento_Efectiva: modalidadProcesamiento,
+      Friccion_Discriminacion_Intercalada: friccionIntercalada,
+      estructuraPractica,
+      modoDisenoIA,
+      modoDisenoIa: modoDisenoIA,
+      modalidadProcesamiento,
+      modalidadProcesamientoEfectiva: modalidadProcesamiento,
+      friccionIntercalada,
+      friccionDiscriminacionIntercalada: friccionIntercalada
     };
   }
 
@@ -222,6 +292,10 @@
       return this._sesiones.map((s) => ({ ...s }));
     }
 
+    obtenerSesiones() {
+      return this.getSesiones();
+    }
+
     /**
      * Busca y devuelve una sesión por su ID único.
      */
@@ -251,6 +325,11 @@
       return nueva;
     }
 
+    // Alias en inglés para compatibilidad
+    addSession(datosFormulario) {
+      return this.agregarSesion(datosFormulario);
+    }
+
     /**
      * Actualiza una sesión existente por su ID único y recalcula su duración, día, franja y XP.
      */
@@ -277,6 +356,11 @@
       return actualizada;
     }
 
+    // Alias en inglés para compatibilidad
+    updateSession(id, datosActualizados) {
+      return this.actualizarSesionPorId(id, datosActualizados);
+    }
+
     /**
      * Elimina una sesión de forma segura usando su ID único.
      */
@@ -296,6 +380,10 @@
       this._sesiones = (Array.isArray(nuevasSesiones) ? nuevasSesiones : []).map(normalizarSesion);
       this._persistir();
       this._notificar({ origen });
+    }
+
+    cargarSesiones(nuevasSesiones, origen = "importar") {
+      return this.reemplazarSesiones(nuevasSesiones, origen);
     }
 
     /**
@@ -322,4 +410,8 @@
   }
 
   StudyTracker.store = new StudyStore();
-})(window);
+
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = StudyTracker.store;
+  }
+})(typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : this));

@@ -135,6 +135,12 @@
       labelEndTime: "Hora Fin",
       btnNowStart: "⏱️ Poner hora actual",
       btnNowEnd: "🏁 Poner hora actual",
+      labelStrategy: "Estrategia Planificada",
+      labelPracticeStructure: "Estructura de Práctica",
+      labelAiDesignMode: "Modo Diseño IA",
+      labelProcessingModality: "Modalidad de Procesamiento Efectiva",
+      labelInterleavedFriction: "Fricción de Discriminación Intercalada",
+      bonusInterleavedFriction: "+5% fricción productiva",
       labelActivity: "Tipo de Actividad",
       labelCognitiveDynamic: "Dinámica Cognitiva (Método y Rol de la IA)",
       labelCognitiveDynamicHint: "(+10% Gen. Propia · +5% Andamiaje · -15% Delegación ≥50%)",
@@ -145,13 +151,13 @@
       labelGoal: "¿Fluidez y Avance del Bloque?",
       labelGoalHint: "(Evalúa este bloque, no si terminaste todo el entregable)",
       labelAiSlider: "Porcentaje de apoyo IA:",
-      labelQuality: "Calidad de Aprendizaje / Asimilación (1 al 5)",
-      labelQualityClass: "Concentración, Interés y Retención en Clase (1 al 5)",
-      qualityOpt1: "1 - ⭐️ Mecánico / Sin retención (Solo copié o distraído)",
-      qualityOpt2: "2 - ⭐️⭐️ Superficial / Pasivo (Entendí por encima)",
-      qualityOpt3: "3 - ⭐️⭐️⭐️ Comprensión estándar (Entendí la lógica)",
-      qualityOpt4: "4 - ⭐️⭐️⭐️⭐️ Aprendizaje sólido (Razoné y puedo replicarlo)",
-      qualityOpt5: "5 - ⭐️⭐️⭐️⭐️⭐️ Asimilación profunda (Dominio total)",
+      labelQuality: "Calificación FSRS (Grade 1–4)",
+      labelQualityClass: "Concentración, Interés y Retención en Clase (Grade 1–4)",
+      qualityOpt1: "1 · Again (Olvido / Bloqueo)",
+      qualityOpt2: "2 · Hard (Esfuerzo extremo)",
+      qualityOpt3: "3 · Good (Recuerdo normal)",
+      qualityOpt4: "4 · Easy (Fluido / Inmediato)",
+      qualityOpt5: "4 · Easy (Fluido / Inmediato)",
       labelNotes: "Notas y Subtema",
       labelNotesHint: "(Usa [Subtema] al inicio para agrupar)",
       placeholderNotes: "[Subtema] ¿Qué aprendiste, qué debatiste o dónde te trabaste?",
@@ -160,6 +166,14 @@
       btnCancelEdit: "✖ Cancelar edición",
 
       // Textos dinámicos de ayuda en el formulario
+      helpStrategyActiveRecall:
+        "🧠 Recuperación Activa: Recordar y codificar a ciegas (flashcards, ejercicios sin ayuda, autoexplicación).",
+      helpStrategyGenerativeBuild:
+        "🛠️ Construcción Generativa: Creación propia (redacción de arquitectura, apuntes estructurados, lógica desde cero).",
+      helpStrategyReceptiveConsume:
+        "📖 Consumo Receptivo: Lectura de documentación, videos, clases grabadas o revisión de código ajeno.",
+      helpStrategyExecutiveDelegation:
+        "⚡ Delegación Ejecutiva: Uso de IA o generadores para resolver scripts, entregables o tareas contra reloj.",
       helpActClass:
         "👨‍🏫 En vivo con profesor: mide tu atención e interés. Por defecto elige Recepción Pasiva (0% IA), pero si hiciste actividades o usaste IA en clase, ajusta abajo la Dinámica Cognitiva.",
       helpActTheory:
@@ -207,19 +221,19 @@
       helpQualityClassAiMech:
         " ⚠️ Clase + Delegación: si usaste IA solo para acabar rápido una actividad de clase sin procesarla, considera nivel 1 o 2.",
       helpQuality1:
-        "Mecánico / Sin retención: Solo copié/pegué respuestas o estuve distraído; no asimilé el tema.",
+        "1 · Again (Olvido / Bloqueo): No se pudo recuperar sin mirar la solución.",
       helpQuality2:
-        "Superficial / Pasivo: Seguí pasos o código generado entendiendo solo por encima; poca retención.",
+        "2 · Hard (Esfuerzo extremo): Vacilación prolongada y alto esfuerzo para resolver o razonar.",
       helpQuality3:
-        "Comprensión estándar: Entendí la lógica general de lo realizado y resolví partes por mi cuenta.",
+        "3 · Good (Recuerdo normal): Comprensión y recuerdo dentro de lo esperado con esfuerzo moderado.",
       helpQuality4:
-        "Aprendizaje sólido: Razoné activamente el problema, comprendí el porqué y puedo replicarlo.",
+        "4 · Easy (Fluido / Inmediato): Fluido, directo y dominio consolidado sin dudas.",
       helpQuality5:
-        "Asimilación profunda: Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda.",
+        "4 · Easy (Fluido / Inmediato): Dominio consolidado sin dudas.",
       helpQualityWarnMech:
         " ⚠️ Nota: seleccionaste 'Delegación / Reproducción'; si solo copiaste sin profundizar, considera nivel 1 o 2 (o cambia a 'Andamiaje / Co-creación' si aprendiste debatiendo con la IA).",
       helpQualityWarnHighAi:
-        " 💡 Con {ai}% de IA, califica con 4-5 solo si hubo diálogo y comprensión profunda, no solo fluidez mecánica.",
+        " 💡 Con {ai}% de IA, califica con 3-4 solo si hubo diálogo y comprensión profunda, no solo fluidez mecánica.",
 
       // Pestañas y Gráficos Analíticos Interactivos
       tabTimeTitle: "📈 1. Tiempo y Ritmo",
@@ -530,6 +544,12 @@
       labelEndTime: "End Time",
       btnNowStart: "⏱️ Set current time",
       btnNowEnd: "🏁 Set current time",
+      labelStrategy: "Planned Strategy",
+      labelPracticeStructure: "Practice Structure",
+      labelAiDesignMode: "AI Design Mode",
+      labelProcessingModality: "Effective Processing Modality",
+      labelInterleavedFriction: "Interleaved Discrimination Friction",
+      bonusInterleavedFriction: "+5% productive friction",
       labelActivity: "Activity Type",
       labelCognitiveDynamic: "Cognitive Dynamic (Method & AI Role)",
       labelCognitiveDynamicHint: "(+10% Own Gen. · +5% Scaffolding · -15% Delegation ≥50%)",
@@ -540,13 +560,13 @@
       labelGoal: "Block Fluency & Progress?",
       labelGoalHint: "(Evaluate this block, not whether the whole project is finished)",
       labelAiSlider: "AI assistance percentage:",
-      labelQuality: "Learning Quality / Assimilation (1 to 5)",
-      labelQualityClass: "Class Focus, Interest & Retention (1 to 5)",
-      qualityOpt1: "1 - ⭐️ Mechanical / No retention (Copied or distracted)",
-      qualityOpt2: "2 - ⭐️⭐️ Superficial / Passive (Surface understanding)",
-      qualityOpt3: "3 - ⭐️⭐️⭐️ Standard comprehension (Understood the logic)",
-      qualityOpt4: "4 - ⭐️⭐️⭐️⭐️ Solid learning (Reasoned & can replicate)",
-      qualityOpt5: "5 - ⭐️⭐️⭐️⭐️⭐️ Deep assimilation (Full mastery)",
+      labelQuality: "FSRS Rating (Grade 1–4)",
+      labelQualityClass: "Class Focus, Interest & Retention (Grade 1–4)",
+      qualityOpt1: "1 · Again (Blackout / Forgot)",
+      qualityOpt2: "2 · Hard (Extreme effort)",
+      qualityOpt3: "3 · Good (Normal recall)",
+      qualityOpt4: "4 · Easy (Instant / Fluid)",
+      qualityOpt5: "4 · Easy (Instant / Fluid)",
       labelNotes: "Notes & Subtopic",
       labelNotesHint: "(Prefix with [Subtopic] to group)",
       placeholderNotes: "[Subtopic] What did you learn, debate, or get stuck on?",
@@ -555,6 +575,14 @@
       btnCancelEdit: "✖ Cancel edit",
 
       // Textos dinámicos de ayuda en el formulario
+      helpStrategyActiveRecall:
+        "🧠 Active Recall: Blind retrieval and coding (flashcards, exercises unaided, self-explanation).",
+      helpStrategyGenerativeBuild:
+        "🛠️ Generative Build: Original creation (architecture design, structured notes, coding from scratch).",
+      helpStrategyReceptiveConsume:
+        "📖 Receptive Consumption: Reading docs, watching videos/lectures, or reviewing existing code.",
+      helpStrategyExecutiveDelegation:
+        "⚡ Executive Delegation: Using AI or generators to deliver scripts or urgent deliverables.",
       helpActClass:
         "👨‍🏫 Live with professor: measures your focus and interest. Defaults to Passive Reception (0% AI), or adjust the Cognitive Dynamic below if you used AI in class.",
       helpActTheory:
@@ -602,19 +630,19 @@
       helpQualityClassAiMech:
         " ⚠️ Class + Delegation: if you used AI just to finish an in-class activity quickly without processing it, consider level 1 or 2.",
       helpQuality1:
-        "Mechanical / No retention: Only copied/pasted answers or was distracted; did not assimilate the topic.",
+        "1 · Again (Blackout / Forgot): Could not retrieve without looking at the answer.",
       helpQuality2:
-        "Superficial / Passive: Followed steps or generated code with surface understanding; low retention.",
+        "2 · Hard (Extreme effort): Prolonged hesitation and high effort to retrieve or reason.",
       helpQuality3:
-        "Standard comprehension: Understood the general logic and solved parts on my own.",
+        "3 · Good (Normal recall): Accurate recall with expected moderate effort.",
       helpQuality4:
-        "Solid learning: Actively reasoned through the problem, understood the 'why', and can replicate it.",
+        "4 · Easy (Instant / Fluid): Effortless and immediate recall; fully consolidated.",
       helpQuality5:
-        "Deep assimilation: Maximum mental effort; mastered the concept thoroughly and can explain it unaided.",
+        "4 · Easy (Instant / Fluid): Fully consolidated.",
       helpQualityWarnMech:
         " ⚠️ Note: you selected 'Delegation / Reproduction'; if you only copied without reading deeply, consider level 1 or 2 (or switch to 'Scaffolding / Co-creation' if you learned by debating with AI).",
       helpQualityWarnHighAi:
-        " 💡 With {ai}% AI, rate 4-5 only if there was deep dialogue and comprehension, not just mechanical speed.",
+        " 💡 With {ai}% AI, rate 3-4 only if there was deep dialogue and comprehension, not just mechanical speed.",
 
       // Pestañas y Gráficos Analíticos Interactivos
       tabTimeTitle: "📈 1. Time & Rhythm",
@@ -828,6 +856,10 @@
         "Desarrollo / Código": "Desarrollo / Código",
         "Práctica / Debugging": "Práctica / Debugging",
         "Repaso / Simulacro": "Repaso / Simulacro",
+        Recuperacion_Activa: "Recuperación Activa",
+        Construccion_Generativa: "Construcción Generativa",
+        Consumo_Receptivo: "Consumo Receptivo",
+        Delegacion_Ejecutiva: "Delegación Ejecutiva",
         // Compatibilidad legado v2
         "Teoría / Docs": "Estudio Teórico / Conceptual",
         "Investigación / Diálogo": "Estudio Teórico / Conceptual",
@@ -840,6 +872,10 @@
         "Desarrollo / Código": "Dev / Code",
         "Práctica / Debugging": "Practice / Debug",
         "Repaso / Simulacro": "Review / Mock",
+        Recuperacion_Activa: "Active Recall",
+        Construccion_Generativa: "Generative Build",
+        Consumo_Receptivo: "Receptive Consumption",
+        Delegacion_Ejecutiva: "Executive Delegation",
         // Compatibilidad legado v2
         "Teoría / Docs": "Theoretical / Conceptual",
         "Investigación / Diálogo": "Theoretical / Conceptual",
@@ -952,6 +988,66 @@
         Sí: "✅ Clean flow (+10%)",
         Parcial: "⚠️ With friction (+5%)",
         No: "🔴 Paralysis / Quit"
+      }
+    },
+    estructuraPracticaChip: {
+      es: {
+        Bloqueado: "🧱 Bloqueado (1 solo tema)",
+        Intercalado: "🔀 Intercalado (Problemas mixtos)"
+      },
+      en: {
+        Bloqueado: "🧱 Blocked (1 single topic)",
+        Intercalado: "🔀 Interleaved (Mixed problems)"
+      }
+    },
+    modoDisenoIaChip: {
+      es: {
+        Sin_IA: "🚫 Sin IA",
+        Tutor_Andamiaje: "🦉 Tutor Andamiaje",
+        Generacion_Automatica: "🤖 Generación Automática"
+      },
+      en: {
+        Sin_IA: "🚫 No AI",
+        Tutor_Andamiaje: "🦉 Scaffolding Tutor",
+        Generacion_Automatica: "🤖 Auto Generation"
+      }
+    },
+    calidadChip: {
+      es: {
+        1: "1 · Again (Olvido / Bloqueo)",
+        2: "2 · Hard (Esfuerzo extremo)",
+        3: "3 · Good (Recuerdo normal)",
+        4: "4 · Easy (Fluido / Inmediato)"
+      },
+      en: {
+        1: "1 · Again (Blackout / Forgot)",
+        2: "2 · Hard (Extreme effort)",
+        3: "3 · Good (Normal recall)",
+        4: "4 · Easy (Instant / Fluid)"
+      }
+    },
+    modalidadProcesamientoChip: {
+      es: {
+        Extraccion_Esforzada: "🔥 Extracción Esforzada",
+        Reconocimiento_Fluido: "👀 Reconocimiento Fluido",
+        Copia_Pasiva: "📋 Copia Pasiva"
+      },
+      en: {
+        Extraccion_Esforzada: "🔥 Effortful Retrieval",
+        Reconocimiento_Fluido: "👀 Fluid Recognition",
+        Copia_Pasiva: "📋 Passive Copy"
+      }
+    },
+    friccionIntercaladaChip: {
+      es: {
+        Sin_Friccion: "🟢 Sin Fricción",
+        Friccion_Productiva: "🧠 Fricción Productiva (+5% XP)",
+        Confusion_Excesiva: "🔴 Confusión Excesiva"
+      },
+      en: {
+        Sin_Friccion: "🟢 No Friction",
+        Friccion_Productiva: "🧠 Productive Friction (+5% XP)",
+        Confusion_Excesiva: "🔴 Excessive Confusion"
       }
     },
     diaSemana: {
@@ -1092,13 +1188,52 @@
       "Síntesis / Documentación": "✍️",
       "Desarrollo / Código": "💻",
       "Práctica / Debugging": "🧪",
-      "Repaso / Simulacro": "🔁"
+      "Repaso / Simulacro": "🔁",
+      Recuperacion_Activa: "🧠",
+      Construccion_Generativa: "🛠️",
+      Consumo_Receptivo: "📖",
+      Delegacion_Ejecutiva: "⚡"
     };
     document
       .querySelectorAll('.chip-group[data-group="tipoActividad"] .chip-btn')
       .forEach((btn) => {
         const val = btn.dataset.value;
         btn.textContent = `${iconosActividad[val] || ""} ${traducirValor("tipoActividad", val)}`;
+      });
+
+    document
+      .querySelectorAll('.chip-group[data-group="estructuraPractica"] .chip-btn')
+      .forEach((btn) => {
+        const val = btn.dataset.value;
+        btn.textContent = traducirValor("estructuraPracticaChip", val);
+      });
+
+    document
+      .querySelectorAll('.chip-group[data-group="modoDisenoIA"] .chip-btn')
+      .forEach((btn) => {
+        const val = btn.dataset.value;
+        btn.textContent = traducirValor("modoDisenoIaChip", val);
+      });
+
+    document
+      .querySelectorAll('.chip-group[data-group="calidad"] .chip-btn')
+      .forEach((btn) => {
+        const val = btn.dataset.value;
+        btn.textContent = traducirValor("calidadChip", val);
+      });
+
+    document
+      .querySelectorAll('.chip-group[data-group="modalidadProcesamiento"] .chip-btn')
+      .forEach((btn) => {
+        const val = btn.dataset.value;
+        btn.textContent = traducirValor("modalidadProcesamientoChip", val);
+      });
+
+    document
+      .querySelectorAll('.chip-group[data-group="friccionIntercalada"] .chip-btn')
+      .forEach((btn) => {
+        const val = btn.dataset.value;
+        btn.textContent = traducirValor("friccionIntercaladaChip", val);
       });
 
     document
@@ -1189,4 +1324,8 @@
     aplicarTraduccionesDOM,
     subscribe
   };
-})(window);
+
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = StudyTracker.I18n;
+  }
+})(typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : this));

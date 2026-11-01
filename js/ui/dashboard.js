@@ -14,6 +14,7 @@
     extraerSubtemaDeNotas,
     calcularMinutos,
     calcularXP,
+    calcularIndiceDeudaCognitiva,
     calcularProgresoRPG,
     calcularKPIs,
     filtrarSesionesAvanzado,
@@ -24,15 +25,20 @@
     obtenerTextoAyudaIA
   } = StudyTracker.RPG;
 
-  // Estado local de los chips seleccionados en el formulario (1 clic)
+  // Estado local de los chips seleccionados en el formulario (1 clic - Puente v3.2 -> v4.0)
   const estadoChips = {
     contexto: "Académico",
-    tipoActividad: "Desarrollo / Código",
+    tipoActividad: "Construccion_Generativa",
+    estructuraPractica: "Bloqueado",
+    modoDisenoIA: "Tutor_Andamiaje",
     dinamicaCognitiva: "Andamiaje / Co-creación",
     dominioPrevio: "En construcción",
     energiaPrevia: "Media",
     complejidad: "Desafiante",
-    objetivoCumplido: "Flujo limpio"
+    objetivoCumplido: "Flujo limpio",
+    calidad: "3",
+    modalidadProcesamiento: "Extraccion_Esforzada",
+    friccionIntercalada: ""
   };
 
   // ID de la sesión que se está editando actualmente (null si es registro nuevo)
@@ -65,7 +71,11 @@
     "Síntesis / Documentación": "✍️",
     "Desarrollo / Código": "💻",
     "Práctica / Debugging": "🧪",
-    "Repaso / Simulacro": "🔁"
+    "Repaso / Simulacro": "🔁",
+    Recuperacion_Activa: "🧠",
+    Construccion_Generativa: "🛠️",
+    Consumo_Receptivo: "📖",
+    Delegacion_Ejecutiva: "⚡"
   };
 
   const ICONOS_DINAMICA = {
@@ -253,6 +263,15 @@
     if (grupo === "modoIA" || grupo === "produccion") {
       grupo = "dinamicaCognitiva";
     }
+    if (grupo === "modoDisenoIa") {
+      grupo = "modoDisenoIA";
+    }
+    if (grupo === "modalidadProcesamientoEfectiva") {
+      grupo = "modalidadProcesamiento";
+    }
+    if (grupo === "friccionDiscriminacionIntercalada") {
+      grupo = "friccionIntercalada";
+    }
     if (!(grupo in estadoChips)) return;
 
     if (grupo === "tipoActividad") {
@@ -263,6 +282,54 @@
 
     estadoChips[grupo] = valor;
     pintarGrupoChip(grupo, valor);
+
+    // Sincronizar input oculto de Calidad FSRS
+    if (grupo === "calidad") {
+      const inputCalidad = document.getElementById("calidad");
+      if (inputCalidad) inputCalidad.value = String(valor);
+      actualizarAyudaCalidad();
+    }
+
+    // 5.1 Condicionalidad de Estructura_Practica -> Friccion_Discriminacion_Intercalada
+    if (grupo === "estructuraPractica") {
+      const inputEst = document.getElementById("estructura-practica");
+      if (inputEst) inputEst.value = valor;
+
+      const contFriccion = document.getElementById("contenedor-friccion-intercalada");
+      if (contFriccion) {
+        if (valor === "Intercalado") {
+          contFriccion.style.display = "block";
+          const valFriccion = estadoChips.friccionIntercalada || "Friccion_Productiva";
+          estadoChips.friccionIntercalada = valFriccion;
+          pintarGrupoChip("friccionIntercalada", valFriccion);
+          const inputFric = document.getElementById("friccion-intercalada");
+          if (inputFric) inputFric.value = valFriccion;
+        } else {
+          contFriccion.style.display = "none";
+          estadoChips.friccionIntercalada = "";
+          pintarGrupoChip("friccionIntercalada", "");
+          const inputFric = document.getElementById("friccion-intercalada");
+          if (inputFric) inputFric.value = "";
+        }
+      }
+    }
+
+    // 5.2 Independencia entre Modo_Diseno_IA y Dinamica_Cognitiva:
+    // Solo actualiza el input oculto sin forzar ni condicionar Dinamica_Cognitiva
+    if (grupo === "modoDisenoIA") {
+      const inputModo = document.getElementById("modo-diseno-ia");
+      if (inputModo) inputModo.value = valor;
+    }
+
+    if (grupo === "modalidadProcesamiento") {
+      const inputMod = document.getElementById("modalidad-procesamiento");
+      if (inputMod) inputMod.value = valor;
+    }
+
+    if (grupo === "friccionIntercalada") {
+      const inputFric = document.getElementById("friccion-intercalada");
+      if (inputFric) inputFric.value = valor;
+    }
 
     if (grupo === "tipoActividad") {
       if (valor === "Clase / Cátedra") {
@@ -396,10 +463,17 @@
     seleccionarChip("contexto", sesionReferencia.contexto || "Académico");
     seleccionarChip("dominioPrevio", sesionReferencia.dominioPrevio || "En construcción");
     seleccionarChip("complejidad", sesionReferencia.complejidad || "Desafiante");
-    seleccionarChip("tipoActividad", sesionReferencia.tipoActividad || "Desarrollo / Código");
+    seleccionarChip("tipoActividad", sesionReferencia.tipoActividad || "Construccion_Generativa");
+    // 5.4 Smart Defaults: Estructura_Practica siempre se inicializa en 'Bloqueado'
+    seleccionarChip("estructuraPractica", "Bloqueado");
+    seleccionarChip("modoDisenoIA", sesionReferencia.modoDisenoIA || sesionReferencia.Modo_Diseno_IA || "Tutor_Andamiaje");
     seleccionarChip(
       "dinamicaCognitiva",
       sesionReferencia.dinamicaCognitiva || "Andamiaje / Co-creación"
+    );
+    seleccionarChip(
+      "modalidadProcesamiento",
+      sesionReferencia.modalidadProcesamiento || sesionReferencia.Modalidad_Procesamiento_Efectiva || "Extraccion_Esforzada"
     );
   }
 
@@ -414,26 +488,45 @@
     document.getElementById("horaInicio").value = sesion.horaInicio;
     document.getElementById("horaFin").value = sesion.horaFin;
     document.getElementById("materia").value = sesion.materia;
-    document.getElementById("calidad").value = String(sesion.calidad);
-    document.getElementById("usoIA").value = String(sesion.usoIA);
-    document.getElementById("notas").value = sesion.notas || "";
 
-    seleccionarChip("contexto", sesion.contexto || "Académico");
-    seleccionarChip("tipoActividad", sesion.tipoActividad || "Desarrollo / Código");
+    const calSegura = String(Math.min(4, Math.max(1, Number(sesion.calidad || sesion.Calidad) || 3)));
+    const inputCal = document.getElementById("calidad");
+    if (inputCal) inputCal.value = calSegura;
+    seleccionarChip("calidad", calSegura);
+
+    document.getElementById("usoIA").value = String(sesion.usoIA !== undefined ? sesion.usoIA : (sesion.Uso_IA_Porcentaje || 0));
+    document.getElementById("notas").value = sesion.notas || sesion.Notas || "";
+
+    seleccionarChip("contexto", sesion.contexto || sesion.Contexto || "Académico");
+    seleccionarChip("tipoActividad", sesion.tipoActividad || sesion.Tipo_Actividad || "Construccion_Generativa");
+
+    const estPractica = sesion.Estructura_Practica || sesion.estructuraPractica || "Bloqueado";
+    seleccionarChip("estructuraPractica", estPractica);
+
+    seleccionarChip("modoDisenoIA", sesion.Modo_Diseno_IA || sesion.modoDisenoIA || "Sin_IA");
     seleccionarChip(
       "dinamicaCognitiva",
       migrarDinamicaCognitiva(
-        sesion.dinamicaCognitiva,
-        sesion.produccion,
-        sesion.modoIA,
+        sesion.dinamicaCognitiva || sesion.Dinamica_Cognitiva,
+        sesion.produccion || sesion.Produccion_Propia,
+        sesion.modoIA || sesion.Modo_IA,
         sesion.usoIA
       )
     );
-    seleccionarChip("dominioPrevio", sesion.dominioPrevio || "En construcción");
-    seleccionarChip("energiaPrevia", sesion.energiaPrevia || "Media");
-    seleccionarChip("complejidad", sesion.complejidad || "Desafiante");
-    seleccionarChip("objetivoCumplido", migrarEstadoObjetivo(sesion.objetivoCumplido));
-    document.getElementById("usoIA").value = String(sesion.usoIA);
+    seleccionarChip("dominioPrevio", sesion.dominioPrevio || sesion.Dominio_Previo || "En construcción");
+    seleccionarChip("energiaPrevia", sesion.energiaPrevia || sesion.Energia_Previa || "Media");
+    seleccionarChip("complejidad", sesion.complejidad || sesion.Complejidad || "Desafiante");
+    seleccionarChip("objetivoCumplido", migrarEstadoObjetivo(sesion.objetivoCumplido || sesion.Objetivo_Cumplido));
+
+    const modProc = sesion.Modalidad_Procesamiento_Efectiva || sesion.modalidadProcesamiento || "Extraccion_Esforzada";
+    seleccionarChip("modalidadProcesamiento", modProc);
+
+    if (estPractica === "Intercalado") {
+      const fric = sesion.Friccion_Discriminacion_Intercalada || sesion.friccionIntercalada || "Sin_Friccion";
+      seleccionarChip("friccionIntercalada", fric);
+    } else {
+      seleccionarChip("friccionIntercalada", "");
+    }
 
     // Sincronizar chip visual de materia
     const contenedorChips = document.getElementById("materiaChipsContainer");
@@ -540,6 +633,12 @@
     Object.keys(estadoChips).forEach((grupo) => {
       pintarGrupoChip(grupo, estadoChips[grupo]);
     });
+    seleccionarChip("estructuraPractica", "Bloqueado");
+    seleccionarChip("modoDisenoIA", "Tutor_Andamiaje");
+    seleccionarChip("tipoActividad", "Construccion_Generativa");
+    seleccionarChip("calidad", "3");
+    seleccionarChip("modalidadProcesamiento", "Extraccion_Esforzada");
+    seleccionarChip("friccionIntercalada", "");
 
     actualizarAyudaDominio();
     actualizarAyudaActividad();
@@ -578,7 +677,7 @@
   }
 
   /**
-   * Actualiza la caja de ayuda según el Tipo de Actividad seleccionado.
+   * Actualiza la caja de ayuda según el Tipo de Actividad / Estrategia Planificada seleccionada.
    */
   function actualizarAyudaActividad() {
     const boxAyuda = document.getElementById("ayudaActividad");
@@ -590,9 +689,13 @@
         "Síntesis / Documentación": "helpActDesign",
         "Desarrollo / Código": "helpActDev",
         "Práctica / Debugging": "helpActPractice",
-        "Repaso / Simulacro": "helpActReview"
+        "Repaso / Simulacro": "helpActReview",
+        Recuperacion_Activa: "helpStrategyActiveRecall",
+        Construccion_Generativa: "helpStrategyGenerativeBuild",
+        Consumo_Receptivo: "helpStrategyReceptiveConsume",
+        Delegacion_Ejecutiva: "helpStrategyExecutiveDelegation"
       };
-      boxAyuda.textContent = t(mapaKey[estadoChips.tipoActividad] || "helpActDev");
+      boxAyuda.textContent = t(mapaKey[estadoChips.tipoActividad] || "helpStrategyGenerativeBuild");
     } else if (typeof obtenerTextoAyudaActividad === "function") {
       boxAyuda.textContent = obtenerTextoAyudaActividad(estadoChips.tipoActividad);
     }
@@ -710,13 +813,15 @@
   }
 
   /**
-   * Calcula y muestra la vista previa de minutos y XP (incluyendo bonos por complejidad, objetivo y dinámica cognitiva).
+   * Calcula y muestra la vista previa de minutos y XP (incluyendo bonos por complejidad, objetivo,
+   * dinámica cognitiva y fricción intercalada), actualizando además el badge de Deuda Cognitiva.
    */
   function actualizarPreview() {
     const horaInicio = document.getElementById("horaInicio")?.value;
     const horaFin = document.getElementById("horaFin")?.value;
-    const calidad = Number(document.getElementById("calidad")?.value || 3);
+    const calidad = Math.min(4, Math.max(1, Number(document.getElementById("calidad")?.value || estadoChips.calidad || 3)));
     const usoIA = Number(document.getElementById("usoIA")?.value || 0);
+    const friccion = estadoChips.estructuraPractica === "Intercalado" ? (estadoChips.friccionIntercalada || "") : "";
 
     const min = calcularMinutos(horaInicio, horaFin);
     const xp = calcularXP(
@@ -725,7 +830,8 @@
       estadoChips.complejidad,
       estadoChips.objetivoCumplido,
       estadoChips.dinamicaCognitiva,
-      usoIA
+      usoIA,
+      friccion
     );
 
     const bonosActivos = [];
@@ -744,6 +850,9 @@
     if (estadoChips.dinamicaCognitiva === "Delegación / Reproducción" && usoIA >= 50) {
       bonosActivos.push(t("bonusAiMech"));
     }
+    if (friccion === "Friccion_Productiva") {
+      bonosActivos.push(t("bonusInterleavedFriction") || "+5% fricción productiva");
+    }
 
     const elDuracion = document.getElementById("previewDuracion");
     const elXP = document.getElementById("previewXP");
@@ -753,6 +862,25 @@
         : t("previewDurationBase", { min });
     }
     if (elXP) elXP.textContent = `+${xp} XP`;
+
+    // 4.2.6 Píldora informativa de Indice_Deuda_Cognitiva (Solo lectura / Automático)
+    const badgeDeuda = document.getElementById("badge-deuda-cognitiva");
+    if (badgeDeuda) {
+      const indice = typeof calcularIndiceDeudaCognitiva === "function"
+        ? calcularIndiceDeudaCognitiva(
+            usoIA,
+            estadoChips.dinamicaCognitiva,
+            estadoChips.modalidadProcesamiento
+          )
+        : "Bajo";
+      badgeDeuda.textContent = `Deuda Cognitiva: ${indice}`;
+      badgeDeuda.className = "status-pill";
+      if (indice === "Critico" || indice === "Moderado") {
+        badgeDeuda.classList.add("warning");
+      } else {
+        badgeDeuda.classList.add("connected");
+      }
+    }
   }
 
   /**

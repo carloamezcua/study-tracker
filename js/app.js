@@ -183,21 +183,55 @@
         }
 
         const chips = UI.obtenerValoresChips();
+        const estructuraPractica =
+          chips.estructuraPractica ||
+          document.getElementById("estructura-practica")?.value ||
+          "Bloqueado";
+        const modoDisenoIA =
+          chips.modoDisenoIA ||
+          document.getElementById("modo-diseno-ia")?.value ||
+          "Sin_IA";
+        const modalidadProcesamiento =
+          chips.modalidadProcesamiento ||
+          document.getElementById("modalidad-procesamiento")?.value ||
+          "Extraccion_Esforzada";
+        const friccionIntercalada =
+          estructuraPractica === "Intercalado"
+            ? (chips.friccionIntercalada ||
+               document.getElementById("friccion-intercalada")?.value ||
+               "Sin_Friccion")
+            : "";
+
+        const calidadVal = Math.min(
+          4,
+          Math.max(1, Number(document.getElementById("calidad")?.value || chips.calidad || 3))
+        );
+
         const datosFormulario = {
           fecha: document.getElementById("fecha").value,
           horaInicio: document.getElementById("horaInicio").value,
           horaFin: document.getElementById("horaFin").value,
-          contexto: chips.contexto,
+          contexto: chips.contexto || "Académico",
           materia: document.getElementById("materia").value.trim(),
-          tipoActividad: chips.tipoActividad,
-          dinamicaCognitiva: chips.dinamicaCognitiva,
-          dominioPrevio: chips.dominioPrevio,
-          energiaPrevia: chips.energiaPrevia,
-          complejidad: chips.complejidad,
-          objetivoCumplido: chips.objetivoCumplido,
-          calidad: Number(document.getElementById("calidad").value),
+          tipoActividad: chips.tipoActividad || "Construccion_Generativa",
+          dinamicaCognitiva: chips.dinamicaCognitiva || "Andamiaje / Co-creación",
+          dominioPrevio: chips.dominioPrevio || "En construcción",
+          energiaPrevia: chips.energiaPrevia || "Media",
+          complejidad: chips.complejidad || "Desafiante",
+          objetivoCumplido: chips.objetivoCumplido || "Flujo limpio",
+          calidad: calidadVal,
           usoIA: Number(document.getElementById("usoIA").value),
-          notas: document.getElementById("notas").value.trim()
+          notas: document.getElementById("notas").value.trim(),
+          // --- 4 Columnas Nuevas (Puente v3.2 -> v4.0) ---
+          Estructura_Practica: estructuraPractica,
+          Modo_Diseno_IA: modoDisenoIA,
+          Modalidad_Procesamiento_Efectiva: modalidadProcesamiento,
+          Friccion_Discriminacion_Intercalada: friccionIntercalada,
+          // Alias camelCase
+          estructuraPractica,
+          modoDisenoIA,
+          modalidadProcesamiento,
+          friccionIntercalada
         };
 
         if (idEditando) {
@@ -238,7 +272,10 @@
       });
     }
     if (inputUsoIA) {
-      inputUsoIA.addEventListener("input", () => UI.actualizarAyudaIA());
+      inputUsoIA.addEventListener("input", () => {
+        UI.actualizarAyudaIA();
+        UI.actualizarPreview();
+      });
     }
 
     // Botones rápidos de hora actual

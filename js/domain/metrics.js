@@ -195,15 +195,70 @@
     "Sábado"
   ];
 
+  // --- NUEVAS CONSTANTES TAXONÓMICAS (v4.0 Ready - Puente v3.2) ---
+  const ESTRATEGIAS_TECNICAS_V4 = [
+    "Recuperacion_Activa",     // Recordar y codificar a ciegas (flashcards, ejercicios sin ayuda, autoexplicación)
+    "Construccion_Generativa", // Creación propia (redacción de arquitectura, apuntes estructurados, lógica desde cero)
+    "Consumo_Receptivo",       // Lectura de documentación, videos, clases grabadas o revisión de código ajeno
+    "Delegacion_Ejecutiva"     // Uso de IA o generadores para resolver scripts, entregables o tareas contra reloj
+  ];
+
+  const ESTRUCTURAS_PRACTICA = ["Bloqueado", "Intercalado"];
+
+  const MODOS_DISENO_IA = [
+    "Sin_IA",
+    "Tutor_Andamiaje",
+    "Generacion_Automatica"
+  ];
+
+  const MODALIDADES_PROCESAMIENTO = [
+    "Extraccion_Esforzada",
+    "Reconocimiento_Fluido",
+    "Copia_Pasiva"
+  ];
+
+  const FRICCIONES_INTERCALADAS = [
+    "", // Vacío (NULL en CSV) cuando Estructura_Practica === 'Bloqueado'
+    "Sin_Friccion",
+    "Friccion_Productiva",
+    "Confusion_Excesiva"
+  ];
+
+  /**
+   * Calculador Automático de Deuda Cognitiva (Fórmula Determinista Puente v3.2 -> v4.0)
+   */
+  function calcularIndiceDeudaCognitiva(usoIaPorcentaje, dinamica, modalidad = "Extraccion_Esforzada") {
+    const ia = Number(usoIaPorcentaje) || 0;
+    const din = String(dinamica || "").trim();
+    const mod = String(modalidad || "").trim();
+
+    if (
+      din === "Delegacion_Mecanica" ||
+      din === "Delegación / Reproducción" ||
+      (ia >= 75 && mod === "Copia_Pasiva")
+    ) {
+      return "Critico";
+    }
+    if (ia >= 50 && (mod === "Reconocimiento_Fluido" || mod === "Copia_Pasiva")) {
+      return "Moderado";
+    }
+    if (
+      (din === "Generacion_Propia" || din === "Generación Propia") &&
+      ia <= 10
+    ) {
+      return "Nulo";
+    }
+    return "Bajo";
+  }
+
   const TEXTOS_CALIDAD = {
-    1: "Mecánico / Sin retención: Solo copié/pegué respuestas o estuve distraído; no asimilé el tema.",
-    2: "Superficial / Pasivo: Seguí pasos o código generado entendiendo solo por encima; poca retención.",
-    3: "Comprensión estándar: Entendí la lógica general de lo realizado y resolví partes por mi cuenta.",
-    4: "Aprendizaje sólido: Razoné activamente el problema, comprendí el porqué y puedo replicarlo.",
-    5: "Asimilación profunda: Esfuerzo mental propio al máximo; dominé el concepto a fondo y puedo explicarlo sin ayuda."
+    1: "1 · Again (Olvido / Bloqueo): No se pudo recuperar sin mirar la solución.",
+    2: "2 · Hard (Esfuerzo extremo): Vacilación prolongada y alto esfuerzo para resolver o razonar.",
+    3: "3 · Good (Recuerdo normal): Comprensión y recuerdo dentro de lo esperado con esfuerzo moderado.",
+    4: "4 · Easy (Fluido / Inmediato): Fluido, directo y dominio consolidado sin dudas."
   };
 
-  const VALORES_ACTIVIDAD_SET = new Set(TIPOS_ACTIVIDAD.map((a) => a.valor));
+  const VALORES_ACTIVIDAD_SET = new Set([...TIPOS_ACTIVIDAD.map((a) => a.valor), ...ESTRATEGIAS_TECNICAS_V4]);
   const VALORES_DINAMICA_SET = new Set(DINAMICAS_COGNITIVAS.map((d) => d.valor));
   const VALORES_DOMINIO_SET = new Set(NIVELES_DOMINIO.map((d) => d.valor));
   const VALORES_OBJETIVO_SET = new Set(ESTADOS_OBJETIVO.map((o) => o.valor));
@@ -420,8 +475,9 @@
   }
 
   /**
-   * Calcula los puntos de experiencia (XP) en función de duración, calidad de asimilación (1-5),
-   * complejidad (+10% desafiante, +20% muy difícil), objetivo (+10% Sí, +5% Parcial) y dinámica cognitiva.
+   * Calcula los puntos de experiencia (XP) en función de duración, calificación FSRS (1 a 4),
+   * complejidad (+10% desafiante, +20% muy difícil), objetivo (+10% Sí, +5% Parcial),
+   * dinámica cognitiva y fricción de discriminación intercalada (+5% si Friccion_Productiva).
    */
   function calcularXP(
     minutos,
@@ -429,14 +485,21 @@
     complejidad = "Fácil",
     objetivoCumplido = "No",
     dinamicaCognitiva = "Andamiaje / Co-creación",
-    usoIA = 0
+    usoIA = 0,
+    friccionIntercalada = ""
   ) {
     const min = Math.max(0, Number(minutos) || 0);
-    const cal = Math.min(5, Math.max(1, Number(calidad) || 3));
+    // Escala FSRS 1 a 4 (si viene 5 de sesiones históricas, se topa en 4 para que 4 * 0.25 = +1.0)
+    const cal = Math.min(4, Math.max(1, Number(calidad) || 3));
     const bonoComp = obtenerBonoComplejidad(complejidad);
     const bonoObj = obtenerBonoObjetivo(objetivoCumplido);
     const bonoDin = obtenerBonoDinamica(dinamicaCognitiva, usoIA);
-    const multiplicador = Math.max(0.5, 1 + cal * 0.2 + bonoComp + bonoObj + bonoDin);
+    const bonoFriccion =
+      String(friccionIntercalada || "").trim() === "Friccion_Productiva" ? 0.05 : 0;
+    const multiplicador = Math.max(
+      0.5,
+      1 + cal * 0.25 + bonoComp + bonoObj + bonoDin + bonoFriccion
+    );
     return Math.round(min * multiplicador);
   }
 
@@ -1213,13 +1276,25 @@
     };
   }
 
+  const AYUDA_ESTRATEGIAS_V4 = {
+    Recuperacion_Activa:
+      "🧠 Recuperación Activa: Recordar y codificar a ciegas (flashcards, ejercicios sin ayuda, autoexplicación).",
+    Construccion_Generativa:
+      "🛠️ Construcción Generativa: Creación propia (redacción de arquitectura, apuntes estructurados, lógica desde cero).",
+    Consumo_Receptivo:
+      "📖 Consumo Receptivo: Lectura de documentación, videos, clases grabadas o revisión de código ajeno.",
+    Delegacion_Ejecutiva:
+      "⚡ Delegación Ejecutiva: Uso de IA o generadores para resolver scripts, entregables o tareas contra reloj."
+  };
+
   /**
-   * Devuelve el texto explicativo para un Tipo de Actividad.
+   * Devuelve el texto explicativo para un Tipo de Actividad o Estrategia Planificada.
    */
   function obtenerTextoAyudaActividad(tipoActividad) {
     const act = migrarTipoActividad(tipoActividad);
+    if (AYUDA_ESTRATEGIAS_V4[act]) return AYUDA_ESTRATEGIAS_V4[act];
     const item = TIPOS_ACTIVIDAD.find((a) => a.valor === act);
-    return item ? item.ayuda : TIPOS_ACTIVIDAD[3].ayuda;
+    return item ? item.ayuda : AYUDA_ESTRATEGIAS_V4.Construccion_Generativa;
   }
 
   /**
@@ -1288,6 +1363,11 @@
     TRAMOS_RANGO,
     CONTEXTOS,
     TIPOS_ACTIVIDAD,
+    ESTRATEGIAS_TECNICAS_V4,
+    ESTRUCTURAS_PRACTICA,
+    MODOS_DISENO_IA,
+    MODALIDADES_PROCESAMIENTO,
+    FRICCIONES_INTERCALADAS,
     DINAMICAS_COGNITIVAS,
     NIVELES_PRODUCCION: DINAMICAS_COGNITIVAS, // Alias retrocompatible
     MODOS_IA: DINAMICAS_COGNITIVAS, // Alias retrocompatible
@@ -1309,6 +1389,7 @@
     obtenerBonoDinamica,
     obtenerBonoModoIA: obtenerBonoDinamica,
     calcularXP,
+    calcularIndiceDeudaCognitiva,
     calcularXpRequeridoParaNivel,
     calcularProgresoRPG,
     calcularKPIs,
@@ -1328,4 +1409,8 @@
     obtenerTextoAyudaCalidad,
     obtenerTextoAyudaIA
   };
-})(window);
+
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = StudyTracker.RPG;
+  }
+})(typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : this));
