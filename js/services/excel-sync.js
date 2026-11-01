@@ -17,7 +17,9 @@
     calcularMinutos,
     calcularDiaSemana,
     calcularFranjaHoraria,
-    calcularXP
+    calcularXP,
+    inferirModoDisenoIA,
+    inferirModalidadProcesamiento
   } = StudyTracker.RPG;
 
   let servidorLocalActivo = false;
@@ -91,12 +93,20 @@
       const notas = formatearNotasConTema(s.notas || s.Notas, s.tema || s.Tema);
 
       const estructuraPractica = s.Estructura_Practica || s.estructuraPractica || "Bloqueado";
-      const modoDisenoIA = s.Modo_Diseno_IA || s.modoDisenoIA || s.modoDisenoIa || "Sin_IA";
+      const modoDisenoIA =
+        s.Modo_Diseno_IA ||
+        s.modoDisenoIA ||
+        s.modoDisenoIa ||
+        (typeof inferirModoDisenoIA === "function"
+          ? inferirModoDisenoIA({ usoIA, dinamicaCognitiva })
+          : "Sin_IA");
       const modalidadProcesamiento =
         s.Modalidad_Procesamiento_Efectiva ||
         s.modalidadProcesamiento ||
         s.modalidadProcesamientoEfectiva ||
-        "Extraccion_Esforzada";
+        (typeof inferirModalidadProcesamiento === "function"
+          ? inferirModalidadProcesamiento({ usoIA, dinamicaCognitiva, calidad })
+          : "Extraccion_Esforzada");
       const friccionIntercalada =
         estructuraPractica === "Intercalado"
           ? (s.Friccion_Discriminacion_Intercalada ||

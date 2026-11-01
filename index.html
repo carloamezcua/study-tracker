@@ -69,6 +69,7 @@
       <div class="xp-total-box">
         <div class="xp-total-label" data-i18n="rpgTotalXpLabel">XP Total Acumulado</div>
         <div class="xp-total-value" id="uiXpTotalBadge">0 XP</div>
+        <div class="xp-milestone-sub" id="uiHito92Badge">🎯 Hito Nv. 92 (50%): 0.0%</div>
       </div>
     </div>
 
@@ -106,32 +107,38 @@
       </div>
     </div>
 
-    <!-- TARJETAS KPI -->
+    <!-- TARJETAS KPI GLOBALES PERSISTENTES -->
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="label" data-i18n="kpiTotalTimeLabel">Tiempo Total Estudiado</div>
+        <div class="label" data-i18n="kpiTotalTimeLabel">Volumen de Estudio</div>
         <div class="value" id="kpiHoras">0.0 h</div>
         <div class="sub" id="kpiMinutos">0 minutos en total</div>
       </div>
       <div class="kpi-card">
-        <div class="label" data-i18n="kpiSessionsLabel">Sesiones Completadas</div>
-        <div class="value" id="kpiSesiones">0</div>
+        <div class="label" data-i18n="kpiSessionsLabel">Autonomía & Sesiones</div>
+        <div class="kpi-value-row">
+          <div class="value" id="kpiSesiones">0</div>
+          <span class="kpi-inline-pill kpi-pill-auton" id="kpiAutonomiaBadge">🧠 0% aut.</span>
+        </div>
         <div class="sub" id="kpiPromedioMin">0 min promedio / sesión</div>
       </div>
       <div class="kpi-card">
-        <div class="label" data-i18n="kpiAssimilationLabel">Asimilación Promedio</div>
-        <div class="value" id="kpiCalidad">0.0 / 5</div>
+        <div class="label" data-i18n="kpiAssimilationLabel">Calidad FSRS & Foco</div>
+        <div class="value" id="kpiCalidad">0.0 / 4</div>
         <div class="sub" id="kpiMejorHora">Mejor hora: --:--</div>
       </div>
       <div class="kpi-card">
-        <div class="label" data-i18n="kpiGoalsLabel">Objetivos Cumplidos</div>
+        <div class="label" data-i18n="kpiGoalsLabel">Fluidez & Éxito</div>
         <div class="value" id="kpiObjetivos">0%</div>
-        <div class="sub" id="kpiObjetivosSub">0 sí · 0 parc. · 0 bloq.</div>
+        <div class="sub" id="kpiObjetivosSub">0 flujo · 0 lucha · 0 fricc.</div>
       </div>
       <div class="kpi-card">
-        <div class="label" data-i18n="kpiAiImpactLabel">Impacto y Uso de IA</div>
-        <div class="value" id="kpiIA">0%</div>
-        <div class="sub" id="kpiIASub">0 diálogo · 0 copiloto · 0 mec.</div>
+        <div class="label" data-i18n="kpiAiImpactLabel">Deuda Cognitiva & IA</div>
+        <div class="kpi-value-row">
+          <div class="value" id="kpiIA">0%</div>
+          <span class="kpi-inline-pill debt-pill-nulo" id="kpiDeudaGlobalBadge">🟢 Nulo</span>
+        </div>
+        <div class="sub" id="kpiIASub">0 andamiaje · 0 gen. · 0 deleg.</div>
       </div>
     </div>
 
@@ -446,28 +453,28 @@
         <!-- NAVEGACIÓN POR PESTAÑAS ANALÍTICAS -->
         <div class="analytics-tabs-bar" id="analyticsTabsBar">
           <button type="button" class="analytics-tab-btn active" data-tab="tiempo" data-i18n="tabTimeTitle">
-            📈 1. Tiempo y Ritmo
+            📈 1. Progresión & Circadiano
           </button>
           <button type="button" class="analytics-tab-btn" data-tab="ia" data-i18n="tabAiTitle">
-            🤖 2. IA vs. Retención
+            🧠 2. Salud Cognitiva & IA
           </button>
           <button type="button" class="analytics-tab-btn" data-tab="habitos" data-i18n="tabHabitsTitle">
-            🧠 3. Hábitos y Energía
+            📉 3. FSRS, DSR & Hábitos
           </button>
           <button type="button" class="analytics-tab-btn" data-tab="inspector" data-i18n="tabInspectorTitle">
-            🗂️ 4. Temas y Notas
+            🔬 4. Inspector & Notas
           </button>
         </div>
 
-        <!-- PESTAÑA 1: TIEMPO, CONSTANCIA Y MAPA DE CALOR CIRCADIANO -->
+        <!-- PESTAÑA 1: PROGRESIÓN RPG, CONSTANCIA Y MAPA DE CALOR CIRCADIANO -->
         <div class="analytics-tab-panel active" id="tabPanel-tiempo">
           <div class="panel">
             <div class="panel-header-flex">
               <div>
                 <h2>
-                  <span data-i18n="chartEvoTitle">📅 Evolución y Constancia de Estudio</span>
+                  <span data-i18n="chartEvoTitle">📅 Evolución Temporal de Horas, XP y Calidad</span>
                 </h2>
-                <div class="subtitle" data-i18n="chartEvoSubtitle">Cuánto estudias por día, semana o mes y cómo evoluciona tu calidad de asimilación.</div>
+                <div class="subtitle" data-i18n="chartEvoSubtitle">Cuánto estudias por día, semana o mes y cómo evoluciona tu calidad de asimilación y ganancia de XP.</div>
               </div>
               <div class="mini-segmented" id="evoGroupingBtns">
                 <button type="button" class="seg-btn active" data-group="dia" data-i18n="evoBtnDay">Día</button>
@@ -479,6 +486,7 @@
               <span class="mini-kpi-badge" id="evoStreakBadge">🔥 Racha: 0 días</span>
               <span class="mini-kpi-badge" id="evoActiveDaysBadge">📅 Días activos: 0</span>
               <span class="mini-kpi-badge" id="evoAvgDayBadge">⏱️ Promedio / día activo: 0 min</span>
+              <span class="mini-kpi-badge" id="evoBestWeekdayBadge">📆 Día top: --</span>
             </div>
             <div class="chart-box">
               <canvas id="chartEvolucion"></canvas>
@@ -510,8 +518,39 @@
           </div>
         </div>
 
-        <!-- PESTAÑA 2: CUADRANTE DE IA VS. RETENCIÓN Y MATERIAS -->
+        <!-- PESTAÑA 2: SALUD COGNITIVA, IA & DEUDA COGNITIVA -->
         <div class="analytics-tab-panel" id="tabPanel-ia">
+          <div class="panel">
+            <div class="mini-kpi-strip" id="iaTabKpiStrip" style="margin-bottom: 12px;">
+              <span class="mini-kpi-badge" id="iaKpiLeverage">🤖 Apalancamiento IA: 0% · Modo: Sin IA</span>
+              <span class="mini-kpi-badge" id="iaKpiExtraction">🔥 Extracción Esforzada: 0% vs. 0% Pasivo</span>
+              <span class="mini-kpi-badge" id="iaKpiIntentionGap">⚖️ Brecha de Intención: 0% (0 bloq.)</span>
+            </div>
+
+            <div class="charts-split-grid">
+              <div class="split-chart-card">
+                <h3>
+                  <span data-i18n="chartDebtTitle">🍩 Índice de Deuda Cognitiva</span>
+                </h3>
+                <div class="subtitle" data-i18n="chartDebtSubtitle">Proporción de bloques según riesgo de delegación pasiva e ilusión de competencia.</div>
+                <div class="deuda-pills-row" id="deudaSummaryPills"></div>
+                <div class="chart-box chart-box-compact">
+                  <canvas id="chartDeudaCognitiva"></canvas>
+                </div>
+              </div>
+
+              <div class="split-chart-card">
+                <h3>
+                  <span data-i18n="chartAiDesignModalityTitle">🧩 Modo Diseño IA × Modalidad Efectiva</span>
+                </h3>
+                <div class="subtitle" data-i18n="chartAiDesignModalitySubtitle">Audita si el rol planeado de la IA derivó en extracción esforzada o copia pasiva.</div>
+                <div class="chart-box chart-box-compact">
+                  <canvas id="chartModoDisenoModalidad"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="panel">
             <h2>
               <span data-i18n="chartQuadTitle">🎯 Cuadrante de Rendimiento Cognitivo (% IA vs. Asimilación)</span>
@@ -541,14 +580,52 @@
           </div>
         </div>
 
-        <!-- PESTAÑA 3: HÁBITOS, BALANCE COGNITIVO, DINÁMICA, DOMINIO Y FRICCIÓN -->
+        <!-- PESTAÑA 3: ALGORITMOS FSRS, CONSOLIDACIÓN MEMÓRICA (DSR) Y HÁBITOS -->
         <div class="analytics-tab-panel" id="tabPanel-habitos">
           <div class="panel">
             <h2>
-              <span data-i18n="chart3Title">🧠 Patrones de Hábito: 6 Actividades y Balance Cognitivo</span>
+              <span data-i18n="chartForgettingTitle">📉 Algoritmos FSRS & Curva Teórica del Olvido (DSR)</span>
+              <small class="chart-hint" data-i18n="chartForgettingHint">Decaimiento R(t) = (1 + t / 9S)⁻¹ · Umbral crítico 90%</small>
+            </h2>
+            <div class="subtitle" data-i18n="chartForgettingSubtitle">Proyección de recuperabilidad memórica a 30 días según tu estabilidad promedio (S) frente a los 4 grados FSRS.</div>
+            <div class="mini-kpi-strip" id="fsrsTabKpiStrip">
+              <span class="mini-kpi-badge" id="fsrsKpiGradeDist">🎯 FSRS: 1:0% · 2:0% · 3:0% · 4:0%</span>
+              <span class="mini-kpi-badge" id="fsrsKpiRetention">🧠 Retención Estimada (R): 0% · Estabilidad (S): 0.0d</span>
+              <span class="mini-kpi-badge" id="fsrsKpiInterleaving">🔀 Intercalado: 0% · Fricción Productiva: 0%</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="chartCurvaOlvido"></canvas>
+            </div>
+
+            <div class="charts-split-grid" style="margin-top: 14px;">
+              <div class="split-chart-card">
+                <h3>
+                  <span data-i18n="chartDsrBubbleTitle">🫧 Mapa de Consolidación DSR por Materia</span>
+                </h3>
+                <div class="subtitle" data-i18n="chartDsrBubbleSubtitle">Estabilidad S (días, eje X) vs. Dificultad D (1–10, eje Y). Tamaño = Minutos.</div>
+                <div class="chart-box chart-box-compact">
+                  <canvas id="chartDSRBurbujas"></canvas>
+                </div>
+              </div>
+
+              <div class="split-chart-card">
+                <h3>
+                  <span data-i18n="chartInterleavedTitle">🔀 Efectividad: Bloqueado vs. Intercalado</span>
+                </h3>
+                <div class="subtitle" data-i18n="chartInterleavedSubtitle">Calidad FSRS (1–4) y velocidad de XP/hora según estructura y fricción de discriminación.</div>
+                <div class="chart-box chart-box-compact">
+                  <canvas id="chartPracticaIntercalada"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>
+              <span data-i18n="chart3Title">🧠 Patrones de Hábito: Actividades y Balance Cognitivo</span>
               <small class="chart-hint" data-i18n="chart3Hint">Comportamiento por tipo de tarea y método</small>
             </h2>
-            <div class="subtitle" data-i18n="chart3Subtitle">Minutos y asimilación promedio según las 6 actividades de estudio y proporción entre recepción pasiva y producción / co-creación activa.</div>
+            <div class="subtitle" data-i18n="chart3Subtitle">Minutos y asimilación promedio según las actividades de estudio y proporción entre recepción pasiva y producción / co-creación activa.</div>
             <div id="balanceCognitivoBox" class="balance-cognitivo-box"></div>
             <div class="chart-box">
               <canvas id="chartPorActividad"></canvas>
@@ -582,8 +659,77 @@
           </div>
         </div>
 
-        <!-- PESTAÑA 4: INSPECTOR DE SUBTEMAS Y BITÁCORA DE NOTAS -->
+        <!-- PESTAÑA 4: INSPECTOR PROFUNDO POR DIMENSIÓN (POWER BI VIEW), SUBTEMAS Y NOTAS -->
         <div class="analytics-tab-panel" id="tabPanel-inspector">
+          <div class="panel" id="deepInspectorPanel">
+            <div class="panel-header-flex">
+              <div>
+                <h2>
+                  <span data-i18n="deepInspectorTitle">🔬 Inspector Profundo por Dimensión (Power BI View)</span>
+                </h2>
+                <div class="subtitle" data-i18n="deepInspectorSubtitle">Audita cualquier variable categórica, haz clic en una barra para aislar su perfil o inspecciona su flujo multivariable.</div>
+              </div>
+              <div class="inspector-controls-row">
+                <div class="inspector-control-item">
+                  <label for="inspectorDimensionSelect" data-i18n="inspectorDimLabel">📐 Dimensión:</label>
+                  <select id="inspectorDimensionSelect" class="filter-select">
+                    <option value="Materia" data-i18n="dimOptSubject">📚 Materia / Proyecto</option>
+                    <option value="Subtema" data-i18n="dimOptSubtopic">🗂️ Subtema [Corchetes]</option>
+                    <option value="Tipo_Actividad" data-i18n="dimOptStrategy">🧭 Estrategia / Actividad</option>
+                    <option value="Dinamica_Cognitiva" data-i18n="dimOptDynamic">🔄 Dinámica Cognitiva</option>
+                    <option value="Modo_Diseno_IA" data-i18n="dimOptAiDesign">🤖 Modo Diseño IA</option>
+                    <option value="Modalidad_Procesamiento_Efectiva" data-i18n="dimOptModality">🔥 Modalidad Procesamiento</option>
+                    <option value="Estructura_Practica" data-i18n="dimOptStructure">🔀 Estructura Práctica</option>
+                    <option value="Dominio_Previo" data-i18n="dimOptMastery">🌱 Dominio Previo</option>
+                    <option value="Contexto" data-i18n="dimOptContext">🎓 Contexto</option>
+                    <option value="Indice_Deuda_Cognitiva" data-i18n="dimOptDebt">🍩 Deuda Cognitiva</option>
+                  </select>
+                </div>
+                <div class="inspector-control-item">
+                  <label for="inspectorValueSelect" data-i18n="inspectorValLabel">🎯 Valor (Drill-down):</label>
+                  <select id="inspectorValueSelect" class="filter-select">
+                    <option value="Todos" data-i18n="inspectorValAll">🌐 Todos (Comparativa)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4 TARJETAS CONTEXTUALES DE LA DIMENSIÓN / VALOR SELECCIONADO -->
+            <div class="inspector-kpi-grid" id="inspectorContextKpis">
+              <div class="inspector-kpi-card">
+                <div class="insp-kpi-label" data-i18n="inspKpiVolTitle">📊 Volumen de Estudio</div>
+                <div class="insp-kpi-val" id="inspKpiVolValue">0.0 h (0%)</div>
+                <div class="insp-kpi-sub" id="inspKpiVolSub">0 sesiones registradas</div>
+              </div>
+              <div class="inspector-kpi-card">
+                <div class="insp-kpi-label" data-i18n="inspKpiAiTitle">🧠 Salud Cognitiva & IA</div>
+                <div class="insp-kpi-val" id="inspKpiAiValue">0% IA · 🟢 Nulo</div>
+                <div class="insp-kpi-sub" id="inspKpiAiSub">0% autonomía cognitiva</div>
+              </div>
+              <div class="inspector-kpi-card">
+                <div class="insp-kpi-label" data-i18n="inspKpiPerfTitle">⚡ Rendimiento FSRS & XP</div>
+                <div class="insp-kpi-val" id="inspKpiPerfValue">⭐️ 0.0 / 4.0</div>
+                <div class="insp-kpi-sub" id="inspKpiPerfSub">+0 XP · 0% éxito</div>
+              </div>
+              <div class="inspector-kpi-card">
+                <div class="insp-kpi-label" data-i18n="inspKpiDomTitle">🌱 Transición de Dominio</div>
+                <div class="insp-kpi-val" id="inspKpiDomValue">0% ➔ 0% ➔ 0%</div>
+                <div class="insp-kpi-sub" id="inspKpiDomSub">🌱 0 · 🌿 0 · 🌳 0</div>
+              </div>
+            </div>
+
+            <!-- GRÁFICO COMPARATIVO DE CATEGORÍAS DE LA DIMENSIÓN ACTIVA -->
+            <div class="chart-box" style="margin-top: 10px;">
+              <canvas id="chartInspectorDimension"></canvas>
+            </div>
+
+            <!-- FLUJO MULTIVARIABLE DE 5 ETAPAS (PIPELINE COGNITIVO) -->
+            <div class="multivariable-flow-section">
+              <h3 class="sub-section-title" data-i18n="inspectorFlowTitle">🔀 Flujo Multivariable de Sesiones (Dominio ➔ Estrategia ➔ Dinámica ➔ Calidad ➔ Deuda)</h3>
+              <div id="inspectorMultivariableFlow" class="multivariable-flow-grid"></div>
+            </div>
+          </div>
+
           <div class="panel">
             <h2>
               <span data-i18n="inspectorTopicsTitle">🗂️ Radiografía por Subtemas ([Subtema] en Notas)</span>

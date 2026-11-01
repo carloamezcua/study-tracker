@@ -53,6 +53,8 @@
   let pestanaAnaliticaActual = "tiempo";
   let agrupacionTemporalActual = "dia";
   let metricaHeatmapActual = "minutos";
+  let inspectorDimensionActual = "Materia";
+  let inspectorValorActual = "Todos";
 
   // Control de vista compacta de la tabla (por defecto muestra solo los últimos 5 registros)
   const LIMITE_HISTORIAL_RECIENTE = 5;
@@ -234,6 +236,29 @@
     document.querySelectorAll("#heatmapMetricBtns .seg-btn").forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.metric === metricaHeatmapActual);
     });
+  }
+
+  /**
+   * Cambia la dimensión activa en el Inspector Profundo (Pestaña 4) y reinicia su valor a "Todos".
+   */
+  function cambiarDimensionInspector(nuevaDimension) {
+    inspectorDimensionActual = nuevaDimension || "Materia";
+    inspectorValorActual = "Todos";
+    const selDim = document.getElementById("inspectorDimensionSelect");
+    if (selDim && selDim.value !== inspectorDimensionActual) {
+      selDim.value = inspectorDimensionActual;
+    }
+  }
+
+  /**
+   * Cambia el valor enfocado (Drill-down) dentro de la dimensión activa en el Inspector Profundo.
+   */
+  function cambiarValorInspector(nuevoValor) {
+    inspectorValorActual = nuevoValor || "Todos";
+    const selVal = document.getElementById("inspectorValueSelect");
+    if (selVal && selVal.value !== inspectorValorActual) {
+      selVal.value = inspectorValorActual;
+    }
   }
 
   /**
@@ -1026,13 +1051,14 @@
   }
 
   /**
-   * Renderiza los indicadores rápidos de Evolución Temporal (Racha, Días activos y Promedio/día).
+   * Renderiza los indicadores rápidos de Evolución Temporal (Racha, Días activos, Promedio/día y Día top).
    */
   function renderizarResumenEvolucion(datosEvolucion) {
     if (!datosEvolucion) return;
     const elStreak = document.getElementById("evoStreakBadge");
     const elActive = document.getElementById("evoActiveDaysBadge");
     const elAvg = document.getElementById("evoAvgDayBadge");
+    const elTopDay = document.getElementById("evoBestWeekdayBadge");
 
     if (elStreak) {
       elStreak.textContent = t("evoStreakBadgeText", {
@@ -1049,6 +1075,16 @@
       elAvg.textContent = t("evoAvgDayBadgeText", {
         min: datosEvolucion.promedioMinPorDiaActivo
       });
+    }
+    if (elTopDay) {
+      if (datosEvolucion.diaSemanaTop) {
+        elTopDay.textContent = t("evoBestWeekdayText", {
+          day: trVal("diaSemana", datosEvolucion.diaSemanaTop),
+          min: datosEvolucion.maxMinDiaSemana
+        });
+      } else {
+        elTopDay.textContent = t("evoBestWeekdayEmpty");
+      }
     }
   }
 
@@ -1557,6 +1593,225 @@
     return tr;
   }
 
+  const META_DEUDA = {
+    Nulo: { icono: "🟢", clase: "debt-pill-nulo", key: "debtLevelNulo" },
+    Bajo: { icono: "🔵", clase: "debt-pill-bajo", key: "debtLevelBajo" },
+    Moderado: { icono: "🟠", clase: "debt-pill-moderado", key: "debtLevelModerado" },
+    Critico: { icono: "🔴", clase: "debt-pill-critico", key: "debtLevelCritico" }
+  };
+
+  /**
+   * Renderiza los KPIs y píldoras de Salud Cognitiva e IA en la Pestaña 2.
+   */
+  function renderizarSaludCognitivaTab(datosSaludIA) {
+    if (!datosSaludIA) return;
+
+    const elLev = document.getElementById("iaKpiLeverage");
+    const elExt = document.getElementById("iaKpiExtraction");
+    const elGap = document.getElementById("iaKpiIntentionGap");
+    const elPills = document.getElementById("deudaSummaryPills");
+
+    if (elLev) {
+      elLev.textContent = t("iaKpiLeverageText", {
+        ia: datosSaludIA.promedioIA,
+        mode: trVal("modoDisenoIA", datosSaludIA.modoDisenoPredominante)
+      });
+    }
+    if (elExt) {
+      elExt.textContent = t("iaKpiExtractionText", {
+        ext: datosSaludIA.pctExtraccionEsforzada,
+        pas: datosSaludIA.pctCopiaReconocimiento
+      });
+    }
+    if (elGap) {
+      elGap.textContent = t("iaKpiIntentionGapText", {
+        pct: datosSaludIA.pctBrechaIntencion,
+        count: datosSaludIA.sesionesBrechaIntencion
+      });
+    }
+
+    if (elPills && datosSaludIA.conteoDeuda) {
+      elPills.replaceChildren();
+      ["Nulo", "Bajo", "Moderado", "Critico"].forEach((niv) => {
+        const meta = META_DEUDA[niv] || META_DEUDA.Nulo;
+        const span = document.createElement("span");
+        span.className = `deuda-mini-pill ${meta.clase}`;
+        span.textContent = `${t(meta.key)}: ${datosSaludIA.conteoDeuda[niv] || 0}`;
+        elPills.appendChild(span);
+      });
+    }
+  }
+
+  /**
+   * Renderiza los KPIs de Algoritmos FSRS, Retención (R) e Intercalación en la Pestaña 3.
+   */
+  function renderizarFSRSTab(datosFSRS) {
+    if (!datosFSRS) return;
+
+    const elGrades = document.getElementById("fsrsKpiGradeDist");
+    const elRet = document.getElementById("fsrsKpiRetention");
+    const elInter = document.getElementById("fsrsKpiInterleaving");
+
+    if (elGrades && datosFSRS.pctGrades) {
+      elGrades.textContent = t("fsrsKpiGradeDistText", {
+        g1: datosFSRS.pctGrades[1] || 0,
+        g2: datosFSRS.pctGrades[2] || 0,
+        g3: datosFSRS.pctGrades[3] || 0,
+        g4: datosFSRS.pctGrades[4] || 0
+      });
+    }
+    if (elRet) {
+      elRet.textContent = t("fsrsKpiRetentionText", {
+        r: datosFSRS.retencionPromedioGlobal,
+        s: datosFSRS.estabilidadPromedioGlobal
+      });
+    }
+    if (elInter) {
+      elInter.textContent = t("fsrsKpiInterleavingText", {
+        inter: datosFSRS.pctIntercalado,
+        fric: datosFSRS.tasaFriccionProductiva
+      });
+    }
+  }
+
+  /**
+   * Renderiza el Inspector Profundo por Dimensión ("Power BI View") en la Pestaña 4:
+   * - Selector de valores de la dimensión activa
+   * - 4 Tarjetas KPI contextuales
+   * - Flujo Multivariable de 5 Etapas (Dominio ➔ Estrategia ➔ Dinámica ➔ Calidad ➔ Deuda)
+   */
+  function renderizarInspectorProfundo(datosDimension) {
+    if (!datosDimension) return;
+
+    inspectorValorActual = datosDimension.valorActivo || "Todos";
+
+    const selVal = document.getElementById("inspectorValueSelect");
+    if (selVal) {
+      selVal.replaceChildren();
+      const optTodos = document.createElement("option");
+      optTodos.value = "Todos";
+      optTodos.textContent = `${t("inspectorValAll")} (${datosDimension.categorias.length})`;
+      selVal.appendChild(optTodos);
+
+      datosDimension.categorias.forEach((cat) => {
+        const opt = document.createElement("option");
+        opt.value = cat.valor;
+        opt.textContent = `${cat.valor} (${cat.sesiones} ses. · ${cat.horas}h)`;
+        selVal.appendChild(opt);
+      });
+      selVal.value = inspectorValorActual;
+    }
+
+    const rc = datosDimension.resumenContextual;
+    if (rc) {
+      const elVolVal = document.getElementById("inspKpiVolValue");
+      const elVolSub = document.getElementById("inspKpiVolSub");
+      const elAiVal = document.getElementById("inspKpiAiValue");
+      const elAiSub = document.getElementById("inspKpiAiSub");
+      const elPerfVal = document.getElementById("inspKpiPerfValue");
+      const elPerfSub = document.getElementById("inspKpiPerfSub");
+      const elDomVal = document.getElementById("inspKpiDomValue");
+      const elDomSub = document.getElementById("inspKpiDomSub");
+
+      if (elVolVal) {
+        elVolVal.textContent = `${rc.volumen.horas} h (${rc.volumen.pctSobreTotal}%)`;
+      }
+      if (elVolSub) {
+        elVolSub.textContent = t("inspKpiVolSubText", {
+          sess: rc.volumen.sesiones,
+          min: rc.volumen.minutos
+        });
+      }
+
+      const metaDeuda = META_DEUDA[rc.saludIA.deudaPredominante] || META_DEUDA.Nulo;
+      if (elAiVal) {
+        elAiVal.textContent = `${rc.saludIA.iaProm}% IA · ${t(metaDeuda.key)}`;
+      }
+      if (elAiSub) {
+        elAiSub.textContent = t("inspKpiAiSubText", {
+          auton: rc.saludIA.indiceAutonomia
+        });
+      }
+
+      if (elPerfVal) {
+        elPerfVal.textContent = `⭐️ ${rc.rendimiento.calidadFSRS} / 4.0`;
+      }
+      if (elPerfSub) {
+        elPerfSub.textContent = `+${rc.rendimiento.xpTotal} XP · ✅ ${rc.rendimiento.tasaObjetivos}%`;
+      }
+
+      if (elDomVal) {
+        elDomVal.textContent = `${rc.progresionDominio.pctNuevo}% ➔ ${rc.progresionDominio.pctConstruccion}% ➔ ${rc.progresionDominio.pctConsolidado}%`;
+      }
+      if (elDomSub) {
+        elDomSub.textContent = `🌱 ${rc.progresionDominio.nuevo} · 🌿 ${rc.progresionDominio.construccion} · 🌳 ${rc.progresionDominio.consolidado}`;
+      }
+    }
+
+    // Flujo Multivariable de 5 Etapas
+    const flowGrid = document.getElementById("inspectorMultivariableFlow");
+    if (flowGrid && datosDimension.flujoMultivariable) {
+      flowGrid.replaceChildren();
+      const fm = datosDimension.flujoMultivariable;
+      const etapasConfig = [
+        { key: "dominio", titulo: t("flowStage1Mastery"), items: fm.dominio },
+        { key: "estrategia", titulo: t("flowStage2Strategy"), items: fm.estrategia },
+        { key: "dinamica", titulo: t("flowStage3Dynamic"), items: fm.dinamica },
+        { key: "calidad", titulo: t("flowStage4Quality"), items: fm.calidad },
+        { key: "deuda", titulo: t("flowStage5Debt"), items: fm.deuda }
+      ];
+
+      etapasConfig.forEach((etapa) => {
+        const col = document.createElement("div");
+        col.className = "flow-stage-col";
+
+        const head = document.createElement("div");
+        head.className = "flow-stage-header";
+        head.textContent = etapa.titulo;
+        col.appendChild(head);
+
+        const listaItems = Array.isArray(etapa.items) ? etapa.items.slice(0, 4) : [];
+        if (!listaItems.length) {
+          const empty = document.createElement("div");
+          empty.className = "insp-kpi-sub";
+          empty.textContent = t("chartNoData");
+          col.appendChild(empty);
+        } else {
+          listaItems.forEach((it) => {
+            const row = document.createElement("div");
+            row.className = "flow-stage-item";
+
+            const top = document.createElement("div");
+            top.className = "flow-stage-item-top";
+
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "flow-stage-item-name";
+            nameSpan.textContent = it.etiqueta;
+            nameSpan.title = it.etiqueta;
+
+            const pctSpan = document.createElement("span");
+            pctSpan.className = "flow-stage-item-pct";
+            pctSpan.textContent = `${it.pct}%`;
+
+            top.append(nameSpan, pctSpan);
+
+            const barBg = document.createElement("div");
+            barBg.className = "flow-stage-bar-bg";
+            const barFill = document.createElement("div");
+            barFill.className = "flow-stage-bar-fill";
+            barFill.style.width = `${it.pct}%`;
+            barBg.appendChild(barFill);
+
+            row.append(top, barBg);
+            col.appendChild(row);
+          });
+        }
+
+        flowGrid.appendChild(col);
+      });
+    }
+  }
+
   /**
    * Renderiza toda la interfaz (Barra RPG Global, Filtro por Contexto, KPIs, Tabla y Gráficos).
    */
@@ -1578,6 +1833,12 @@
       : progreso.xpSiguienteNivel;
     document.getElementById("uiXpBar").style.width = `${progreso.porcentajeBarra}%`;
     document.getElementById("uiXpTotalBadge").textContent = `${progreso.totalXP} XP`;
+    const elHito92 = document.getElementById("uiHito92Badge");
+    if (elHito92) {
+      elHito92.textContent = t("rpgMilestone92Text", {
+        pct: progreso.porcentajeHito92
+      });
+    }
 
     // Aplicar filtros globales combinados
     const sesionesFiltradas = filtrarSesionesAvanzado(listaGlobal, {
@@ -1588,17 +1849,30 @@
 
     const kpis = calcularKPIs(sesionesFiltradas);
 
-    // 2. Tarjetas KPI
+    // 2. Tarjetas KPI Globales Persistentes (5 KPIs)
     document.getElementById("kpiHoras").textContent = `${kpis.totalHoras} h`;
     document.getElementById("kpiMinutos").textContent = t("kpiTotalMinutesSub", {
       min: kpis.totalMinutos
     });
     document.getElementById("kpiSesiones").textContent = kpis.totalSesiones;
+    const elAutonBadge = document.getElementById("kpiAutonomiaBadge");
+    if (elAutonBadge) {
+      elAutonBadge.textContent = t("kpiAutonomyPillText", {
+        pct: kpis.indiceAutonomia
+      });
+    }
     document.getElementById("kpiPromedioMin").textContent = kpis.totalSesiones
       ? t("kpiAvgMinSub", { min: kpis.promedioMinutos })
       : t("kpiAvgMinZero");
-    document.getElementById("kpiCalidad").textContent = `${kpis.promedioCalidad} / 5`;
+    document.getElementById("kpiCalidad").textContent = `${kpis.promedioCalidadFSRS} / 4`;
     document.getElementById("kpiIA").textContent = `${kpis.promedioIA}%`;
+
+    const elDeudaGlobal = document.getElementById("kpiDeudaGlobalBadge");
+    if (elDeudaGlobal) {
+      const metaDeuda = META_DEUDA[kpis.deudaPredominante] || META_DEUDA.Nulo;
+      elDeudaGlobal.className = `kpi-inline-pill ${metaDeuda.clase}`;
+      elDeudaGlobal.textContent = t(metaDeuda.key);
+    }
 
     const elKpiIASub = document.getElementById("kpiIASub");
     if (elKpiIASub) {
@@ -1682,10 +1956,16 @@
       }
     }
 
-    // 4. Gráficos, Mapa de Calor, Cuadrante IA, Hábitos e Inspector de Subtemas
+    // 4. Gráficos, Mapa de Calor, Cuadrante IA, Salud Cognitiva, FSRS/DSR, Hábitos e Inspector Profundo
     const manejarClickMateria = (materiaClick) => {
       const nueva = filtroMateriaActual === materiaClick ? "Todas" : materiaClick;
       cambiarFiltroMateria(nueva);
+      renderizarDashboard(todasLasSesiones, { onEditarSesion, onEliminarSesion });
+    };
+
+    const manejarClickValorInspector = (valorClick) => {
+      const nuevoVal = inspectorValorActual === valorClick ? "Todos" : valorClick;
+      cambiarValorInspector(nuevoVal);
       renderizarDashboard(todasLasSesiones, { onEditarSesion, onEliminarSesion });
     };
 
@@ -1693,18 +1973,27 @@
       datosEvolucion,
       datosMapaCalor,
       datosCuadrante,
+      datosSaludIA,
+      datosFSRS,
+      datosDimension,
       datosHora,
       datosHabitos,
       datosInspector
     } = StudyTracker.Charts.renderizarGraficos(sesionesFiltradas, {
       agrupacionTemporal: agrupacionTemporalActual,
-      onSeleccionarMateria: manejarClickMateria
+      inspectorDimension: inspectorDimensionActual,
+      inspectorValor: inspectorValorActual,
+      onSeleccionarMateria: manejarClickMateria,
+      onSeleccionarValorInspector: manejarClickValorInspector
     });
 
     renderizarResumenEvolucion(datosEvolucion);
     renderizarMapaCalorCircadiano(datosMapaCalor);
+    renderizarSaludCognitivaTab(datosSaludIA);
     renderizarBadgesCuadrante(datosCuadrante);
+    renderizarFSRSTab(datosFSRS);
     renderizarResumenHabitos(datosHabitos);
+    renderizarInspectorProfundo(datosDimension);
     renderizarInspector(datosInspector, { onClickMateria: manejarClickMateria });
 
     const elMejorHora = document.getElementById("kpiMejorHora");
@@ -1730,6 +2019,8 @@
     cambiarPestanaAnalitica,
     cambiarAgrupacionTemporal,
     cambiarMetricaHeatmap,
+    cambiarDimensionInspector,
+    cambiarValorInspector,
     alternarVistaHistorial,
     seleccionarChip,
     aplicarValoresPorDefectoInteligentes,

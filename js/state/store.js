@@ -19,7 +19,9 @@
     calcularMinutos,
     calcularDiaSemana,
     calcularFranjaHoraria,
-    calcularXP
+    calcularXP,
+    inferirModoDisenoIA,
+    inferirModalidadProcesamiento
   } = StudyTracker.RPG;
 
   const STORAGE_KEY = "study_tracker_sesiones";
@@ -175,12 +177,20 @@
 
     // --- 4 Propiedades Nuevas (Puente v3.2 -> v4.0) ---
     const estructuraPractica = raw.Estructura_Practica || raw.estructuraPractica || "Bloqueado";
-    const modoDisenoIA = raw.Modo_Diseno_IA || raw.modoDisenoIA || raw.modoDisenoIa || "Sin_IA";
+    const modoDisenoIA =
+      raw.Modo_Diseno_IA ||
+      raw.modoDisenoIA ||
+      raw.modoDisenoIa ||
+      (typeof inferirModoDisenoIA === "function"
+        ? inferirModoDisenoIA({ usoIA, dinamicaCognitiva })
+        : "Sin_IA");
     const modalidadProcesamiento =
       raw.Modalidad_Procesamiento_Efectiva ||
       raw.modalidadProcesamiento ||
       raw.modalidadProcesamientoEfectiva ||
-      "Extraccion_Esforzada";
+      (typeof inferirModalidadProcesamiento === "function"
+        ? inferirModalidadProcesamiento({ usoIA, dinamicaCognitiva, calidad })
+        : "Extraccion_Esforzada");
     const friccionIntercalada =
       estructuraPractica === "Intercalado"
         ? (raw.Friccion_Discriminacion_Intercalada ||

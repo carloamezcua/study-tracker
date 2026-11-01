@@ -162,6 +162,33 @@
       });
     }
 
+    // Selectores del Inspector Profundo por Dimensión (Power BI View en Pestaña 4)
+    const selInspectorDim = document.getElementById("inspectorDimensionSelect");
+    if (selInspectorDim) {
+      selInspectorDim.addEventListener("change", () => {
+        if (typeof UI.cambiarDimensionInspector === "function") {
+          UI.cambiarDimensionInspector(selInspectorDim.value);
+          UI.renderizarDashboard(store.getSesiones(), {
+            onEditarSesion: manejarEditarSesion,
+            onEliminarSesion: manejarEliminarSesion
+          });
+        }
+      });
+    }
+
+    const selInspectorVal = document.getElementById("inspectorValueSelect");
+    if (selInspectorVal) {
+      selInspectorVal.addEventListener("change", () => {
+        if (typeof UI.cambiarValorInspector === "function") {
+          UI.cambiarValorInspector(selInspectorVal.value);
+          UI.renderizarDashboard(store.getSesiones(), {
+            onEditarSesion: manejarEditarSesion,
+            onEliminarSesion: manejarEliminarSesion
+          });
+        }
+      });
+    }
+
     // Selectores de chips de 1 clic (Contexto, Actividad, Energía, Complejidad, Objetivo y Modo IA)
     document.querySelectorAll(".chip-group").forEach((grupoEl) => {
       const nombreGrupo = grupoEl.dataset.group;

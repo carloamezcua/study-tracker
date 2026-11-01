@@ -56,18 +56,24 @@
       btnResetFilters: "✖ Quitar filtros",
 
       // Tarjetas KPI
-      kpiTotalTimeLabel: "Tiempo Total Estudiado",
+      kpiTotalTimeLabel: "Volumen de Estudio",
       kpiTotalMinutesSub: "{min} minutos en total",
-      kpiSessionsLabel: "Sesiones Completadas",
+      kpiSessionsLabel: "Autonomía & Sesiones",
+      kpiAutonomyPillText: "🧠 {pct}% aut.",
       kpiAvgMinSub: "{min} min promedio / sesión",
       kpiAvgMinZero: "0 min promedio",
-      kpiAssimilationLabel: "Asimilación Promedio",
+      kpiAssimilationLabel: "Calidad FSRS & Foco",
       kpiBestHourNone: "Mejor hora: --:--",
       kpiBestHourPeak: "Pico de foco: ~{hour} (⭐️ {quality})",
-      kpiGoalsLabel: "Objetivos Cumplidos",
+      kpiGoalsLabel: "Fluidez & Éxito",
       kpiGoalsSub: "{flow} flujo · {struggle} lucha · {friction} fricc. · {freeze} parál.",
-      kpiAiImpactLabel: "Impacto y Uso de IA",
+      kpiAiImpactLabel: "Deuda Cognitiva & IA",
       kpiAiSub: "🔄 {dial} andamiaje · 🧠 {auton} gen. propia · 🤖 {mech} deleg.",
+      rpgMilestone92Text: "🎯 Hito Nv. 92 (50% XP): {pct}%",
+      debtLevelNulo: "🟢 Nulo",
+      debtLevelBajo: "🔵 Bajo",
+      debtLevelModerado: "🟠 Moderado",
+      debtLevelCritico: "🔴 Crítico",
 
       // Panel Formulario y Timer
       formTitleNew: "➕ Registrar Sesión",
@@ -267,19 +273,85 @@
         " 💡 Con {ai}% de IA, califica con 3-4 solo si hubo diálogo y comprensión profunda, no solo fluidez mecánica.",
 
       // Pestañas y Gráficos Analíticos Interactivos
-      tabTimeTitle: "📈 1. Tiempo y Ritmo",
-      tabAiTitle: "🤖 2. IA vs. Retención",
-      tabHabitsTitle: "🧠 3. Hábitos y Energía",
-      tabInspectorTitle: "🗂️ 4. Temas y Notas",
-      chartEvoTitle: "📅 Evolución y Constancia de Estudio",
+      tabTimeTitle: "📈 1. Progresión & Circadiano",
+      tabAiTitle: "🧠 2. Salud Cognitiva & IA",
+      tabHabitsTitle: "📉 3. FSRS, DSR & Hábitos",
+      tabInspectorTitle: "🔬 4. Inspector & Notas",
+      chartEvoTitle: "📅 Evolución Temporal de Horas, XP y Calidad",
       chartEvoSubtitle:
-        "Cuánto estudias por día, semana o mes y cómo evoluciona tu calidad de asimilación.",
+        "Cuánto estudias por día, semana o mes y cómo evoluciona tu calidad de asimilación y ganancia de XP.",
       evoBtnDay: "Día",
       evoBtnWeek: "Semana",
       evoBtnMonth: "Mes",
       evoStreakBadgeText: "🔥 Racha: {streak}d (Mejor: {best}d)",
       evoActiveDaysBadgeText: "📅 Días activos: {days}",
       evoAvgDayBadgeText: "⏱️ Promedio / día activo: {min} min",
+      evoBestWeekdayText: "📆 Día top: {day} ({min}m)",
+      evoBestWeekdayEmpty: "📆 Día top: --",
+      iaKpiLeverageText: "🤖 Apalancamiento IA: {ia}% · Modo: {mode}",
+      iaKpiExtractionText: "🔥 Extracción Esforzada: {ext}% vs. {pas}% Pasivo/Fluido",
+      iaKpiIntentionGapText: "⚖️ Brecha de Intención: {pct}% ({count} bloq.)",
+      chartDebtTitle: "🍩 Índice de Deuda Cognitiva",
+      chartDebtSubtitle:
+        "Proporción de bloques según riesgo de delegación pasiva e ilusión de competencia.",
+      chartAiDesignModalityTitle: "🧩 Modo Diseño IA × Modalidad Efectiva",
+      chartAiDesignModalitySubtitle:
+        "Audita si el rol planeado de la IA derivó en extracción esforzada o copia pasiva.",
+      chartForgettingTitle: "📉 Algoritmos FSRS & Curva Teórica del Olvido (DSR)",
+      chartForgettingHint: "Decaimiento R(t) = (1 + t / 9S)⁻¹ · Umbral crítico 90%",
+      chartForgettingSubtitle:
+        "Proyección de recuperabilidad memórica a 30 días según tu estabilidad promedio (S) frente a los 4 grados FSRS.",
+      fsrsKpiGradeDistText: "🎯 FSRS: 1:{g1}% · 2:{g2}% · 3:{g3}% · 4:{g4}%",
+      fsrsKpiRetentionText: "🧠 Retención Estimada (R): {r}% · Estabilidad (S): {s}d",
+      fsrsKpiInterleavingText: "🔀 Intercalado: {inter}% · Fricción Productiva: {fric}%",
+      forgettingUserCurve: "⭐ Tu Curva Promedio (S={s}d)",
+      forgettingThreshold90: "🎯 Umbral Repaso 90%",
+      forgettingAxisDays: "Días transcurridos desde el estudio (t)",
+      forgettingAxisRetention: "Recuperabilidad Estimada R(t) %",
+      chartDsrBubbleTitle: "🫧 Mapa de Consolidación DSR por Materia",
+      chartDsrBubbleSubtitle:
+        "Estabilidad S (días, eje X) vs. Dificultad D (1–10, eje Y). Tamaño = Minutos.",
+      dsrAxisStability: "Estabilidad Memórica S (días hasta 90% R)",
+      dsrAxisDifficulty: "Dificultad Estimada D (1-10)",
+      chartInterleavedTitle: "🔀 Efectividad: Bloqueado vs. Intercalado",
+      chartInterleavedSubtitle:
+        "Calidad FSRS (1–4) y velocidad de XP/hora según estructura y fricción de discriminación.",
+      interleavedCatBlocked: "🧱 Bloqueado",
+      interleavedCatNoFric: "🟢 Sin Fricción",
+      interleavedCatProdFric: "🧠 Fricción Prod.",
+      interleavedCatConf: "🔴 Confusión",
+      interleavedDsQuality: "Calidad FSRS (1-4)",
+      interleavedDsXpHour: "XP / Hora",
+      deepInspectorTitle: "🔬 Inspector Profundo por Dimensión (Power BI View)",
+      deepInspectorSubtitle:
+        "Audita cualquier variable categórica, haz clic en una barra para aislar su perfil o inspecciona su flujo multivariable.",
+      inspectorDimLabel: "📐 Dimensión:",
+      inspectorValLabel: "🎯 Valor (Drill-down):",
+      inspectorValAll: "🌐 Todos (Comparativa)",
+      dimOptSubject: "📚 Materia / Proyecto",
+      dimOptSubtopic: "🗂️ Subtema [Corchetes]",
+      dimOptStrategy: "🧭 Estrategia / Actividad",
+      dimOptDynamic: "🔄 Dinámica Cognitiva",
+      dimOptAiDesign: "🤖 Modo Diseño IA",
+      dimOptModality: "🔥 Modalidad Procesamiento",
+      dimOptStructure: "🔀 Estructura Práctica",
+      dimOptMastery: "🌱 Dominio Previo",
+      dimOptContext: "🎓 Contexto",
+      dimOptDebt: "🍩 Deuda Cognitiva",
+      inspKpiVolTitle: "📊 Volumen de Estudio",
+      inspKpiVolSubText: "{sess} sesiones ({min} min)",
+      inspKpiAiTitle: "🧠 Salud Cognitiva & IA",
+      inspKpiAiSubText: "{auton}% autonomía cognitiva",
+      inspKpiPerfTitle: "⚡ Rendimiento FSRS & XP",
+      inspKpiDomTitle: "🌱 Transición de Dominio",
+      inspectorFlowTitle:
+        "🔀 Flujo Multivariable de Sesiones (Dominio ➔ Estrategia ➔ Dinámica ➔ Calidad ➔ Deuda)",
+      flowStage1Mastery: "1. Dominio Previo",
+      flowStage2Strategy: "2. Estrategia",
+      flowStage3Dynamic: "3. Dinámica",
+      flowStage4Quality: "4. Calidad FSRS",
+      flowStage5Debt: "5. Deuda Cognitiva",
+      chartDsQualityFSRS: "Calidad FSRS (1-4)",
       heatmapTitle: "🔥 Mapa de Calor de Ritmo Circadiano (Día × Franja)",
       heatmapSubtitle:
         "Descubre tu ventana dorada cruzando los días de la semana contra las 4 franjas de 6h (Madrugada 00-05, Mañana 06-11, Tarde 12-17, Noche 18-23).",
@@ -498,18 +570,24 @@
       btnResetFilters: "✖ Reset filters",
 
       // Tarjetas KPI
-      kpiTotalTimeLabel: "Total Study Time",
+      kpiTotalTimeLabel: "Study Volume",
       kpiTotalMinutesSub: "{min} total minutes",
-      kpiSessionsLabel: "Completed Sessions",
+      kpiSessionsLabel: "Autonomy & Sessions",
+      kpiAutonomyPillText: "🧠 {pct}% aut.",
       kpiAvgMinSub: "{min} min avg / session",
       kpiAvgMinZero: "0 min average",
-      kpiAssimilationLabel: "Avg. Assimilation",
+      kpiAssimilationLabel: "FSRS Quality & Focus",
       kpiBestHourNone: "Best hour: --:--",
       kpiBestHourPeak: "Focus peak: ~{hour} (⭐️ {quality})",
-      kpiGoalsLabel: "Goals Achieved",
+      kpiGoalsLabel: "Fluency & Success",
       kpiGoalsSub: "{flow} flow · {struggle} struggle · {friction} frict. · {freeze} freeze",
-      kpiAiImpactLabel: "AI Impact & Usage",
+      kpiAiImpactLabel: "Cognitive Debt & AI",
       kpiAiSub: "🔄 {dial} scaffolding · 🧠 {auton} own gen. · 🤖 {mech} deleg.",
+      rpgMilestone92Text: "🎯 Lv. 92 Milestone (50% XP): {pct}%",
+      debtLevelNulo: "🟢 None",
+      debtLevelBajo: "🔵 Low",
+      debtLevelModerado: "🟠 Moderate",
+      debtLevelCritico: "🔴 Critical",
 
       // Panel Formulario y Timer
       formTitleNew: "➕ Log Session",
@@ -709,19 +787,85 @@
         " 💡 With {ai}% AI, rate 3-4 only if there was deep dialogue and comprehension, not just mechanical speed.",
 
       // Pestañas y Gráficos Analíticos Interactivos
-      tabTimeTitle: "📈 1. Time & Rhythm",
-      tabAiTitle: "🤖 2. AI vs. Retention",
-      tabHabitsTitle: "🧠 3. Habits & Energy",
-      tabInspectorTitle: "🗂️ 4. Topics & Notes",
-      chartEvoTitle: "📅 Study Evolution & Consistency",
+      tabTimeTitle: "📈 1. Progression & Circadian",
+      tabAiTitle: "🧠 2. Cognitive Health & AI",
+      tabHabitsTitle: "📉 3. FSRS, DSR & Habits",
+      tabInspectorTitle: "🔬 4. Inspector & Notes",
+      chartEvoTitle: "📅 Temporal Evolution of Hours, XP & Quality",
       chartEvoSubtitle:
-        "How much you study per day, week, or month and how your assimilation quality evolves.",
+        "How much you study per day, week, or month and how your assimilation quality and XP evolve.",
       evoBtnDay: "Day",
       evoBtnWeek: "Week",
       evoBtnMonth: "Month",
       evoStreakBadgeText: "🔥 Streak: {streak}d (Best: {best}d)",
       evoActiveDaysBadgeText: "📅 Active days: {days}",
       evoAvgDayBadgeText: "⏱️ Avg / active day: {min} min",
+      evoBestWeekdayText: "📆 Top day: {day} ({min}m)",
+      evoBestWeekdayEmpty: "📆 Top day: --",
+      iaKpiLeverageText: "🤖 AI Leverage: {ia}% · Mode: {mode}",
+      iaKpiExtractionText: "🔥 Effortful Extraction: {ext}% vs. {pas}% Passive/Fluent",
+      iaKpiIntentionGapText: "⚖️ Intention Gap: {pct}% ({count} blk.)",
+      chartDebtTitle: "🍩 Cognitive Debt Index",
+      chartDebtSubtitle:
+        "Proportion of blocks by risk of passive delegation and illusion of competence.",
+      chartAiDesignModalityTitle: "🧩 AI Design Mode × Effective Modality",
+      chartAiDesignModalitySubtitle:
+        "Audits whether planned AI role resulted in effortful extraction or passive copy.",
+      chartForgettingTitle: "📉 FSRS Algorithms & Theoretical Forgetting Curve (DSR)",
+      chartForgettingHint: "Decay R(t) = (1 + t / 9S)⁻¹ · 90% critical threshold",
+      chartForgettingSubtitle:
+        "30-day memory retrievability projection based on your average stability (S) against the 4 FSRS grades.",
+      fsrsKpiGradeDistText: "🎯 FSRS: 1:{g1}% · 2:{g2}% · 3:{g3}% · 4:{g4}%",
+      fsrsKpiRetentionText: "🧠 Est. Retention (R): {r}% · Stability (S): {s}d",
+      fsrsKpiInterleavingText: "🔀 Interleaved: {inter}% · Productive Friction: {fric}%",
+      forgettingUserCurve: "⭐ Your Avg Curve (S={s}d)",
+      forgettingThreshold90: "🎯 90% Review Threshold",
+      forgettingAxisDays: "Days elapsed since study (t)",
+      forgettingAxisRetention: "Estimated Retrievability R(t) %",
+      chartDsrBubbleTitle: "🫧 DSR Consolidation Map by Subject",
+      chartDsrBubbleSubtitle:
+        "Stability S (days, X-axis) vs. Difficulty D (1–10, Y-axis). Size = Minutes.",
+      dsrAxisStability: "Memory Stability S (days to 90% R)",
+      dsrAxisDifficulty: "Estimated Difficulty D (1-10)",
+      chartInterleavedTitle: "🔀 Effectiveness: Blocked vs. Interleaved",
+      chartInterleavedSubtitle:
+        "FSRS Quality (1–4) and XP/hour rate by practice structure and discrimination friction.",
+      interleavedCatBlocked: "🧱 Blocked",
+      interleavedCatNoFric: "🟢 No Friction",
+      interleavedCatProdFric: "🧠 Prod. Friction",
+      interleavedCatConf: "🔴 Confusion",
+      interleavedDsQuality: "FSRS Quality (1-4)",
+      interleavedDsXpHour: "XP / Hour",
+      deepInspectorTitle: "🔬 Deep Dimension Inspector (Power BI View)",
+      deepInspectorSubtitle:
+        "Audit any categorical variable, click a bar to isolate its profile, or inspect its multivariable flow.",
+      inspectorDimLabel: "📐 Dimension:",
+      inspectorValLabel: "🎯 Value (Drill-down):",
+      inspectorValAll: "🌐 All (Comparison)",
+      dimOptSubject: "📚 Subject / Project",
+      dimOptSubtopic: "🗂️ Subtopic [Brackets]",
+      dimOptStrategy: "🧭 Strategy / Activity",
+      dimOptDynamic: "🔄 Cognitive Dynamic",
+      dimOptAiDesign: "🤖 AI Design Mode",
+      dimOptModality: "🔥 Processing Modality",
+      dimOptStructure: "🔀 Practice Structure",
+      dimOptMastery: "🌱 Prior Mastery",
+      dimOptContext: "🎓 Context",
+      dimOptDebt: "🍩 Cognitive Debt",
+      inspKpiVolTitle: "📊 Study Volume",
+      inspKpiVolSubText: "{sess} sessions ({min} min)",
+      inspKpiAiTitle: "🧠 Cognitive Health & AI",
+      inspKpiAiSubText: "{auton}% cognitive autonomy",
+      inspKpiPerfTitle: "⚡ FSRS Performance & XP",
+      inspKpiDomTitle: "🌱 Mastery Transition",
+      inspectorFlowTitle:
+        "🔀 Multivariable Session Flow (Mastery ➔ Strategy ➔ Dynamic ➔ Quality ➔ Debt)",
+      flowStage1Mastery: "1. Prior Mastery",
+      flowStage2Strategy: "2. Strategy",
+      flowStage3Dynamic: "3. Dynamic",
+      flowStage4Quality: "4. FSRS Quality",
+      flowStage5Debt: "5. Cognitive Debt",
+      chartDsQualityFSRS: "FSRS Quality (1-4)",
       heatmapTitle: "🔥 Circadian Rhythm Heatmap (Day × Time Slot)",
       heatmapSubtitle:
         "Discover your golden focus window by crossing weekdays against the 4 6-hour biological slots (Early Morning 00-05, Morning 06-11, Afternoon 12-17, Night 18-23).",
@@ -1066,16 +1210,48 @@
         Intercalado: "🔀 Interleaved (Mixed problems)"
       }
     },
-    modoDisenoIaChip: {
+    modoDisenoIA: {
       es: {
         Sin_IA: "🚫 Sin IA",
         Tutor_Andamiaje: "🦉 Tutor Andamiaje",
-        Generacion_Automatica: "🤖 Generación Automática"
+        Co_Disenador: "👥 Co-Diseñador",
+        Generacion_Automatica: "🤖 Generación Automática",
+        Evaluador_Socratico: "🔍 Evaluador Socrático"
       },
       en: {
         Sin_IA: "🚫 No AI",
         Tutor_Andamiaje: "🦉 Scaffolding Tutor",
-        Generacion_Automatica: "🤖 Auto Generation"
+        Co_Disenador: "👥 Co-Designer",
+        Generacion_Automatica: "🤖 Auto Generation",
+        Evaluador_Socratico: "🔍 Socratic Evaluator"
+      }
+    },
+    modoDisenoIaChip: {
+      es: {
+        Sin_IA: "🚫 Sin IA",
+        Tutor_Andamiaje: "🦉 Tutor Andamiaje",
+        Co_Disenador: "👥 Co-Diseñador",
+        Generacion_Automatica: "🤖 Generación Automática",
+        Evaluador_Socratico: "🔍 Evaluador Socrático"
+      },
+      en: {
+        Sin_IA: "🚫 No AI",
+        Tutor_Andamiaje: "🦉 Scaffolding Tutor",
+        Co_Disenador: "👥 Co-Designer",
+        Generacion_Automatica: "🤖 Auto Generation",
+        Evaluador_Socratico: "🔍 Socratic Evaluator"
+      }
+    },
+    modalidadProcesamiento: {
+      es: {
+        Extraccion_Esforzada: "🔥 Extracción Esforzada",
+        Reconocimiento_Fluido: "👀 Reconocimiento Fluido",
+        Copia_Pasiva: "📋 Copia Pasiva"
+      },
+      en: {
+        Extraccion_Esforzada: "🔥 Effortful Extraction",
+        Reconocimiento_Fluido: "👀 Fluent Recognition",
+        Copia_Pasiva: "📋 Passive Copy"
       }
     },
     calidadChip: {

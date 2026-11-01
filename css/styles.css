@@ -1689,3 +1689,275 @@ tr.row-editing td {
   color: #38bdf8;
 }
 
+/* =========================================================================
+   VISUALIZACIONES Y ANALÍTICA AVANZADA v3.2 -> v4.0 (FSRS / DSR / POWER BI)
+   ========================================================================= */
+
+.charts-col,
+.panel,
+.kpi-card {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.xp-milestone-sub {
+  font-size: 0.72rem;
+  color: #a5b4fc;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+.kpi-value-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kpi-inline-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.kpi-pill-auton {
+  background: rgba(56, 189, 248, 0.16);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.debt-pill-nulo {
+  background: rgba(16, 185, 129, 0.18);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.debt-pill-bajo {
+  background: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.debt-pill-moderado {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+}
+
+.debt-pill-critico {
+  background: rgba(239, 68, 68, 0.22);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+}
+
+/* Grid de 2 gráficos lado a lado (anti-overfull con min-width: 0) */
+.charts-split-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.split-chart-card {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 14px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.split-chart-card h3 {
+  margin: 0 0 4px;
+  font-size: 0.96rem;
+  color: #f8fafc;
+}
+
+.split-chart-card .subtitle {
+  margin-bottom: 10px;
+  font-size: 0.77rem;
+}
+
+.chart-box-compact {
+  position: relative;
+  height: 225px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.deuda-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.deuda-mini-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Inspector Profundo por Dimensión (Power BI View en Pestaña 4) */
+.inspector-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.inspector-control-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.inspector-control-item label {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.inspector-control-item .filter-select {
+  min-width: 150px;
+  max-width: 220px;
+}
+
+.inspector-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inspector-kpi-card {
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 10px 12px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+}
+
+.insp-kpi-label {
+  font-size: 0.73rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.insp-kpi-val {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 2px;
+  overflow-wrap: break-word;
+}
+
+.insp-kpi-sub {
+  font-size: 0.73rem;
+  color: #94a3b8;
+}
+
+/* Flujo Multivariable de 5 Etapas (Pipeline Cognitivo) */
+.multivariable-flow-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.multivariable-flow-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.flow-stage-col {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 10px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.flow-stage-header {
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: #a5b4fc;
+  margin-bottom: 7px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flow-stage-item {
+  margin-bottom: 6px;
+  font-size: 0.72rem;
+}
+
+.flow-stage-item:last-child {
+  margin-bottom: 0;
+}
+
+.flow-stage-item-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  color: #e2e8f0;
+  margin-bottom: 2px;
+}
+
+.flow-stage-item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.flow-stage-item-pct {
+  color: #94a3b8;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.flow-stage-bar-bg {
+  width: 100%;
+  height: 5px;
+  background: rgba(30, 41, 59, 0.9);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.flow-stage-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6366f1, #38bdf8);
+}
+
+

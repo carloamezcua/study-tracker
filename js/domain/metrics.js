@@ -208,7 +208,9 @@
   const MODOS_DISENO_IA = [
     "Sin_IA",
     "Tutor_Andamiaje",
-    "Generacion_Automatica"
+    "Co_Disenador",
+    "Generacion_Automatica",
+    "Evaluador_Socratico"
   ];
 
   const MODALIDADES_PROCESAMIENTO = [
@@ -249,6 +251,78 @@
       return "Nulo";
     }
     return "Bajo";
+  }
+
+  /**
+   * Infiere el Modo_Diseno_IA para sesiones históricas que no tenían explícitamente la columna 19.
+   */
+  function inferirModoDisenoIA(sesion) {
+    if (!sesion) return "Sin_IA";
+    const explicito = String(sesion.Modo_Diseno_IA || sesion.modoDisenoIA || "").trim();
+    if (explicito && MODOS_DISENO_IA.includes(explicito)) return explicito;
+
+    const ia = Number(sesion.usoIA) || 0;
+    const din = String(sesion.dinamicaCognitiva || "").trim();
+    if (ia === 0) return "Sin_IA";
+    if (din === "Delegación / Reproducción" || din === "Delegacion_Mecanica") {
+      return "Generacion_Automatica";
+    }
+    if (din === "Andamiaje / Co-creación" && ia >= 55) {
+      return "Co_Disenador";
+    }
+    return "Tutor_Andamiaje";
+  }
+
+  /**
+   * Infiere la Modalidad_Procesamiento_Efectiva para sesiones históricas sin la columna 20.
+   */
+  function inferirModalidadProcesamiento(sesion) {
+    if (!sesion) return "Extraccion_Esforzada";
+    const explicita = String(
+      sesion.Modalidad_Procesamiento_Efectiva || sesion.modalidadProcesamiento || ""
+    ).trim();
+    if (explicita && MODALIDADES_PROCESAMIENTO.includes(explicita)) return explicita;
+
+    const din = String(sesion.dinamicaCognitiva || "").trim();
+    const ia = Number(sesion.usoIA) || 0;
+    const cal = Number(sesion.calidad) || 3;
+    if (din === "Delegación / Reproducción" || din === "Delegacion_Mecanica") {
+      return "Copia_Pasiva";
+    }
+    if (din === "Recepción Pasiva" || (ia >= 50 && cal <= 3)) {
+      return "Reconocimiento_Fluido";
+    }
+    return "Extraccion_Esforzada";
+  }
+
+  /**
+   * Infiere la Estructura_Practica ("Bloqueado" | "Intercalado") para cualquier sesión.
+   */
+  function inferirEstructuraPractica(sesion) {
+    if (!sesion) return "Bloqueado";
+    const est = String(sesion.Estructura_Practica || sesion.estructuraPractica || "").trim();
+    return est === "Intercalado" ? "Intercalado" : "Bloqueado";
+  }
+
+  /**
+   * Calcula o recupera el Indice_Deuda_Cognitiva de una sesión con soporte retrocompatible.
+   */
+  function inferirDeudaSesion(sesion) {
+    if (!sesion) return "Nulo";
+    const tieneModalidadExplicita = Boolean(
+      String(sesion.Modalidad_Procesamiento_Efectiva || sesion.modalidadProcesamiento || "").trim()
+    );
+    const deudaExplicita = String(
+      sesion.Indice_Deuda_Cognitiva || sesion.indiceDeudaCognitiva || ""
+    ).trim();
+    if (tieneModalidadExplicita && ["Nulo", "Bajo", "Moderado", "Critico"].includes(deudaExplicita)) {
+      return deudaExplicita;
+    }
+    return calcularIndiceDeudaCognitiva(
+      sesion.usoIA,
+      sesion.dinamicaCognitiva,
+      inferirModalidadProcesamiento(sesion)
+    );
   }
 
   const TEXTOS_CALIDAD = {
@@ -546,6 +620,9 @@
         : Math.min(100, +((xpEnNivelActual / xpRequeridoTramoActual) * 100).toFixed(1));
 
     const rango = obtenerRangoPorNivel(nivel);
+    const xpMetaNivel92 = calcularXpRequeridoParaNivel(92);
+    const xpMetaNivel99 = calcularXpRequeridoParaNivel(NIVEL_MAXIMO);
+    const porcentajeHito92 = Math.min(100, +((xpSeguro / Math.max(1, xpMetaNivel92)) * 100).toFixed(2));
 
     return {
       nivel,
@@ -553,6 +630,9 @@
       xpEnNivelActual,
       xpSiguienteNivel: nivel < NIVEL_MAXIMO ? xpRequeridoTramoActual : 0,
       xpMetaTotalSiguiente: xpMetaSiguienteNivel,
+      xpMetaNivel92,
+      xpMetaNivel99,
+      porcentajeHito92,
       porcentajeBarra,
       totalXP: xpSeguro,
       esNivelMaximo: nivel >= NIVEL_MAXIMO
@@ -571,6 +651,14 @@
     const promedioMinutos = totalSesiones ? Math.round(totalMinutos / totalSesiones) : 0;
     const promedioCalidad = totalSesiones
       ? (lista.reduce((acc, s) => acc + (Number(s.calidad) || 0), 0) / totalSesiones).toFixed(1)
+      : "0.0";
+    const promedioCalidadFSRS = totalSesiones
+      ? (
+          lista.reduce(
+            (acc, s) => acc + Math.min(4, Math.max(1, Number(s.calidad) || 3)),
+            0
+          ) / totalSesiones
+        ).toFixed(1)
       : "0.0";
     const promedioIA = totalSesiones
       ? Math.round(lista.reduce((acc, s) => acc + (Number(s.usoIA) || 0), 0) / totalSesiones)
@@ -606,6 +694,33 @@
       (s) => s.dinamicaCognitiva === "Delegación / Reproducción"
     ).length;
 
+    // Índice de Autonomía Cognitiva (% de sesiones con Generación Propia + Andamiaje vs Delegación)
+    const indiceAutonomia = totalSesiones
+      ? Math.round(((dinGeneracion + dinAndamiaje) / totalSesiones) * 100)
+      : 0;
+    const tasaDelegacion = totalSesiones
+      ? Math.round((dinDelegacion / totalSesiones) * 100)
+      : 0;
+
+    // Desglose y estado predominante de Deuda Cognitiva
+    const conteoDeuda = { Nulo: 0, Bajo: 0, Moderado: 0, Critico: 0 };
+    lista.forEach((s) => {
+      const d = inferirDeudaSesion(s);
+      conteoDeuda[d] = (conteoDeuda[d] || 0) + 1;
+    });
+
+    let deudaPredominante = "Nulo";
+    if (totalSesiones > 0) {
+      const ordenDeuda = ["Nulo", "Bajo", "Moderado", "Critico"];
+      let maxCount = -1;
+      ordenDeuda.forEach((nivel) => {
+        if (conteoDeuda[nivel] >= maxCount && conteoDeuda[nivel] > 0) {
+          maxCount = conteoDeuda[nivel];
+          deudaPredominante = nivel;
+        }
+      });
+    }
+
     return {
       totalSesiones,
       totalMinutos,
@@ -613,6 +728,7 @@
       totalXP,
       promedioMinutos,
       promedioCalidad,
+      promedioCalidadFSRS,
       promedioIA,
       cumplidosFlujo,
       cumplidosLucha,
@@ -626,6 +742,10 @@
       dinAndamiaje,
       dinRecepcion,
       dinDelegacion,
+      indiceAutonomia,
+      tasaDelegacion,
+      conteoDeuda,
+      deudaPredominante,
       // Alias retrocompatibles para UI
       iaAutonomo: dinGeneracion,
       iaDialogo: dinAndamiaje,
@@ -1032,10 +1152,27 @@
 
     const clavesOrdenadas = Object.keys(mapa).sort();
     const minutos = clavesOrdenadas.map((k) => mapa[k].minutos);
+    const xpPorPeriodo = clavesOrdenadas.map((k) => mapa[k].xp);
     const calidadPromedio = clavesOrdenadas.map(
       (k) => +(mapa[k].sumaCalidad / mapa[k].conteo).toFixed(2)
     );
     const conteoSesiones = clavesOrdenadas.map((k) => mapa[k].conteo);
+
+    // Día de la semana más productivo (por minutos acumulados)
+    const mapaDiaSemana = {};
+    lista.forEach((s) => {
+      const ds = s.diaSemana || calcularDiaSemana(s.fecha);
+      if (!ds || ds === "Sin fecha") return;
+      mapaDiaSemana[ds] = (mapaDiaSemana[ds] || 0) + (Number(s.duracion) || 0);
+    });
+    let diaSemanaTop = null;
+    let maxMinDiaSemana = 0;
+    Object.keys(mapaDiaSemana).forEach((ds) => {
+      if (mapaDiaSemana[ds] > maxMinDiaSemana) {
+        maxMinDiaSemana = mapaDiaSemana[ds];
+        diaSemanaTop = ds;
+      }
+    });
 
     const diasOrdenados = Array.from(diasUnicosSet).sort();
     let rachaActual = 0;
@@ -1064,12 +1201,15 @@
     return {
       clavesOrdenadas,
       minutos,
+      xpPorPeriodo,
       calidadPromedio,
       conteoSesiones,
       diasActivos,
       rachaActual,
       mejorRacha,
-      promedioMinPorDiaActivo
+      promedioMinPorDiaActivo,
+      diaSemanaTop,
+      maxMinDiaSemana
     };
   }
 
@@ -1246,11 +1386,17 @@
       item.minutos += Number(s.duracion) || 0;
       item.sesiones += 1;
       item.sumaCalidad += Number(s.calidad) || 0;
+      item.sumaCalidadFSRS =
+        (item.sumaCalidadFSRS || 0) + Math.min(4, Math.max(1, Number(s.calidad) || 3));
       item.sumaIA += Number(s.usoIA) || 0;
       item.xp += Number(s.xp) || 0;
       if ((s.fecha || "") >= item.ultimaFecha) {
         item.ultimaFecha = s.fecha || "";
       }
+
+      const deuda = inferirDeudaSesion(s);
+      item.conteoDeuda = item.conteoDeuda || { Nulo: 0, Bajo: 0, Moderado: 0, Critico: 0 };
+      item.conteoDeuda[deuda] = (item.conteoDeuda[deuda] || 0) + 1;
 
       const dominio = migrarDominioPrevio(s.dominioPrevio);
       if (item.curvaDominio[item.curvaDominio.length - 1] !== dominio) {
@@ -1259,11 +1405,24 @@
     });
 
     const subtemas = Object.values(mapaTemas)
-      .map((item) => ({
-        ...item,
-        calidadProm: +(item.sumaCalidad / item.sesiones).toFixed(1),
-        iaProm: Math.round(item.sumaIA / item.sesiones)
-      }))
+      .map((item) => {
+        let deudaPredominante = "Nulo";
+        const cd = item.conteoDeuda || { Nulo: 0, Bajo: 0, Moderado: 0, Critico: 0 };
+        let maxC = -1;
+        ["Nulo", "Bajo", "Moderado", "Critico"].forEach((niv) => {
+          if ((cd[niv] || 0) >= maxC && (cd[niv] || 0) > 0) {
+            maxC = cd[niv];
+            deudaPredominante = niv;
+          }
+        });
+        return {
+          ...item,
+          calidadProm: +(item.sumaCalidad / item.sesiones).toFixed(1),
+          calidadFSRS: +((item.sumaCalidadFSRS || item.sumaCalidad) / item.sesiones).toFixed(1),
+          iaProm: Math.round(item.sumaIA / item.sesiones),
+          deudaPredominante
+        };
+      })
       .sort((a, b) => b.minutos - a.minutos);
 
     const bitacoraNotas = [...lista]
@@ -1273,6 +1432,571 @@
     return {
       subtemas,
       bitacoraNotas
+    };
+  }
+
+  /**
+   * Analiza la Salud Cognitiva, el Diseño de IA vs. Modalidad de Procesamiento Efectiva,
+   * la distribución de Deuda Cognitiva y la Brecha de Intención (Pestaña 2).
+   */
+  function analizarSaludCognitivaIA(sesiones) {
+    const lista = Array.isArray(sesiones) ? sesiones : [];
+    const total = lista.length;
+
+    const conteoDeuda = { Nulo: 0, Bajo: 0, Moderado: 0, Critico: 0 };
+    const conteoModalidad = {
+      Extraccion_Esforzada: 0,
+      Reconocimiento_Fluido: 0,
+      Copia_Pasiva: 0
+    };
+    const conteoModoDiseno = {};
+    const matrizModoModalidad = {};
+
+    MODOS_DISENO_IA.forEach((m) => {
+      conteoModoDiseno[m] = 0;
+      matrizModoModalidad[m] = {
+        Extraccion_Esforzada: 0,
+        Reconocimiento_Fluido: 0,
+        Copia_Pasiva: 0
+      };
+    });
+
+    let sesionesBrechaIntencion = 0;
+    let brechaDeudaNegativa = 0;
+    let brechaSuperacionPositiva = 0;
+    let sumaIA = 0;
+
+    const actividadesActivas = new Set([
+      "Recuperacion_Activa",
+      "Construccion_Generativa",
+      "Desarrollo / Código",
+      "Práctica / Debugging",
+      "Síntesis / Documentación",
+      "Repaso / Simulacro"
+    ]);
+    const actividadesReceptivas = new Set([
+      "Consumo_Receptivo",
+      "Clase en Vivo",
+      "Estudio Teórico / Conceptual"
+    ]);
+
+    lista.forEach((s) => {
+      const ia = Math.min(100, Math.max(0, Number(s.usoIA) || 0));
+      sumaIA += ia;
+
+      const deuda = inferirDeudaSesion(s);
+      conteoDeuda[deuda] = (conteoDeuda[deuda] || 0) + 1;
+
+      const modo = inferirModoDisenoIA(s);
+      const modalidad = inferirModalidadProcesamiento(s);
+
+      if (!matrizModoModalidad[modo]) {
+        matrizModoModalidad[modo] = {
+          Extraccion_Esforzada: 0,
+          Reconocimiento_Fluido: 0,
+          Copia_Pasiva: 0
+        };
+      }
+      conteoModoDiseno[modo] = (conteoModoDiseno[modo] || 0) + 1;
+      conteoModalidad[modalidad] = (conteoModalidad[modalidad] || 0) + 1;
+      matrizModoModalidad[modo][modalidad] = (matrizModoModalidad[modo][modalidad] || 0) + 1;
+
+      // Detección de Brecha de Intención (Tiempo 1 planeado vs Tiempo 2 ejecutado)
+      const act = migrarTipoActividad(s.tipoActividad);
+      const din = s.dinamicaCognitiva || "Andamiaje / Co-creación";
+
+      const caidaEnDelegacion =
+        (actividadesActivas.has(act) &&
+          (din === "Delegación / Reproducción" || modalidad === "Copia_Pasiva")) ||
+        ((modo === "Sin_IA" || modo === "Tutor_Andamiaje" || modo === "Evaluador_Socratico") &&
+          (modalidad === "Copia_Pasiva" || din === "Delegación / Reproducción"));
+
+      const elevacionActiva =
+        actividadesReceptivas.has(act) &&
+        (din === "Generación Propia" || din === "Andamiaje / Co-creación") &&
+        modalidad === "Extraccion_Esforzada";
+
+      if (caidaEnDelegacion) {
+        sesionesBrechaIntencion += 1;
+        brechaDeudaNegativa += 1;
+      } else if (elevacionActiva) {
+        sesionesBrechaIntencion += 1;
+        brechaSuperacionPositiva += 1;
+      }
+    });
+
+    let modoDisenoPredominante = "Sin_IA";
+    let maxModoCount = -1;
+    MODOS_DISENO_IA.forEach((m) => {
+      if ((conteoModoDiseno[m] || 0) > maxModoCount) {
+        maxModoCount = conteoModoDiseno[m] || 0;
+        modoDisenoPredominante = m;
+      }
+    });
+
+    const promedioIA = total ? Math.round(sumaIA / total) : 0;
+    const pctExtraccionEsforzada = total
+      ? Math.round((conteoModalidad.Extraccion_Esforzada / total) * 100)
+      : 0;
+    const pctCopiaReconocimiento = total ? 100 - pctExtraccionEsforzada : 0;
+    const pctBrechaIntencion = total ? Math.round((sesionesBrechaIntencion / total) * 100) : 0;
+    const pctBrechaDeuda = total ? Math.round((brechaDeudaNegativa / total) * 100) : 0;
+
+    return {
+      totalSesiones: total,
+      promedioIA,
+      modoDisenoPredominante,
+      conteoDeuda,
+      conteoModalidad,
+      conteoModoDiseno,
+      modosDisenoLabels: MODOS_DISENO_IA,
+      serieExtraccion: MODOS_DISENO_IA.map((m) => matrizModoModalidad[m].Extraccion_Esforzada),
+      serieReconocimiento: MODOS_DISENO_IA.map((m) => matrizModoModalidad[m].Reconocimiento_Fluido),
+      serieCopia: MODOS_DISENO_IA.map((m) => matrizModoModalidad[m].Copia_Pasiva),
+      pctExtraccionEsforzada,
+      pctCopiaReconocimiento,
+      sesionesBrechaIntencion,
+      brechaDeudaNegativa,
+      brechaSuperacionPositiva,
+      pctBrechaIntencion,
+      pctBrechaDeuda
+    };
+  }
+
+  /**
+   * Analiza los Algoritmos FSRS, Curva del Olvido, Modelo DSR (Dificultad, Estabilidad, Recuperabilidad)
+   * y Efectividad de la Práctica Intercalada vs. Bloqueada (Pestaña 3).
+   */
+  function analizarFSRSConsolidacion(sesiones) {
+    const lista = Array.isArray(sesiones) ? sesiones : [];
+    const total = lista.length;
+
+    // 1. Distribución de Calificaciones FSRS (1 Again, 2 Hard, 3 Good, 4 Easy)
+    const conteoGrades = { 1: 0, 2: 0, 3: 0, 4: 0 };
+    let sesionesIntercaladas = 0;
+    let sesionesBloqueadas = 0;
+    let sesionesFriccionProductiva = 0;
+
+    // Estructura para comparar Bloqueado vs Intercalado por tipo de fricción
+    const gruposPractica = {
+      Bloqueado: { sesiones: 0, minutos: 0, sumaCalFSRS: 0, xp: 0 },
+      Sin_Friccion: { sesiones: 0, minutos: 0, sumaCalFSRS: 0, xp: 0 },
+      Friccion_Productiva: { sesiones: 0, minutos: 0, sumaCalFSRS: 0, xp: 0 },
+      Confusion_Excesiva: { sesiones: 0, minutos: 0, sumaCalFSRS: 0, xp: 0 }
+    };
+
+    // Fecha más reciente del conjunto para calcular días transcurridos de forma consistente
+    let maxFechaMs = 0;
+    lista.forEach((s) => {
+      if (s.fecha) {
+        const p = String(s.fecha).slice(0, 10).split("-").map(Number);
+        if (p.length === 3 && !p.some(Number.isNaN)) {
+          const ms = new Date(p[0], p[1] - 1, p[2]).getTime();
+          if (ms > maxFechaMs) maxFechaMs = ms;
+        }
+      }
+    });
+    if (!maxFechaMs) maxFechaMs = Date.now();
+
+    // Agrupación cronológica por Materia para estimar el modelo DSR (Difficulty, Stability, Retrievability)
+    const ordenadas = [...lista].sort((a, b) =>
+      `${a.fecha || ""} ${a.horaInicio || ""}`.localeCompare(`${b.fecha || ""} ${b.horaInicio || ""}`)
+    );
+
+    const mapaMateriasDSR = {};
+
+    ordenadas.forEach((s) => {
+      const grade = Math.min(4, Math.max(1, Math.round(Number(s.calidad) || 3)));
+      conteoGrades[grade] = (conteoGrades[grade] || 0) + 1;
+
+      const dur = Math.max(5, Number(s.duracion) || 0);
+      const xp = Number(s.xp) || 0;
+      const estructura = inferirEstructuraPractica(s);
+      const friccion = String(
+        s.Friccion_Discriminacion_Intercalada || s.friccionIntercalada || ""
+      ).trim();
+
+      if (estructura === "Intercalado") {
+        sesionesIntercaladas += 1;
+        const catFric =
+          friccion === "Friccion_Productiva" || friccion === "Confusion_Excesiva"
+            ? friccion
+            : "Sin_Friccion";
+        if (catFric === "Friccion_Productiva") sesionesFriccionProductiva += 1;
+        gruposPractica[catFric].sesiones += 1;
+        gruposPractica[catFric].minutos += dur;
+        gruposPractica[catFric].sumaCalFSRS += grade;
+        gruposPractica[catFric].xp += xp;
+      } else {
+        sesionesBloqueadas += 1;
+        gruposPractica.Bloqueado.sesiones += 1;
+        gruposPractica.Bloqueado.minutos += dur;
+        gruposPractica.Bloqueado.sumaCalFSRS += grade;
+        gruposPractica.Bloqueado.xp += xp;
+      }
+
+      // Estimación DSR por Materia
+      const mat = (s.materia || "General").trim() || "General";
+      if (!mapaMateriasDSR[mat]) {
+        const estabilidadInicial = { 1: 1.2, 2: 3.0, 3: 6.5, 4: 13.0 }[grade] || 6.0;
+        mapaMateriasDSR[mat] = {
+          materia: mat,
+          contexto: s.contexto || "Académico",
+          sesiones: 0,
+          minutos: 0,
+          xp: 0,
+          sumaGrade: 0,
+          sumaDificultad: 0,
+          estabilidadDias: estabilidadInicial,
+          ultimaFechaMs: maxFechaMs,
+          ultimaFecha: s.fecha || ""
+        };
+      }
+
+      const dsr = mapaMateriasDSR[mat];
+      dsr.sesiones += 1;
+      dsr.minutos += dur;
+      dsr.xp += xp;
+      dsr.sumaGrade += grade;
+      if (s.contexto) dsr.contexto = s.contexto;
+
+      // Dificultad instantánea del bloque (escala 1 a 10)
+      const baseComp =
+        s.complejidad === "Muy difícil" ? 7.5 : s.complejidad === "Desafiante" ? 5.2 : 3.0;
+      const ajusteGrade = (4 - grade) * 1.15;
+      const objCanon = migrarEstadoObjetivo(s.objetivoCumplido);
+      const ajusteFriccion =
+        objCanon === "Parálisis / Abandono"
+          ? 1.4
+          : objCanon === "Con fricción"
+            ? 0.7
+            : objCanon === "Lucha productiva"
+              ? 0.4
+              : -0.3;
+      const difSesion = Math.min(10, Math.max(1, baseComp + ajusteGrade + ajusteFriccion));
+      dsr.sumaDificultad += difSesion;
+
+      // Evolución de Estabilidad S (en días hasta caer a 90% de retención)
+      if (dsr.sesiones > 1) {
+        const modalidad = inferirModalidadProcesamiento(s);
+        const factorDuracion = Math.min(1.4, Math.max(0.75, dur / 45));
+        if (grade >= 3 && modalidad !== "Copia_Pasiva") {
+          const factorCrecimiento =
+            1 + (grade === 4 ? 0.42 : 0.26) * factorDuracion * (estructura === "Intercalado" ? 1.12 : 1);
+          dsr.estabilidadDias = Math.min(90, dsr.estabilidadDias * factorCrecimiento);
+        } else if (grade === 2) {
+          dsr.estabilidadDias = Math.min(90, dsr.estabilidadDias * 1.08);
+        } else {
+          dsr.estabilidadDias = Math.max(1.0, dsr.estabilidadDias * 0.72);
+        }
+      }
+
+      if (s.fecha) {
+        const p = String(s.fecha).slice(0, 10).split("-").map(Number);
+        if (p.length === 3 && !p.some(Number.isNaN)) {
+          const ms = new Date(p[0], p[1] - 1, p[2]).getTime();
+          if (ms >= dsr.ultimaFechaMs || dsr.sesiones === 1) {
+            dsr.ultimaFechaMs = ms;
+            dsr.ultimaFecha = s.fecha;
+          }
+        }
+      }
+    });
+
+    const burbujasDSR = Object.values(mapaMateriasDSR).map((item) => {
+      const S = +item.estabilidadDias.toFixed(1);
+      const D = +(item.sumaDificultad / item.sesiones).toFixed(1);
+      const diasTranscurridos = Math.max(
+        0,
+        Math.round((maxFechaMs - item.ultimaFechaMs) / 86400000)
+      );
+      // Fórmula FSRS: R(t) = (1 + t / (9 * S))^-1
+      const R = Math.round((1 / (1 + diasTranscurridos / (9 * Math.max(0.5, S)))) * 100);
+      return {
+        materia: item.materia,
+        contexto: item.contexto,
+        sesiones: item.sesiones,
+        minutos: item.minutos,
+        xp: item.xp,
+        calidadFSRS: +(item.sumaGrade / item.sesiones).toFixed(2),
+        estabilidadS: S,
+        dificultadD: D,
+        diasSinRepaso: diasTranscurridos,
+        retencionR: R,
+        x: S,
+        y: D,
+        r: Math.min(24, Math.max(7, Math.round(Math.sqrt(item.minutos) * 1.35)))
+      };
+    });
+
+    const estabilidadPromedioGlobal = burbujasDSR.length
+      ? +(
+          burbujasDSR.reduce((acc, b) => acc + b.estabilidadS * b.minutos, 0) /
+          Math.max(1, burbujasDSR.reduce((acc, b) => acc + b.minutos, 0))
+        ).toFixed(1)
+      : 6.5;
+
+    const retencionPromedioGlobal = burbujasDSR.length
+      ? Math.round(
+          burbujasDSR.reduce((acc, b) => acc + b.retencionR, 0) / burbujasDSR.length
+        )
+      : 0;
+
+    // Curvas Teóricas de Olvido FSRS: R(t) = (1 + t / (9 * S))^-1 * 100 para t = 0..30 días
+    const diasCurva = [0, 1, 2, 3, 5, 7, 10, 14, 21, 30];
+    const calcCurva = (S) =>
+      diasCurva.map((t) => +((1 / (1 + t / (9 * Math.max(0.5, S)))) * 100).toFixed(1));
+
+    const curvasOlvido = {
+      diasLabels: diasCurva.map((d) => `${d}d`),
+      diasValores: diasCurva,
+      curvaUsuario: calcCurva(estabilidadPromedioGlobal),
+      curvaGrade4: calcCurva(24.0),
+      curvaGrade3: calcCurva(9.0),
+      curvaGrade2: calcCurva(3.2),
+      curvaGrade1: calcCurva(1.1),
+      umbral90: diasCurva.map(() => 90)
+    };
+
+    const pctGrades = {
+      1: total ? Math.round((conteoGrades[1] / total) * 100) : 0,
+      2: total ? Math.round((conteoGrades[2] / total) * 100) : 0,
+      3: total ? Math.round((conteoGrades[3] / total) * 100) : 0,
+      4: total ? Math.round((conteoGrades[4] / total) * 100) : 0
+    };
+
+    const pctIntercalado = total ? Math.round((sesionesIntercaladas / total) * 100) : 0;
+    const tasaFriccionProductiva = sesionesIntercaladas
+      ? Math.round((sesionesFriccionProductiva / sesionesIntercaladas) * 100)
+      : 0;
+
+    const ordenGruposPractica = [
+      "Bloqueado",
+      "Sin_Friccion",
+      "Friccion_Productiva",
+      "Confusion_Excesiva"
+    ];
+    const seriePracticaCalidad = ordenGruposPractica.map((k) => {
+      const g = gruposPractica[k];
+      return g.sesiones ? +(g.sumaCalFSRS / g.sesiones).toFixed(2) : 0;
+    });
+    const seriePracticaXpHora = ordenGruposPractica.map((k) => {
+      const g = gruposPractica[k];
+      return g.minutos > 0 ? Math.round((g.xp / g.minutos) * 60) : 0;
+    });
+    const seriePracticaSesiones = ordenGruposPractica.map((k) => gruposPractica[k].sesiones);
+
+    return {
+      totalSesiones: total,
+      conteoGrades,
+      pctGrades,
+      sesionesIntercaladas,
+      sesionesBloqueadas,
+      sesionesFriccionProductiva,
+      pctIntercalado,
+      tasaFriccionProductiva,
+      estabilidadPromedioGlobal,
+      retencionPromedioGlobal,
+      burbujasDSR,
+      curvasOlvido,
+      practicaIntercalada: {
+        claves: ordenGruposPractica,
+        calidadPromedio: seriePracticaCalidad,
+        xpPorHora: seriePracticaXpHora,
+        sesiones: seriePracticaSesiones
+      }
+    };
+  }
+
+  /**
+   * Extrae el valor de una sesión para la dimensión solicitada en el Inspector Profundo (Pestaña 4).
+   */
+  function obtenerValorDimensionSesion(sesion, dimension) {
+    if (!sesion) return "General";
+    switch (dimension) {
+      case "Materia":
+        return (sesion.materia || "General").trim() || "General";
+      case "Subtema":
+        return extraerSubtemaDeNotas(sesion.notas, sesion.tema).subtema || "General";
+      case "Tipo_Actividad":
+        return migrarTipoActividad(sesion.tipoActividad);
+      case "Dinamica_Cognitiva":
+        return sesion.dinamicaCognitiva || "Andamiaje / Co-creación";
+      case "Modo_Diseno_IA":
+        return inferirModoDisenoIA(sesion);
+      case "Modalidad_Procesamiento_Efectiva":
+        return inferirModalidadProcesamiento(sesion);
+      case "Estructura_Practica":
+        return inferirEstructuraPractica(sesion);
+      case "Dominio_Previo":
+        return migrarDominioPrevio(sesion.dominioPrevio);
+      case "Contexto":
+        return sesion.contexto || "Académico";
+      case "Indice_Deuda_Cognitiva":
+        return inferirDeudaSesion(sesion);
+      default:
+        return (sesion.materia || "General").trim() || "General";
+    }
+  }
+
+  /**
+   * Analiza en profundidad cualquier Dimensión categórica ("Power BI View" en Pestaña 4),
+   * devolviendo la comparativa entre categorías, los 4 KPIs contextuales del valor activo
+   * y el flujo multivariable a través de las 5 etapas cognitivas.
+   */
+  function analizarDimensionProfunda(sesiones, dimension = "Materia", valorSeleccionado = "Todos") {
+    const lista = Array.isArray(sesiones) ? sesiones : [];
+    const totalMinGlobal = lista.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
+
+    const mapaCat = {};
+    lista.forEach((s) => {
+      const val = obtenerValorDimensionSesion(s, dimension);
+      if (!mapaCat[val]) {
+        mapaCat[val] = {
+          valor: val,
+          sesiones: 0,
+          minutos: 0,
+          sumaCalFSRS: 0,
+          sumaIA: 0,
+          xpTotal: 0,
+          conteoDeuda: { Nulo: 0, Bajo: 0, Moderado: 0, Critico: 0 },
+          conteoDominio: { Nuevo: 0, "En construcción": 0, Consolidado: 0 }
+        };
+      }
+      const item = mapaCat[val];
+      const dur = Number(s.duracion) || 0;
+      const cal = Math.min(4, Math.max(1, Number(s.calidad) || 3));
+      const deuda = inferirDeudaSesion(s);
+      const dom = migrarDominioPrevio(s.dominioPrevio);
+
+      item.sesiones += 1;
+      item.minutos += dur;
+      item.sumaCalFSRS += cal;
+      item.sumaIA += Number(s.usoIA) || 0;
+      item.xpTotal += Number(s.xp) || 0;
+      item.conteoDeuda[deuda] = (item.conteoDeuda[deuda] || 0) + 1;
+      item.conteoDominio[dom] = (item.conteoDominio[dom] || 0) + 1;
+    });
+
+    const categorias = Object.values(mapaCat)
+      .map((item) => {
+        let deudaPredominante = "Nulo";
+        let maxD = -1;
+        ["Nulo", "Bajo", "Moderado", "Critico"].forEach((niv) => {
+          if ((item.conteoDeuda[niv] || 0) >= maxD && (item.conteoDeuda[niv] || 0) > 0) {
+            maxD = item.conteoDeuda[niv];
+            deudaPredominante = niv;
+          }
+        });
+        return {
+          valor: item.valor,
+          sesiones: item.sesiones,
+          minutos: item.minutos,
+          horas: +(item.minutos / 60).toFixed(1),
+          pctTiempo: totalMinGlobal ? Math.round((item.minutos / totalMinGlobal) * 100) : 0,
+          calidadFSRS: +(item.sumaCalFSRS / item.sesiones).toFixed(2),
+          iaProm: Math.round(item.sumaIA / item.sesiones),
+          xpTotal: item.xpTotal,
+          deudaPredominante,
+          conteoDeuda: item.conteoDeuda,
+          conteoDominio: item.conteoDominio
+        };
+      })
+      .sort((a, b) => b.minutos - a.minutos);
+
+    const valoresDisponibles = categorias.map((c) => c.valor);
+    const valorActivo =
+      valorSeleccionado && valorSeleccionado !== "Todos" && valoresDisponibles.includes(valorSeleccionado)
+        ? valorSeleccionado
+        : "Todos";
+
+    const sesionesEnfocadas =
+      valorActivo === "Todos"
+        ? lista
+        : lista.filter((s) => obtenerValorDimensionSesion(s, dimension) === valorActivo);
+
+    const kpisEnfocados = calcularKPIs(sesionesEnfocadas);
+    const pctVolumenSobreTotal = totalMinGlobal
+      ? Math.round((kpisEnfocados.totalMinutos / totalMinGlobal) * 100)
+      : 0;
+
+    // Progresión de Dominio Previo en las sesiones enfocadas
+    const domCounts = { Nuevo: 0, "En construcción": 0, Consolidado: 0 };
+    sesionesEnfocadas.forEach((s) => {
+      const d = migrarDominioPrevio(s.dominioPrevio);
+      domCounts[d] = (domCounts[d] || 0) + 1;
+    });
+    const totalEnfocadas = sesionesEnfocadas.length;
+
+    const resumenContextual = {
+      valorActivo,
+      volumen: {
+        horas: kpisEnfocados.totalHoras,
+        minutos: kpisEnfocados.totalMinutos,
+        sesiones: totalEnfocadas,
+        pctSobreTotal: pctVolumenSobreTotal
+      },
+      saludIA: {
+        iaProm: kpisEnfocados.promedioIA,
+        deudaPredominante: kpisEnfocados.deudaPredominante,
+        indiceAutonomia: kpisEnfocados.indiceAutonomia,
+        conteoDeuda: kpisEnfocados.conteoDeuda
+      },
+      rendimiento: {
+        calidadFSRS: kpisEnfocados.promedioCalidadFSRS,
+        xpTotal: kpisEnfocados.totalXP,
+        tasaObjetivos: kpisEnfocados.tasaObjetivos
+      },
+      progresionDominio: {
+        nuevo: domCounts.Nuevo,
+        construccion: domCounts["En construcción"],
+        consolidado: domCounts.Consolidado,
+        pctNuevo: totalEnfocadas ? Math.round((domCounts.Nuevo / totalEnfocadas) * 100) : 0,
+        pctConstruccion: totalEnfocadas
+          ? Math.round((domCounts["En construcción"] / totalEnfocadas) * 100)
+          : 0,
+        pctConsolidado: totalEnfocadas
+          ? Math.round((domCounts.Consolidado / totalEnfocadas) * 100)
+          : 0
+      }
+    };
+
+    // Flujo Multivariable (5 etapas cognitivas: Dominio -> Estrategia -> Dinámica -> Calidad FSRS -> Deuda)
+    const agruparEtapa = (fnExtractor) => {
+      const m = {};
+      sesionesEnfocadas.forEach((s) => {
+        const k = fnExtractor(s);
+        m[k] = (m[k] || 0) + 1;
+      });
+      return Object.entries(m)
+        .map(([etiqueta, conteo]) => ({
+          etiqueta,
+          conteo,
+          pct: totalEnfocadas ? Math.round((conteo / totalEnfocadas) * 100) : 0
+        }))
+        .sort((a, b) => b.conteo - a.conteo);
+    };
+
+    const flujoMultivariable = {
+      dominio: agruparEtapa((s) => migrarDominioPrevio(s.dominioPrevio)),
+      estrategia: agruparEtapa((s) => migrarTipoActividad(s.tipoActividad)),
+      dinamica: agruparEtapa((s) => s.dinamicaCognitiva || "Andamiaje / Co-creación"),
+      calidad: agruparEtapa((s) => {
+        const g = Math.min(4, Math.max(1, Math.round(Number(s.calidad) || 3)));
+        const nombres = { 1: "1 · Again", 2: "2 · Hard", 3: "3 · Good", 4: "4 · Easy" };
+        return nombres[g] || "3 · Good";
+      }),
+      deuda: agruparEtapa((s) => inferirDeudaSesion(s))
+    };
+
+    return {
+      dimension,
+      valorActivo,
+      valoresDisponibles,
+      categorias,
+      resumenContextual,
+      flujoMultivariable,
+      sesionesEnfocadas
     };
   }
 
@@ -1390,6 +2114,10 @@
     obtenerBonoModoIA: obtenerBonoDinamica,
     calcularXP,
     calcularIndiceDeudaCognitiva,
+    inferirModoDisenoIA,
+    inferirModalidadProcesamiento,
+    inferirEstructuraPractica,
+    inferirDeudaSesion,
     calcularXpRequeridoParaNivel,
     calcularProgresoRPG,
     calcularKPIs,
@@ -1400,6 +2128,9 @@
     analizarEvolucionTemporal,
     analizarMapaCalorCircadiano,
     analizarCuadranteIA,
+    analizarSaludCognitivaIA,
+    analizarFSRSConsolidacion,
+    analizarDimensionProfunda,
     analizarInspectorMateria,
     obtenerTextoAyudaActividad,
     obtenerTextoAyudaDinamica,
