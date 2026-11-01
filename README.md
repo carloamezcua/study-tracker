@@ -2,16 +2,30 @@
   <img src="assets/icon.png" alt="StudyTracker Logo" width="128" height="128" style="border-radius: 26px;">
 </p>
 
-# ⚔️ StudyTracker v3 — Local-First Analytics & CSV Sync
+# ⚔️ StudyTracker v3.2 — Local-First Analytics & CSV Sync
 
 > 🌐 **Idioma / Language:** [🇪🇸 Español](#-español) | [🇬🇧 English](#-english)  
-> 📚 **Documentación / Docs:** [📐 Decisiones & Versiones](docs/DECISIONES.md) · [❓ Preguntas Guía](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🗺️ Ruta v3](docs/ruta_refactorizaci%C3%B3n.md)
+> 📚 **Documentación / Docs:** [📐 Decisiones & Versiones](docs/DECISIONES.md) · [❓ Preguntas Guía](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🌉 Especificación Puente v3.2](docs/especificaci_n_puente_v3_2_para_agente_antigravity.md) · [🗺️ Ruta v4.0](docs/ruta_de_refactorizaci_n_quir_rgica_v4_0.md)
 
 ---
 
 ## 🇪🇸 Español
 
 Aplicación web **Local-First** gamificada (estilo RPG) ultra-ligera con **micro-servidor local en Node.js** (y soporte directo por navegador vía *File System Access API*) para registrar, editar y eliminar bloques de estudio sin fatiga de decisión, evaluar hábitos cognitivos y sincronizar los datos en tiempo real directamente sobre un archivo CSV local (`data/study-tracker.csv`) con **respaldos automáticos diarios** (`data/backups/YYYY-MM-DD.csv`).
+
+### 🌉 Novedades v3.2 — Puente de Captura Compatible con v4.0
+
+La v3.2 sigue siendo Vanilla JS + CSV, pero captura desde ya los datos que necesitará la v4.0 (FSRS y Deuda Cognitiva), sin romper el histórico de 18 columnas:
+
+- **4 columnas nuevas en el CSV (22 en total):** `Estructura_Practica`, `Modo_Diseno_IA`, `Modalidad_Procesamiento_Efectiva`, `Friccion_Discriminacion_Intercalada`.
+- **Estrategia Planificada (`Tipo_Actividad`):** `Recuperacion_Activa`, `Construccion_Generativa` *(por defecto)*, `Consumo_Receptivo`, `Delegacion_Ejecutiva`. Los 6 valores históricos siguen siendo válidos.
+- **Estructura de Práctica:** `Bloqueado` *(por defecto)* o `Intercalado`. Al elegir `Intercalado` aparece la **Fricción de Discriminación** (`Sin_Friccion`, `Friccion_Productiva` *(+5% XP, preseleccionada)*, `Confusion_Excesiva`); en `Bloqueado` se oculta y se guarda vacía.
+- **Modo de Diseño con IA** (`Sin_IA`, `Tutor_Andamiaje`, …): independiente de `Dinamica_Cognitiva` (la discrepancia entre ambos es intencional).
+- **Modalidad de Procesamiento Efectiva:** `Extraccion_Esforzada` *(por defecto)*, `Reconocimiento_Fluido`, `Copia_Pasiva`.
+- **Calificación FSRS (1–4):** `1 · Again`, `2 · Hard`, `3 · Good` *(por defecto)*, `4 · Easy`. Las sesiones antiguas con calidad 5 se tratan como 4 (mismo XP que antes).
+- **Índice de Deuda Cognitiva en vivo (`Nulo` · `Bajo` · `Moderado` · `Critico`):** fórmula determinista a partir de `% IA`, Dinámica y Modalidad, visible como píldora en la vista previa de XP.
+- **Formulario simplificado:** `Contexto`, `Energía Previa` y `Complejidad` quedan ocultos con valores neutros por defecto.
+- **Retrocompatibilidad:** un CSV de 18 columnas se lee sin pérdida (`Estructura_Practica = Bloqueado`, resto vacío) y se reescribe con 22 columnas al guardar. Respaldo previo al puente en `data/backups/study-tracker-v3.1-pre-bridge.csv`.
 
 ### ✨ Características Principales (v3.0)
 
@@ -62,7 +76,7 @@ Aplicación web **Local-First** gamificada (estilo RPG) ultra-ligera con **micro
   - **Modo 2 (100% Navegador sin servidor):** Puedes vincular cualquier `.csv` local usando la *File System Access API* del navegador.
   - Migración automática transparente si cargas un archivo CSV antiguo de 20 columnas (v2) al nuevo esquema canónico de 18 columnas (v3).
 
-### 🏗️ Arquitectura del Proyecto (v3.0)
+### 🏗️ Arquitectura del Proyecto (v3.2)
 
 ```mermaid
 flowchart TD
@@ -80,7 +94,7 @@ flowchart TD
     end
 
     subgraph State["Capa de Estado / State Layer"]
-        STORE["js/state/store.js\n(18-col Normalizer & Pub/Sub)"]
+        STORE["js/state/store.js\n(22-col Normalizer & Pub/Sub)"]
         LS[("LocalStorage")]
     end
 
@@ -89,7 +103,7 @@ flowchart TD
     end
 
     subgraph Sync["Sincronización CSV & Respaldos"]
-        SYNC["js/services/excel-sync.js\n(18-col RFC 4180 CSV + On-the-fly Migration)"]
+        SYNC["js/services/excel-sync.js\n(22-col RFC 4180 CSV + Backward-compatible 18-col Parser)"]
         SERVER["server.js\n(Node.js HTTP + Native FS + Daily Backups)"]
         CSV[("data/study-tracker.csv\n(UTF-8 BOM, Git-ignored)")]
         BACKUPS[("data/backups/YYYY-MM-DD.csv\n(Automatic Daily Backups)")]
@@ -114,16 +128,17 @@ flowchart TD
     SYNC --> METRICS
 ```
 
-### 🧮 Esquema de 18 Columnas en CSV (`data/study-tracker.csv`) y Fórmulas en JavaScript
+### 🧮 Esquema de 22 Columnas en CSV (`data/study-tracker.csv`) y Fórmulas en JavaScript
 
-El archivo `data/study-tracker.csv` se guarda en texto plano `UTF-8 con BOM` (estándar RFC 4180) con las siguientes **18 columnas**:
+El archivo `data/study-tracker.csv` se guarda en texto plano `UTF-8 con BOM` (estándar RFC 4180) con las siguientes **22 columnas** (las 18 originales + 4 del Puente v3.2):
 
-`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tipo_Actividad,Dinamica_Cognitiva,Uso_IA_Porcentaje,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,XP_Ganados,Notas`
+`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tipo_Actividad,Dinamica_Cognitiva,Uso_IA_Porcentaje,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,XP_Ganados,Notas,Estructura_Practica,Modo_Diseno_IA,Modalidad_Procesamiento_Efectiva,Friccion_Discriminacion_Intercalada`
 
 | Métrica | Regla / Fórmula en JavaScript (`js/domain/metrics.js`) |
 | :--- | :--- |
 | **Duración (min)** | Diferencia entre `Hora_Fin` y `Hora_Inicio` (soporta cruce de medianoche sumando `1440` min). En cronómetro/pomodoro se calcula a partir del tiempo neto activo transcurrido (excluyendo pausas). |
-| **XP Ganados** | $\text{REDONDEAR}\Big(\text{Duración} \times \max(0.5,\ 1 + \text{Calidad}\times 0.2 + \text{BonoReto} + \text{BonoFluidez} + \text{BonoDinamica})\Big)$ |
+| **XP Ganados** | $\text{REDONDEAR}\Big(\text{Duración} \times \max(0.5,\ 1 + \text{Calidad}\times 0.25 + \text{BonoReto} + \text{BonoFluidez} + \text{BonoDinamica} + \text{BonoFricción})\Big)$ con `Calidad` FSRS 1–4 (el 5 histórico se limita a 4) y `BonoFricción = +0.05` si `Friccion_Productiva` |
+| **Deuda Cognitiva** | `Critico` si Dinámica de delegación o (`IA ≥ 75%` y `Copia_Pasiva`) · `Moderado` si `IA ≥ 50%` y (`Reconocimiento_Fluido` o `Copia_Pasiva`) · `Nulo` si `Generación Propia` y `IA ≤ 10%` · `Bajo` en otro caso |
 | **Nivel Exponencial (1-99)** | $\text{XP}(L) = \text{REDONDEAR}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Nivel 92 = 50% de 99)* |
 | **Franja Horaria** | `00:00–05:59 Madrugada` · `06:00–11:59 Mañana` · `12:00–17:59 Tarde` · `18:00–23:59 Noche` |
 | **Fluidez del Bloque** | `Flujo limpio (+10%)` · `Lucha productiva (+10%)` · `Con fricción (+5%)` · `Parálisis / Abandono (0% bono)` |
@@ -143,6 +158,20 @@ No requiere instalar paquetes externos (`node_modules`), ya que tanto el fronten
 ## 🇬🇧 English
 
 An ultra-lightweight gamified **Local-First** web application (RPG-style) powered by a **zero-dependency Node.js micro-server** (plus direct browser *File System Access API* support) to log, edit, and delete study blocks without decision fatigue, evaluate cognitive habits, and sync your data in real time directly onto a local CSV file (`data/study-tracker.csv`) with **automatic daily backups** (`data/backups/YYYY-MM-DD.csv`).
+
+### 🌉 What's New in v3.2 — v4.0-Compatible Capture Bridge
+
+v3.2 remains Vanilla JS + CSV, but already captures the data v4.0 (FSRS & Cognitive Debt) will need, without breaking the 18-column history:
+
+- **4 new CSV columns (22 total):** `Estructura_Practica`, `Modo_Diseno_IA`, `Modalidad_Procesamiento_Efectiva`, `Friccion_Discriminacion_Intercalada`.
+- **Planned Strategy (`Tipo_Actividad`):** `Recuperacion_Activa`, `Construccion_Generativa` *(default)*, `Consumo_Receptivo`, `Delegacion_Ejecutiva`. The 6 legacy values remain valid.
+- **Practice Structure:** `Bloqueado` (blocked, *default*) or `Intercalado` (interleaved). Choosing interleaved reveals **Discrimination Friction** (`Sin_Friccion`, `Friccion_Productiva` *(+5% XP, preselected)*, `Confusion_Excesiva`); when blocked it is hidden and stored empty.
+- **AI Design Mode** (`Sin_IA`, `Tutor_Andamiaje`, …): independent from `Dinamica_Cognitiva` (any mismatch is intentional).
+- **Effective Processing Modality:** `Extraccion_Esforzada` *(default)*, `Reconocimiento_Fluido`, `Copia_Pasiva`.
+- **FSRS Grade (1–4):** `1 · Again`, `2 · Hard`, `3 · Good` *(default)*, `4 · Easy`. Legacy sessions with quality 5 are treated as 4 (same XP as before).
+- **Live Cognitive Debt Index (`Nulo` · `Bajo` · `Moderado` · `Critico`):** deterministic formula from `% AI`, Dynamic and Modality, shown as a pill in the XP preview.
+- **Simplified form:** `Contexto`, `Energia Previa` and `Complejidad` are hidden with neutral defaults.
+- **Backward compatible:** an 18-column CSV loads losslessly (`Estructura_Practica = Bloqueado`, the rest empty) and is rewritten with 22 columns on save. Pre-bridge backup at `data/backups/study-tracker-v3.1-pre-bridge.csv`.
 
 ### ✨ Key Features (v3.0)
 
@@ -178,16 +207,17 @@ An ultra-lightweight gamified **Local-First** web application (RPG-style) powere
 - **Fluid Grid & Text Wrap (Zero Horizontal Overflow):**
   - Chip groups use `repeat(auto-fit, minmax(150px, 1fr))` with natural wrapping to fit cards cleanly across all screen sizes.
 
-### 🧮 18-Column CSV Schema (`data/study-tracker.csv`) & JavaScript Formulas
+### 🧮 22-Column CSV Schema (`data/study-tracker.csv`) & JavaScript Formulas
 
-The generated `data/study-tracker.csv` file is stored in plain-text `UTF-8 with BOM` (RFC 4180 standard) with the following **18 columns**:
+The generated `data/study-tracker.csv` file is stored in plain-text `UTF-8 with BOM` (RFC 4180 standard) with the following **22 columns** (the original 18 + 4 from the v3.2 Bridge):
 
-`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tipo_Actividad,Dinamica_Cognitiva,Uso_IA_Porcentaje,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,XP_Ganados,Notas`
+`Fecha,Dia_Semana,Hora_Inicio,Hora_Fin,Franja_Horaria,Contexto,Materia,Tipo_Actividad,Dinamica_Cognitiva,Uso_IA_Porcentaje,Dominio_Previo,Energia_Previa,Complejidad,Objetivo_Cumplido,Duracion_Minutos,Calidad,XP_Ganados,Notas,Estructura_Practica,Modo_Diseno_IA,Modalidad_Procesamiento_Efectiva,Friccion_Discriminacion_Intercalada`
 
 | Metric | Rule / Formula in JavaScript (`js/domain/metrics.js`) |
 | :--- | :--- |
 | **Duration (min)** | Difference between `Hora_Fin` and `Hora_Inicio` (supports midnight crossover by adding `1440` min). In timer/pomodoro it is computed from active net elapsed time (excluding pauses). |
-| **XP Earned** | $\text{ROUND}\Big(\text{Duration} \times \max(0.5,\ 1 + \text{Quality}\times 0.2 + \text{ChallengeBonus} + \text{GoalBonus} + \text{DynamicBonus})\Big)$ |
+| **XP Earned** | $\text{ROUND}\Big(\text{Duration} \times \max(0.5,\ 1 + \text{Quality}\times 0.25 + \text{ChallengeBonus} + \text{GoalBonus} + \text{DynamicBonus} + \text{FrictionBonus})\Big)$ with FSRS `Quality` 1–4 (legacy 5 is clamped to 4) and `FrictionBonus = +0.05` for `Friccion_Productiva` |
+| **Cognitive Debt** | `Critico` if delegation Dynamic or (`AI ≥ 75%` and `Copia_Pasiva`) · `Moderado` if `AI ≥ 50%` and (`Reconocimiento_Fluido` or `Copia_Pasiva`) · `Nulo` if `Own Generation` and `AI ≤ 10%` · `Bajo` otherwise |
 | **Exponential Level (1-99)** | $\text{XP}(L) = \text{ROUND}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Level 92 = 50% of 99)* |
 | **Circadian Slots** | `00:00–05:59 Early Morning` · `06:00–11:59 Morning` · `12:00–17:59 Afternoon` · `18:00–23:59 Night` |
 | **Block Fluency** | `Clean flow (+10%)` · `Productive struggle (+10%)` · `With friction (+5%)` · `Paralysis / Quit (0% bonus)` |
