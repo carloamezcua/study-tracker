@@ -69,7 +69,8 @@
       kpiGoalsSub: "{flow} flujo · {struggle} lucha · {friction} fricc. · {freeze} parál.",
       kpiAiImpactLabel: "Deuda Cognitiva & IA",
       kpiAiSub: "🔄 {dial} andamiaje · 🧠 {auton} gen. propia · 🤖 {mech} deleg.",
-      rpgMilestone92Text: "🎯 Hito Nv. 92 (50% XP): {pct}%",
+      rpgNextRankText: "🎯 Próximo rango: {rank} (Nv. {level})",
+      rpgMaxRankText: "🏆 Rango supremo: {rank}",
       debtLevelNulo: "🟢 Nulo",
       debtLevelBajo: "🔵 Bajo",
       debtLevelModerado: "🟠 Moderado",
@@ -436,85 +437,109 @@
       btnShowRecentHistory: "⬆️ Mostrar solo últimos 5",
       thDateSlot: "Fecha / Franja",
       thSchedule: "Horario",
-      thSubjectTopic: "Materia / Tema",
-      thActivity: "Actividad",
-      thEnergyChallengeGoal: "Energía · Reto · Meta",
+      thSubjectTopic: "Materia / Subtema",
+      thActivity: "Estrategia · Dominio",
+      thEnergyChallengeGoal: "Fluidez · Estructura",
       thDuration: "Duración",
-      thAssimilation: "Asimilación",
-      thAiModePct: "Dinámica · % IA",
+      thAssimilation: "FSRS · Modalidad",
+      thAiModePct: "IA · Dinámica · Deuda",
       thXpEarned: "XP Ganados",
       thNotes: "Notas",
       thActions: "Acciones",
-      tableAiSupportSub: "{pct}% apoyo IA",
+      tableAiSupportSub: "{pct}% IA",
       btnEditSessionTitle: "Editar esta sesión",
       btnDeleteSessionTitle: "Eliminar esta sesión",
 
-      // Guía de Referencia inferior (6 tarjetas v3.2)
-      guideMainTitle: "📖 Guía de Referencia y Criterios del Sistema (v3.2)",
+      // Guía de Referencia inferior (Manual exhaustivo campo por campo en 8 tarjetas v3.2)
+      guideMainTitle: "📖 Guía de Referencia y Criterios del Sistema (Manual Campo por Campo)",
       guideMainSubtitle:
-        "Manual rápido para elegir la estrategia correcta, auditar la brecha de intención y entender las fórmulas cognitivas.",
-      guideCard1Title: "🧭 1. Estrategias Planificadas (Tiempo 1)",
+        "Criterios exactos, ejemplos prácticos y reglas anti-confusión para cada campo del formulario (Tiempo 1 y Tiempo 2), indicadores cognitivos y fórmulas RPG.",
+      guideCard1Title: "🎓 1. Contexto, Materia, [Subtema] y Horario",
       guideCard1Li1:
-        "<strong>🧠 Recuperación Activa:</strong> Recordar y resolver a ciegas (flashcards, ejercicios, o depurar un bug existente aislando variables).",
+        "<strong>🎓 Académico / 🏅 Certificación:</strong> Materias escolares/universitarias vs. preparación de exámenes oficiales (ej. AWS, Snowflake, idiomas).",
       guideCard1Li2:
-        "<strong>🛠️ Construcción Generativa:</strong> Producir un artefacto nuevo desde cero (código inédito, notas estructuradas, arquitectura propia).",
+        "<strong>🚀 Proyecto Propio / 🤝 Externo:</strong> Portafolio, investigación o herramientas personales vs. clientes, trabajo freelance o encargos externos.",
       guideCard1Li3:
-        "<strong>📖 Consumo Receptivo:</strong> Absorber información (documentación oficial, papers, libros, videocursos grabados o clases).",
+        "<strong>Materia vs. Tema específico (<code>[Subtema]</code>):</strong> <em>Materia</em> es el curso o proyecto general (ej. <code>Base de Datos</code>); <em>Tema específico</em> es el módulo puntual (ej. <code>Índices B-Tree</code>) que se guarda como <code>[Subtema]</code> al inicio de Notas para el Inspector.",
       guideCard1Li4:
-        "<strong>⚡ Delegación Ejecutiva:</strong> Automatizar entregables o scripts usando IA o generadores contra reloj.",
-      guideCard1Li5:
-        "<strong>Histórico v3:</strong> Las 6 actividades anteriores siguen siendo 100% compatibles en reportes e historial.",
-      guideCard2Title: "🎯 2. Fluidez y Avance del Bloque",
+        "<strong>Franjas Circadianas (6h):</strong> Se calculan por tu <em>Hora Inicio</em>: <code>00:00–05:59 Madrugada</code> · <code>06:00–11:59 Mañana</code> · <code>12:00–17:59 Tarde</code> · <code>18:00–23:59 Noche</code> (soporta cruce de medianoche).",
+      guideCard2Title: "🌱 2. Dominio Previo del Tema (Tiempo 1)",
       guideCard2Li1:
-        "<strong>Regla de Oro:</strong> Evalúa <strong>la fluidez de este bloque de tiempo</strong>, no si ya terminaste todo el proyecto. Si tuviste que retirarte antes por causas externas pero tu tiempo fue enfocado, es <em>Flujo limpio</em>.",
+        "<strong>Prueba de Cerrar Documentación:</strong> Antes de iniciar, pregúntate: <em>\"Si cierro internet, mis apuntes y la IA ahora mismo, ¿puedo resolver o explicar esto solo?\"</em>",
       guideCard2Li2:
-        "<strong>✅ Flujo limpio (+10% XP):</strong> Ritmo constante y sin tropiezos graves en lo planeado para esta sesión.",
+        "<strong>🌱 Nuevo (Autonomía 0%):</strong> Primer contacto o concepto olvidado; frente a una hoja o editor en blanco no sabrías ni cómo arrancar.",
       guideCard2Li3:
-        "<strong>🧠 Lucha productiva (+10% XP):</strong> Duelo mental activo contra un bug o concepto duro; descartaste hipótesis y aprendiste qué no funciona aunque el avance visible sea poco.",
+        "<strong>🌿 En construcción (Dependencia externa):</strong> Entiendes la idea general, pero si cierras la documentación o la IA te trabas en pasos o sintaxis.",
       guideCard2Li4:
-        "<strong>⚠️ Con fricción (+5% XP):</strong> Hubo avance pero con tropiezos, distracciones, cansancio o velocidad irregular.",
+        "<strong>🌳 Consolidado (Autonomía total):</strong> Puedes implementarlo o explicarlo de principio a fin sin ayuda externa, o es mantenimiento rutinario.",
       guideCard2Li5:
-        "<strong>🔴 Parálisis / Abandono (0% bono):</strong> Bloqueo pasivo, dar vueltas en círculos sin probar caminos, procrastinación o sesión en blanco.",
-      guideCard3Title: "🌱 3. La Prueba Objetiva de Dominio Previo",
+        "<strong>Impacto en Deuda:</strong> Delegar a la IA un tema <code>🌱 Nuevo</code> sin procesarlo dispara el riesgo de <strong>Deuda Cognitiva Crítica</strong>.",
+      guideCard3Title: "🧭 3. Estrategia Planificada (Tiempo 1)",
       guideCard3Li1:
-        "<strong>🌱 Nuevo (Autonomía: 0):</strong> Nunca has estudiado este concepto; si te pidieran explicarlo o programarlo ahorita, no sabrías por dónde empezar.",
+        "<strong>🧠 Recuperación Activa:</strong> Extraer información de tu memoria sin mirar apuntes (flashcards, simulacros) o <strong>depurar un bug existente (debugging)</strong> aislando variables e hipótesis.",
       guideCard3Li2:
-        "<strong>🌿 En construcción (Dependencia externa):</strong> Entiendes la noción, pero si cierras la documentación o la IA, te quedas atascado.",
+        "<strong>🛠️ Construcción Generativa:</strong> Crear un artefacto nuevo desde cero (programar una función nueva, diseñar arquitectura o escribir apuntes/resúmenes propios). <em>(Crear = Construcción; Arreglar bug = Recuperación)</em>.",
       guideCard3Li3:
-        "<strong>🌳 Consolidado (Autonomía total):</strong> Puedes explicarlo o programarlo sin manuales ni IA, o es una sesión de mantenimiento rápido.",
+        "<strong>📖 Consumo Receptivo:</strong> Absorber información externa (leer documentación oficial, libros, papers, asistir a clase o ver videocursos) sin producir entregables aún.",
       guideCard3Li4:
-        "<strong>Franjas Horarias (6h):</strong> <code>00:00–05:59 Madrugada</code> · <code>06:00–11:59 Mañana</code> · <code>12:00–17:59 Tarde</code> · <code>18:00–23:59 Noche</code>.",
-      guideCard4Title: "⭐️ 4. Calificación FSRS (1–4) y Modalidad",
+        "<strong>⚡ Delegación Ejecutiva:</strong> Automatizar código repetitivo, scripts o trámites con IA cuando la prioridad es entregar rápido y no memorizar ese paso.",
+      guideCard3Li5:
+        "<strong>Compatibilidad v3:</strong> Las 6 actividades clásicas se mapean automáticamente a estas 4 estrategias en todo el dashboard.",
+      guideCard4Title: "🧱 4. Estructura de Práctica y Fricción Intercalada",
       guideCard4Li1:
-        "<strong>1 · Again (Olvido / Bloqueo):</strong> Bloqueo total; si me preguntan mañana no me acordaré sin mirar la solución.",
+        "<strong>🧱 Bloqueado (1 solo tema — 90% de casos):</strong> Estudiar o programar un único tema continuo durante toda la sesión (ej. 1h solo de React Hooks). Oculta el campo de fricción.",
       guideCard4Li2:
-        "<strong>2 · Hard (Esfuerzo extremo):</strong> 'Lo saqué, pero sudé sangre'; fatiga cognitiva intensa y vacilación prolongada.",
+        "<strong>🔀 Intercalado (Problemas mixtos):</strong> Alternar intencionalmente entre varios temas o tipos de problemas en el mismo bloque para forzar al cerebro a elegir qué método usar.",
       guideCard4Li3:
-        "<strong>3 · Good (Recuerdo normal):</strong> 'Todo en orden con esfuerzo moderado'; comprensión esperada (Default).",
+        "<strong>🟢 Sin Fricción (en Intercalado):</strong> Cambiaste entre temas o ejercicios distintos con fluidez y sin confundir los métodos.",
       guideCard4Li4:
-        "<strong>4 · Easy (Fluido / Inmediato):</strong> 'Un paseo por el parque'; dominio total y respuesta inmediata sin titubeos.",
+        "<strong>🧠 Fricción Productiva (+5% XP):</strong> Al mezclar temas dudaste cuál aplicar, forzando a tu mente a comparar y discriminar diferencias clave (máxima retención).",
       guideCard4Li5:
-        "<strong>Modalidad:</strong> 🔥 <em>Extracción Esforzada</em> (retención alta), 👀 <em>Reconocimiento Fluido</em> (familiaridad) o 📋 <em>Copia Pasiva</em>.",
-      guideCard5Title: "🔄 5. Dinámicas Cognitivas y Deuda Cognitiva",
+        "<strong>🔴 Confusión Excesiva (0% bono):</strong> Mezclaste temas demasiado verdes y terminaste abrumado sin consolidar ninguno (conviene volver a <code>🧱 Bloqueado</code>).",
+      guideCard5Title: "🤖 5. Modo de Diseño con IA (Tiempo 1)",
       guideCard5Li1:
-        "<strong>👀 Recepción Pasiva (0% ajuste):</strong> Leer, escuchar clase o ver un video sin producir aún entregables propios.",
+        "<strong>🚫 Sin IA:</strong> Planeas resolver el bloque 100% a pulmón (solo tu mente, compilador o documentación oficial estática).",
       guideCard5Li2:
-        "<strong>🤖 Delegación / Reproducción (-15% XP si IA &ge;50%):</strong> Copiar o transcribir algo ya resuelto por la IA sin razonar el porqué.",
+        "<strong>🦉 Tutor Andamiaje:</strong> Le pides a la IA explicaciones conceptuales, analogías o pistas graduales <strong>sin que te escriba la solución final</strong>.",
       guideCard5Li3:
-        "<strong>🔄 Andamiaje / Co-creación (+5% XP):</strong> Pensar en equipo con la IA debatiendo y deduciendo la lógica.",
+        "<strong>👥 Co-Diseñador:</strong> Pensar en pareja (<em>pair programming</em> / arquitectura): tú propones un diseño y debates pros, contras y mejoras con la IA.",
       guideCard5Li4:
-        "<strong>🧠 Generación Propia (+10% XP sin IA / +5% con consulta mínima):</strong> El esfuerzo mental pesado salió de tu propia mente.",
+        "<strong>🤖 Generación Automática:</strong> Le pides a la IA que genere directamente código base, boilerplate, mocks, regex o resúmenes operativos.",
       guideCard5Li5:
-        "<strong>Deuda Cognitiva:</strong> Audita la brecha entre intención y realidad. <strong>Intercalado</strong> otorga +5% XP en <em>Fricción Productiva</em>.",
-      guideCard6Title: "📊 6. Franjas Horarias (6h) y Fórmulas RPG",
+        "<strong>🔍 Evaluador Socrático:</strong> Tú resuelves o explicas primero el tema y usas la IA como examinador para que cuestione tu lógica o busque fallos.",
+      guideCard6Title: "🔄 6. Dinámica Real, % IA y Brecha de Intención (Tiempo 2)",
       guideCard6Li1:
-        "<strong>Franjas Circadianas (6h):</strong> <code>00:00–05:59 Madrugada</code> · <code>06:00–11:59 Mañana</code> · <code>12:00–17:59 Tarde</code> · <code>18:00–23:59 Noche</code>.",
+        "<strong>👀 Recepción Pasiva (0% ajuste):</strong> Solo leíste, escuchaste clase o viste videos sin producir ni debatir activamente todavía.",
       guideCard6Li2:
-        "<strong>Subtemas en Notas:</strong> Escribe <code>[Subtema] Tu nota</code> (ej. <code>[Mesa Redonda - GANs] Debate de arquitectura</code>) para agrupar en el Inspector.",
+        "<strong>🤖 Delegación / Reproducción (-15% XP si IA &ge;50%):</strong> La IA resolvió el problema pesado y tú solo copiaste, pegaste o seguiste pasos mecánicamente.",
       guideCard6Li3:
-        "<strong>Fórmula XP (v3.2):</strong> <code>ROUND(Minutos * MAX(0.5, 1 + Calidad*0.25 + BonoReto + BonoAvance + BonoDinamica + BonoFriccion))</code>.",
+        "<strong>🔄 Andamiaje / Co-creación (+5% XP):</strong> Dialogaste con la IA, cuestionaste el porqué, depuraste sus ideas y comprendiste cada línea construida.",
       guideCard6Li4:
-        "<strong>Curva Exponencial (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code>.",
+        "<strong>🧠 Generación Propia (+10% sin IA / +5% consulta mínima):</strong> La solución salió de tu cabeza (0% IA o solo una consulta puntual de sintaxis).",
+      guideCard6Li5:
+        "<strong>⚖️ Regla de la Brecha de Intención:</strong> <strong>No fuerces a que Tiempo 1 y 2 coincidan.</strong> Si planeabas <em>Tutor Andamiaje</em> (T1) pero terminaste en <em>Delegación</em> (T2), regístralo tal cual para medir tu Deuda Cognitiva.",
+      guideCard7Title: "🎯 7. Fluidez y Avance del Bloque (Tiempo 2)",
+      guideCard7Li1:
+        "<strong>Regla de Oro:</strong> Evalúa <strong>cómo fluyó este bloque de tiempo</strong>, NO si ya terminaste todo el entregable. Si paraste antes por algo externo pero estudiaste enfocado, es <em>Flujo limpio</em>.",
+      guideCard7Li2:
+        "<strong>✅ Flujo limpio (+10% XP):</strong> Concentración sostenida, ritmo constante y avance sin bloqueos graves en lo que tocaba hoy.",
+      guideCard7Li3:
+        "<strong>🧠 Lucha productiva (+10% XP):</strong> Duelo mental intenso contra un bug o concepto duro; aunque avanzaste pocas líneas, probaste hipótesis y aprendiste qué no funciona.",
+      guideCard7Li4:
+        "<strong>⚠️ Con fricción (+5% XP):</strong> Lograste avanzar, pero con distracciones, cansancio, interrupciones o ritmo irregular.",
+      guideCard7Li5:
+        "<strong>🔴 Parálisis / Abandono (0% bono):</strong> Bloqueo pasivo frente a la pantalla, dar vueltas sin probar nada, procrastinación o abandono del bloque.",
+      guideCard8Title: "⭐️ 8. Calificación FSRS (1–4), Modalidad y Fórmulas",
+      guideCard8Li1:
+        "<strong>Grados FSRS (1–4):</strong> <code>1 · Again</code> (olvido/bloqueo, <em>S≈1.2d</em>) · <code>2 · Hard</code> (salió con esfuerzo extremo, <em>S≈3d</em>) · <code>3 · Good</code> (comprensión sólida esperada, <em>S≈6.5d</em>) · <code>4 · Easy</code> (dominio inmediato sin dudas, <em>S≈13d</em>).",
+      guideCard8Li2:
+        "<strong>Modalidad Efectiva:</strong> 🔥 <em>Extracción Esforzada</em> (lo sacaste de tu mente/lógica) vs. 👀 <em>Reconocimiento Fluido</em> (lo leíste y dijiste \"ah, claro\", trampa de familiaridad) vs. 📋 <em>Copia Pasiva</em> (transcripción sin procesar).",
+      guideCard8Li3:
+        "<strong>Deuda Cognitiva (<code>🟢 Nulo</code> a <code>🔴 Crítico</code>):</strong> Sube al combinar <code>📋 Copia Pasiva</code> o <code>🤖 Delegación</code> con alto <code>% IA</code> en temas nuevos o al calificar <code>4 · Easy</code> habiendo copiado.",
+      guideCard8Li4:
+        "<strong>Fórmula XP (v3.2):</strong> <code>ROUND(Min * MAX(0.5, 1 + Calidad*0.25 + BonoReto + BonoFluidez + BonoDinamica + BonoFriccion))</code>.",
+      guideCard8Li5:
+        "<strong>Curvas Matemáticas:</strong> Nivel cuadrático infinito <code>XP(L) = 50 * L * (L - 1)</code> (Nv. 2 = 100 XP, 16 rangos hasta <em>Visionario</em> Nv. 200+) · Olvido FSRS <code>R(t) = (1 + t/(9S))⁻¹</code>.",
 
       // Alertas y confirmaciones
       alertServerOffline:
@@ -583,7 +608,8 @@
       kpiGoalsSub: "{flow} flow · {struggle} struggle · {friction} frict. · {freeze} freeze",
       kpiAiImpactLabel: "Cognitive Debt & AI",
       kpiAiSub: "🔄 {dial} scaffolding · 🧠 {auton} own gen. · 🤖 {mech} deleg.",
-      rpgMilestone92Text: "🎯 Lv. 92 Milestone (50% XP): {pct}%",
+      rpgNextRankText: "🎯 Next rank: {rank} (Lv. {level})",
+      rpgMaxRankText: "🏆 Supreme rank: {rank}",
       debtLevelNulo: "🟢 None",
       debtLevelBajo: "🔵 Low",
       debtLevelModerado: "🟠 Moderate",
@@ -950,85 +976,109 @@
       btnShowRecentHistory: "⬆️ Show latest 5 only",
       thDateSlot: "Date / Time Slot",
       thSchedule: "Schedule",
-      thSubjectTopic: "Subject / Topic",
-      thActivity: "Activity",
-      thEnergyChallengeGoal: "Energy · Challenge · Goal",
+      thSubjectTopic: "Subject / Subtopic",
+      thActivity: "Strategy · Mastery",
+      thEnergyChallengeGoal: "Fluency · Structure",
       thDuration: "Duration",
-      thAssimilation: "Assimilation",
-      thAiModePct: "Dynamic · % AI",
+      thAssimilation: "FSRS · Modality",
+      thAiModePct: "AI · Dynamic · Debt",
       thXpEarned: "XP Earned",
       thNotes: "Notes",
       thActions: "Actions",
-      tableAiSupportSub: "{pct}% AI support",
+      tableAiSupportSub: "{pct}% AI",
       btnEditSessionTitle: "Edit this session",
       btnDeleteSessionTitle: "Delete this session",
 
-      // Guía de Referencia inferior (6 tarjetas v3.2)
-      guideMainTitle: "📖 System Reference Guide & Criteria (v3.2)",
+      // Guía de Referencia inferior (Manual exhaustivo campo por campo en 8 tarjetas v3.2)
+      guideMainTitle: "📖 System Reference Guide & Criteria (Field-by-Field Manual)",
       guideMainSubtitle:
-        "Quick manual to choose the right strategy, audit the intention gap, and master cognitive formulas.",
-      guideCard1Title: "🧭 1. Planned Strategies (Stage 1)",
+        "Exact criteria, practical examples, and anti-confusion rules for every form field (Stage 1 & Stage 2), cognitive indicators, and RPG formulas.",
+      guideCard1Title: "🎓 1. Context, Subject, [Subtopic] & Schedule",
       guideCard1Li1:
-        "<strong>🧠 Active Recall:</strong> Blind retrieval and testing (flashcards, exercises, or isolating a bug in existing code).",
+        "<strong>🎓 Academic / 🏅 Certification:</strong> University/school courses vs. official exam prep (e.g. AWS, Snowflake, languages).",
       guideCard1Li2:
-        "<strong>🛠️ Generative Build:</strong> Creating a new artifact from scratch (original code, structured notes, or architecture).",
+        "<strong>🚀 Own Project / 🤝 External:</strong> Personal portfolio, research, or tools vs. freelance, client work, or external assignments.",
       guideCard1Li3:
-        "<strong>📖 Receptive Consumption:</strong> Absorbing information (official docs, papers, books, video lectures, or classes).",
+        "<strong>Subject vs. Specific Topic (<code>[Subtopic]</code>):</strong> <em>Subject</em> is the macro course/project (e.g. <code>Databases</code>); <em>Specific Topic</em> is the specific module (e.g. <code>B-Tree Indexes</code>) saved as <code>[Subtopic]</code> at the start of Notes for the Inspector.",
       guideCard1Li4:
-        "<strong>⚡ Executive Delegation:</strong> Automating deliverables or scripts using AI under time constraints.",
-      guideCard1Li5:
-        "<strong>v3 Legacy Compatibility:</strong> The 6 historical activities remain 100% supported across reports and filters.",
-      guideCard2Title: "🎯 2. Block Fluency and Progress",
+        "<strong>Circadian Slots (6h):</strong> Computed from your <em>Start Time</em>: <code>00:00–05:59 Early Morning</code> · <code>06:00–11:59 Morning</code> · <code>12:00–17:59 Afternoon</code> · <code>18:00–23:59 Night</code> (supports midnight crossing).",
+      guideCard2Title: "🌱 2. Prior Topic Mastery (Stage 1)",
       guideCard2Li1:
-        "<strong>Golden Rule:</strong> Evaluate <strong>the fluency of this time block</strong>, not whether the entire project is finished. If you had to leave early due to external reasons but your time was focused, it is <em>Clean flow</em>.",
+        "<strong>The Close-the-Docs Test:</strong> Before starting, ask yourself: <em>\"If I close the internet, my notes, and AI right now, can I solve or explain this solo?\"</em>",
       guideCard2Li2:
-        "<strong>✅ Clean flow (+10% XP):</strong> Steady pace without major hiccups on today's session goals.",
+        "<strong>🌱 New (0% Autonomy):</strong> First contact or wiped memory; facing a blank editor or page you wouldn't know how to start.",
       guideCard2Li3:
-        "<strong>🧠 Productive struggle (+10% XP):</strong> Active mental duel against a hard bug or tough concept; discarded hypotheses and learned what fails even with minimal visible code.",
+        "<strong>🌿 In progress (External dependency):</strong> You grasp the general idea, but closing docs or AI leaves you stuck on steps or syntax.",
       guideCard2Li4:
-        "<strong>⚠️ With friction (+5% XP):</strong> Progress made but with hurdles, distractions, fatigue, or uneven pace.",
+        "<strong>🌳 Consolidated (Total autonomy):</strong> You can implement or explain it end-to-end without external help, or it's routine maintenance.",
       guideCard2Li5:
-        "<strong>🔴 Paralysis / Quit (0% bonus):</strong> Passive freeze, spinning wheels in circles without testing paths, procrastination, or blank session.",
-      guideCard3Title: "🌱 3. The Objective Prior Mastery Test",
+        "<strong>Debt Impact:</strong> Delegating a <code>🌱 New</code> topic to AI without processing it triggers <strong>Critical Cognitive Debt</strong> risk.",
+      guideCard3Title: "🧭 3. Planned Strategy (Stage 1)",
       guideCard3Li1:
-        "<strong>🌱 New (Current autonomy: 0):</strong> Zero prior contacts or wiped memory; if asked to code or explain it right now, you wouldn't know where to start.",
+        "<strong>🧠 Active Recall:</strong> Retrieving knowledge from memory without looking at notes (flashcards, mock tests) or <strong>debugging an existing bug</strong> by isolating variables and hypotheses.",
       guideCard3Li2:
-        "<strong>🌿 In progress (External dependency):</strong> You understand the notion, but if you close docs or AI, you get stuck.",
+        "<strong>🛠️ Generative Build:</strong> Creating a brand-new artifact from scratch (coding a new feature, designing architecture, or writing your own structured notes). <em>(Building new = Generative; Fixing bug = Active Recall)</em>.",
       guideCard3Li3:
-        "<strong>🌳 Consolidated (Total autonomy):</strong> You can explain or code without manuals or AI, or it's a fast maintenance block.",
+        "<strong>📖 Receptive Consumption:</strong> Absorbing external information (reading official docs, books, papers, attending lectures, or watching courses) without producing artifacts yet.",
       guideCard3Li4:
-        "<strong>Circadian Slots (6h):</strong> <code>00:00–05:59 Early Morning</code> · <code>06:00–11:59 Morning</code> · <code>12:00–17:59 Afternoon</code> · <code>18:00–23:59 Night</code>.",
-      guideCard4Title: "⭐️ 4. FSRS Rating (1–4) & Modality",
+        "<strong>⚡ Executive Delegation:</strong> Automating repetitive boilerplate, scripts, or deliverables with AI when speed is the priority over memorizing that step.",
+      guideCard3Li5:
+        "<strong>v3 Compatibility:</strong> All 6 classic activities map automatically to these 4 strategies across the dashboard.",
+      guideCard4Title: "🧱 4. Practice Structure & Interleaved Friction",
       guideCard4Li1:
-        "<strong>1 · Again (Blackout / Forgot):</strong> Total blackout; if asked tomorrow I won't remember without looking at the answer.",
+        "<strong>🧱 Blocked (1 single topic — 90% of cases):</strong> Studying or coding a single continuous topic throughout the block (e.g. 1h of React Hooks only). Hides the friction field.",
       guideCard4Li2:
-        "<strong>2 · Hard (Extreme effort):</strong> 'Got it, but sweated blood'; high cognitive fatigue and prolonged hesitation.",
+        "<strong>🔀 Interleaved (Mixed problems):</strong> Intentionally alternating across multiple topics or problem types in the same session to force your brain to choose which method applies.",
       guideCard4Li3:
-        "<strong>3 · Good (Normal recall):</strong> 'Solved it well, had to think a bit, but all in order' (expected moderate effort).",
+        "<strong>🟢 No Friction (when Interleaved):</strong> Switched across topics or distinct exercises smoothly without confusing methods.",
       guideCard4Li4:
-        "<strong>4 · Easy (Instant / Fluid):</strong> 'A walk in the park'; instant, direct, and fully mastered without hesitation.",
+        "<strong>🧠 Productive Friction (+5% XP):</strong> Mixing topics made you hesitate which method to apply, forcing your mind to compare and discriminate key differences (maximum retention).",
       guideCard4Li5:
-        "<strong>Modality:</strong> 🔥 <em>Effortful Extraction</em> (high retention), 👀 <em>Fluent Recognition</em> (surface familiarity) or 📋 <em>Passive Copy</em>.",
-      guideCard5Title: "🔄 5. Cognitive Dynamics & Cognitive Debt",
+        "<strong>🔴 Excessive Confusion (0% bonus):</strong> Mixed topics that were too raw and ended up overwhelmed without consolidating any (signal to return to <code>🧱 Blocked</code>).",
+      guideCard5Title: "🤖 5. AI Design Mode (Stage 1)",
       guideCard5Li1:
-        "<strong>👀 Passive Reception (0% adj.):</strong> Reading, listening to a lecture, or watching a video without actively producing or debating yet.",
+        "<strong>🚫 No AI:</strong> You plan to solve the block 100% solo (only your mind, compiler, or static official documentation).",
       guideCard5Li2:
-        "<strong>🤖 Delegation / Reproduction (-15% XP if AI &ge;50%):</strong> Transcribing or following AI solutions without internalizing why.",
+        "<strong>🦉 Scaffolding Tutor:</strong> You ask AI for conceptual explanations, analogies, or gradual hints <strong>without letting it write the final solution</strong>.",
       guideCard5Li3:
-        "<strong>🔄 Scaffolding / Co-creation (+5% XP):</strong> Thinking as a team with AI, actively debating hypotheses and deducing the logic.",
+        "<strong>👥 Co-Designer:</strong> Pair thinking (<em>pair programming</em> / architecture): you propose a design and debate pros, cons, and edge cases with AI.",
       guideCard5Li4:
-        "<strong>🧠 Own Generation (+10% XP no AI / +5% minor lookup):</strong> The heavy mental effort came from your own head.",
+        "<strong>🤖 Auto Generation:</strong> You ask AI to directly generate base code, boilerplate, mocks, regex, or operational summaries.",
       guideCard5Li5:
-        "<strong>Cognitive Debt:</strong> Audits the intention gap. <strong>Interleaving</strong> grants +5% XP on <em>Productive Friction</em>.",
-      guideCard6Title: "📊 6. Time Slots (6h) & RPG Formulas",
+        "<strong>🔍 Socratic Evaluator:</strong> You solve or explain the topic first and use AI as an examiner to challenge your logic or spot flaws.",
+      guideCard6Title: "🔄 6. Real Cognitive Dynamic, % AI & Intention Gap (Stage 2)",
       guideCard6Li1:
-        "<strong>Circadian Slots (6h):</strong> <code>00:00–05:59 Early Morning</code> · <code>06:00–11:59 Morning</code> · <code>12:00–17:59 Afternoon</code> · <code>18:00–23:59 Night</code>.",
+        "<strong>👀 Passive Reception (0% adj.):</strong> Only read, listened to a lecture, or watched videos without actively producing or debating yet.",
       guideCard6Li2:
-        "<strong>Subtopics in Notes:</strong> Write <code>[Subtopic] Your note</code> (e.g. <code>[Roundtable - GANs] Architecture debate</code>) to group in the Inspector.",
+        "<strong>🤖 Delegation / Reproduction (-15% XP if AI &ge;50%):</strong> AI solved the heavy lifting and you copied, pasted, or followed steps mechanically.",
       guideCard6Li3:
-        "<strong>XP Formula (v3.2):</strong> <code>ROUND(Minutes * MAX(0.5, 1 + Quality*0.25 + ChallengeBonus + ProgressBonus + DynamicBonus + FrictionBonus))</code>.",
+        "<strong>🔄 Scaffolding / Co-creation (+5% XP):</strong> Dialogued with AI, questioned the why, debugged its ideas, and understood every line built.",
       guideCard6Li4:
-        "<strong>Exponential Curve (Lv. 92 = 50% of 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code>.",
+        "<strong>🧠 Own Generation (+10% no AI / +5% minor lookup):</strong> The solution came from your own head (0% AI or only a quick syntax lookup).",
+      guideCard6Li5:
+        "<strong>⚖️ Intention Gap Rule:</strong> <strong>Never force Stage 1 and 2 to match.</strong> If you planned <em>Scaffolding Tutor</em> (T1) but ended up in <em>Delegation</em> (T2), log it honestly to measure your Cognitive Debt.",
+      guideCard7Title: "🎯 7. Block Fluency & Progress (Stage 2)",
+      guideCard7Li1:
+        "<strong>Golden Rule:</strong> Evaluate <strong>how this time block flowed</strong>, NOT whether the whole deliverable is finished. If you stopped early for external reasons but studied with focus, choose <em>Clean flow</em>.",
+      guideCard7Li2:
+        "<strong>✅ Clean flow (+10% XP):</strong> Sustained focus, steady pace, and progress without major blockers on today's goal.",
+      guideCard7Li3:
+        "<strong>🧠 Productive struggle (+10% XP):</strong> Intense mental duel against a tough bug or concept; even with few lines written, you tested hypotheses and learned what fails.",
+      guideCard7Li4:
+        "<strong>⚠️ With friction (+5% XP):</strong> Made progress, but with distractions, fatigue, interruptions, or uneven pace.",
+      guideCard7Li5:
+        "<strong>🔴 Paralysis / Quit (0% bonus):</strong> Passive freeze staring at the screen, spinning wheels without testing hypotheses, procrastination, or quitting.",
+      guideCard8Title: "⭐️ 8. FSRS Rating (1–4), Modality & Formulas",
+      guideCard8Li1:
+        "<strong>FSRS Grades (1–4):</strong> <code>1 · Again</code> (blackout/forgot, <em>S≈1.2d</em>) · <code>2 · Hard</code> (solved with extreme effort, <em>S≈3d</em>) · <code>3 · Good</code> (expected solid grasp, <em>S≈6.5d</em>) · <code>4 · Easy</code> (instant mastery without doubt, <em>S≈13d</em>).",
+      guideCard8Li2:
+        "<strong>Effective Modality:</strong> 🔥 <em>Effortful Extraction</em> (pulled from your mind/logic) vs. 👀 <em>Fluent Recognition</em> (read it and said \"ah, makes sense\", familiarity trap) vs. 📋 <em>Passive Copy</em> (unprocessed transcription).",
+      guideCard8Li3:
+        "<strong>Cognitive Debt (<code>🟢 None</code> to <code>🔴 Critical</code>):</strong> Rises when combining <code>📋 Passive Copy</code> or <code>🤖 Delegation</code> with high <code>% AI</code> on new topics or rating <code>4 · Easy</code> after copying.",
+      guideCard8Li4:
+        "<strong>XP Formula (v3.2):</strong> <code>ROUND(Min * MAX(0.5, 1 + Quality*0.25 + ChallengeBonus + FluencyBonus + DynamicBonus + FrictionBonus))</code>.",
+      guideCard8Li5:
+        "<strong>Math Curves:</strong> Infinite quadratic level <code>XP(L) = 50 * L * (L - 1)</code> (Lv. 2 = 100 XP, 16 ranks up to <em>Visionary</em> Lv. 200+) · FSRS Forgetting <code>R(t) = (1 + t/(9S))⁻¹</code>.",
 
       // Alertas y confirmaciones
       alertServerOffline:
@@ -1200,6 +1250,16 @@
         No: "🔴 Paralysis / Quit"
       }
     },
+    estructuraPractica: {
+      es: {
+        Bloqueado: "🧱 Bloqueado",
+        Intercalado: "🔀 Intercalado"
+      },
+      en: {
+        Bloqueado: "🧱 Blocked",
+        Intercalado: "🔀 Interleaved"
+      }
+    },
     estructuraPracticaChip: {
       es: {
         Bloqueado: "🧱 Bloqueado (1 solo tema)",
@@ -1280,6 +1340,18 @@
         Copia_Pasiva: "📋 Passive Copy"
       }
     },
+    friccionIntercalada: {
+      es: {
+        Sin_Friccion: "🟢 Sin Fricción",
+        Friccion_Productiva: "🧠 Fricción Prod. (+5% XP)",
+        Confusion_Excesiva: "🔴 Confusión"
+      },
+      en: {
+        Sin_Friccion: "🟢 No Friction",
+        Friccion_Productiva: "🧠 Prod. Friction (+5% XP)",
+        Confusion_Excesiva: "🔴 Confusion"
+      }
+    },
     friccionIntercaladaChip: {
       es: {
         Sin_Friccion: "🟢 Sin Fricción",
@@ -1330,28 +1402,40 @@
     },
     rango: {
       es: {
-        "Capa de Maestría (Nivel 99)": "Capa de Maestría (Nivel 99)",
-        "Leyenda de la Mitad (Nv. 92+)": "Leyenda de la Mitad (Nv. 92+)",
-        "Gran Maestro Cognitivo": "Gran Maestro Cognitivo",
-        "Sabio del Flujo Profundo": "Sabio del Flujo Profundo",
-        "Maestro de la Concentración": "Maestro de la Concentración",
-        "Arquitecto del Estudio": "Arquitecto del Estudio",
-        "Guerrero Pomodoro": "Guerrero Pomodoro",
-        "Explorador de Datos": "Explorador de Datos",
-        "Aprendiz Constante": "Aprendiz Constante",
-        "Novato del Enfoque": "Novato del Enfoque"
+        Visionario: "Visionario",
+        Autoridad: "Autoridad",
+        Maestro: "Maestro",
+        Élite: "Élite",
+        Senior: "Senior",
+        Experto: "Experto",
+        Referente: "Referente",
+        Consolidado: "Consolidado",
+        Experimentado: "Experimentado",
+        Estratega: "Estratega",
+        Táctico: "Táctico",
+        Metódico: "Metódico",
+        Especialista: "Especialista",
+        Analista: "Analista",
+        Practicante: "Practicante",
+        Iniciado: "Iniciado"
       },
       en: {
-        "Capa de Maestría (Nivel 99)": "Mastery Cape (Level 99)",
-        "Leyenda de la Mitad (Nv. 92+)": "Halfway Legend (Lv. 92+)",
-        "Gran Maestro Cognitivo": "Cognitive Grandmaster",
-        "Sabio del Flujo Profundo": "Deep Flow Sage",
-        "Maestro de la Concentración": "Focus Master",
-        "Arquitecto del Estudio": "Study Architect",
-        "Guerrero Pomodoro": "Pomodoro Warrior",
-        "Explorador de Datos": "Data Explorer",
-        "Aprendiz Constante": "Steady Apprentice",
-        "Novato del Enfoque": "Focus Novice"
+        Visionario: "Visionary",
+        Autoridad: "Authority",
+        Maestro: "Master",
+        Élite: "Elite",
+        Senior: "Senior",
+        Experto: "Expert",
+        Referente: "Benchmark",
+        Consolidado: "Consolidated",
+        Experimentado: "Experienced",
+        Estratega: "Strategist",
+        Táctico: "Tactician",
+        Metódico: "Methodical",
+        Especialista: "Specialist",
+        Analista: "Analyst",
+        Practicante: "Practitioner",
+        Iniciado: "Initiate"
       }
     }
   };

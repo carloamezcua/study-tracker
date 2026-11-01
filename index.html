@@ -59,8 +59,8 @@
       </div>
       <div class="xp-progress-container">
         <div class="xp-header">
-          <span><span data-i18n="rpgRankPrefix">Rango:</span> <strong id="uiRango">Novato del Enfoque</strong></span>
-          <span><strong id="uiXpActual">0</strong> / <span id="uiXpSiguiente">500</span> <span data-i18n="rpgXpToNext">XP para subir de nivel</span></span>
+          <span><span data-i18n="rpgRankPrefix">Rango:</span> <strong id="uiRango">Iniciado</strong></span>
+          <span><strong id="uiXpActual">0</strong> / <span id="uiXpSiguiente">100</span> <span data-i18n="rpgXpToNext">XP para subir de nivel</span></span>
         </div>
         <div class="xp-bar-bg">
           <div class="xp-bar-fill" id="uiXpBar"></div>
@@ -69,7 +69,7 @@
       <div class="xp-total-box">
         <div class="xp-total-label" data-i18n="rpgTotalXpLabel">XP Total Acumulado</div>
         <div class="xp-total-value" id="uiXpTotalBadge">0 XP</div>
-        <div class="xp-milestone-sub" id="uiHito92Badge">🎯 Hito Nv. 92 (50%): 0.0%</div>
+        <div class="xp-milestone-sub" id="uiHito92Badge">🎯 Próximo rango: Practicante (Nv. 5)</div>
       </div>
     </div>
 
@@ -763,11 +763,11 @@
               <th data-i18n="thDateSlot">Fecha / Franja</th>
               <th data-i18n="thSchedule">Horario</th>
               <th data-i18n="thSubjectTopic">Materia / Subtema</th>
-              <th data-i18n="thActivity">Actividad · Dominio</th>
-              <th data-i18n="thEnergyChallengeGoal">Energía · Reto · Meta</th>
+              <th data-i18n="thActivity">Estrategia · Dominio</th>
+              <th data-i18n="thEnergyChallengeGoal">Fluidez · Estructura</th>
               <th data-i18n="thDuration">Duración</th>
-              <th data-i18n="thAssimilation">Asimilación</th>
-              <th data-i18n="thAiModePct">Dinámica · % IA</th>
+              <th data-i18n="thAssimilation">FSRS · Modalidad</th>
+              <th data-i18n="thAiModePct">IA · Dinámica · Deuda</th>
               <th data-i18n="thXpEarned">XP Ganados</th>
               <th data-i18n="thNotes">Notas</th>
               <th data-i18n="thActions">Acciones</th>
@@ -784,78 +784,103 @@
       </div>
     </div>
 
-    <!-- GUÍA Y ESCALAS DE REFERENCIA DEL SISTEMA (MANUAL DE BOLSILLO EN 6 TARJETAS) -->
+    <!-- GUÍA Y ESCALAS DE REFERENCIA DEL SISTEMA (MANUAL EXHAUSTIVO CAMPO POR CAMPO EN 8 TARJETAS) -->
     <div class="panel">
-      <h2 data-i18n="guideMainTitle">📖 Guía de Referencia y Criterios del Sistema</h2>
-      <div class="subtitle" data-i18n="guideMainSubtitle">Manual rápido para elegir la actividad correcta, calificar el avance de tu bloque sin ambigüedades e interpretar los gráficos analíticos.</div>
+      <h2 data-i18n="guideMainTitle">📖 Guía de Referencia y Criterios del Sistema (Manual Campo por Campo)</h2>
+      <div class="subtitle" data-i18n="guideMainSubtitle">Criterios exactos, ejemplos prácticos y reglas anti-confusión para cada campo del formulario (Tiempo 1 y Tiempo 2), indicadores cognitivos y fórmulas RPG.</div>
       <div class="guide-grid">
-        <!-- TARJETA 1: ESTRATEGIAS PLANIFICADAS (TIEMPO 1) -->
+        <!-- TARJETA 1: IDENTIFICACIÓN, CONTEXTO, SUBTEMAS Y FRANJAS -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard1Title">🧭 1. Estrategias Planificadas (Tiempo 1)</h4>
+          <h4 data-i18n="guideCard1Title">🎓 1. Contexto, Materia, [Subtema] y Horario</h4>
           <ul>
-            <li data-i18n-html="guideCard1Li1"><strong>🧠 Recuperación Activa:</strong> Recordar y resolver a ciegas (flashcards, ejercicios, o depurar un bug existente aislando variables).</li>
-            <li data-i18n-html="guideCard1Li2"><strong>🛠️ Construcción Generativa:</strong> Producir un artefacto nuevo desde cero (código inédito, notas estructuradas, arquitectura propia).</li>
-            <li data-i18n-html="guideCard1Li3"><strong>📖 Consumo Receptivo:</strong> Absorber información (documentación oficial, papers, libros, videocursos grabados o clases).</li>
-            <li data-i18n-html="guideCard1Li4"><strong>⚡ Delegación Ejecutiva:</strong> Automatizar entregables o scripts usando IA o generadores contra reloj.</li>
-            <li data-i18n-html="guideCard1Li5"><strong>Histórico v3:</strong> Las 6 actividades anteriores siguen siendo 100% compatibles en reportes e historial.</li>
+            <li data-i18n-html="guideCard1Li1"><strong>🎓 Académico / 🏅 Certificación:</strong> Materias escolares/universitarias vs. preparación de exámenes oficiales (ej. AWS, Snowflake, idiomas).</li>
+            <li data-i18n-html="guideCard1Li2"><strong>🚀 Proyecto Propio / 🤝 Externo:</strong> Portafolio, investigación o herramientas personales vs. clientes, trabajo freelance o encargos externos.</li>
+            <li data-i18n-html="guideCard1Li3"><strong>Materia vs. Tema específico (<code>[Subtema]</code>):</strong> <em>Materia</em> es el curso o proyecto general (ej. <code>Base de Datos</code>); <em>Tema específico</em> es el módulo puntual (ej. <code>Índices B-Tree</code>) que se guarda como <code>[Subtema]</code> al inicio de Notas para el Inspector.</li>
+            <li data-i18n-html="guideCard1Li4"><strong>Franjas Circadianas (6h):</strong> Se calculan por tu <em>Hora Inicio</em>: <code>00:00–05:59 Madrugada</code> · <code>06:00–11:59 Mañana</code> · <code>12:00–17:59 Tarde</code> · <code>18:00–23:59 Noche</code> (soporta cruce de medianoche).</li>
           </ul>
         </div>
 
-        <!-- TARJETA 2: FLUIDEZ Y AVANCE DEL BLOQUE (REGLA DE ORO) -->
+        <!-- TARJETA 2: DOMINIO PREVIO DEL TEMA (PRUEBA OBJETIVA) -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard2Title">🎯 2. Fluidez y Avance del Bloque</h4>
+          <h4 data-i18n="guideCard2Title">🌱 2. Dominio Previo del Tema (Tiempo 1)</h4>
           <ul>
-            <li data-i18n-html="guideCard2Li1"><strong>Regla de Oro:</strong> Evalúa <strong>la fluidez de este bloque de tiempo</strong>, no si ya terminaste todo el proyecto. Si tuviste que retirarte antes por causas externas pero tu tiempo fue enfocado, es <em>Flujo limpio</em>.</li>
-            <li data-i18n-html="guideCard2Li2"><strong>✅ Flujo limpio (+10% XP):</strong> Ritmo constante y sin tropiezos graves en lo planeado para esta sesión.</li>
-            <li data-i18n-html="guideCard2Li3"><strong>🧠 Lucha productiva (+10% XP):</strong> Duelo mental activo contra un bug o concepto duro; descartaste hipótesis y aprendiste qué no funciona aunque el avance visible sea poco.</li>
-            <li data-i18n-html="guideCard2Li4"><strong>⚠️ Con fricción (+5% XP):</strong> Hubo avance pero con tropiezos, distracciones, cansancio o velocidad irregular.</li>
-            <li data-i18n-html="guideCard2Li5"><strong>🔴 Parálisis / Abandono (0% bono):</strong> Bloqueo pasivo, dar vueltas en círculos sin probar caminos, procrastinación o sesión en blanco.</li>
+            <li data-i18n-html="guideCard2Li1"><strong>Prueba de Cerrar Documentación:</strong> Antes de iniciar, pregúntate: <em>"Si cierro internet, mis apuntes y la IA ahora mismo, ¿puedo resolver o explicar esto solo?"</em></li>
+            <li data-i18n-html="guideCard2Li2"><strong>🌱 Nuevo (Autonomía 0%):</strong> Primer contacto o concepto olvidado; frente a una hoja o editor en blanco no sabrías ni cómo arrancar.</li>
+            <li data-i18n-html="guideCard2Li3"><strong>🌿 En construcción (Dependencia externa):</strong> Entiendes la idea general, pero si cierras la documentación o la IA te trabas en pasos o sintaxis.</li>
+            <li data-i18n-html="guideCard2Li4"><strong>🌳 Consolidado (Autonomía total):</strong> Puedes implementarlo o explicarlo de principio a fin sin ayuda externa, o es mantenimiento rutinario.</li>
+            <li data-i18n-html="guideCard2Li5"><strong>Impacto en Deuda:</strong> Delegar a la IA un tema <code>🌱 Nuevo</code> sin procesarlo dispara el riesgo de <strong>Deuda Cognitiva Crítica</strong>.</li>
           </ul>
         </div>
 
-        <!-- TARJETA 3: PRUEBA OBJETIVA DE DOMINIO PREVIO, ENERGÍA Y RETO -->
+        <!-- TARJETA 3: ESTRATEGIA PLANIFICADA (TIEMPO 1) -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard3Title">🌱 3. Dominio Previo (Prueba Objetiva), Energía y Reto</h4>
+          <h4 data-i18n="guideCard3Title">🧭 3. Estrategia Planificada (Tiempo 1)</h4>
           <ul>
-            <li data-i18n-html="guideCard3Li1"><strong>🌱 Nuevo (Autonomía: 0):</strong> Nunca has estudiado este concepto; si te pidieran explicarlo o programarlo ahorita, no sabrías por dónde empezar.</li>
-            <li data-i18n-html="guideCard3Li2"><strong>🌿 En construcción (Dependencia externa):</strong> Entiendes la noción, pero si cierras la documentación o la IA, te quedas atascado.</li>
-            <li data-i18n-html="guideCard3Li3"><strong>🌳 Consolidado (Autonomía total):</strong> Puedes explicarlo o programarlo sin manuales ni IA, o es una sesión de mantenimiento rápido.</li>
-            <li data-i18n-html="guideCard3Li4"><strong>Franjas Horarias (6h):</strong> <code>00:00–05:59 Madrugada</code> · <code>06:00–11:59 Mañana</code> · <code>12:00–17:59 Tarde</code> · <code>18:00–23:59 Noche</code>.</li>
+            <li data-i18n-html="guideCard3Li1"><strong>🧠 Recuperación Activa:</strong> Extraer información de tu memoria sin mirar apuntes (flashcards, simulacros) o <strong>depurar un bug existente (debugging)</strong> aislando variables e hipótesis.</li>
+            <li data-i18n-html="guideCard3Li2"><strong>🛠️ Construcción Generativa:</strong> Crear un artefacto nuevo desde cero (programar una función nueva, diseñar arquitectura o escribir apuntes/resúmenes propios). <em>(Crear = Construcción; Arreglar bug = Recuperación)</em>.</li>
+            <li data-i18n-html="guideCard3Li3"><strong>📖 Consumo Receptivo:</strong> Absorber información externa (leer documentación oficial, libros, papers, asistir a clase o ver videocursos) sin producir entregables aún.</li>
+            <li data-i18n-html="guideCard3Li4"><strong>⚡ Delegación Ejecutiva:</strong> Automatizar código repetitivo, scripts o trámites con IA cuando la prioridad es entregar rápido y no memorizar ese paso.</li>
+            <li data-i18n-html="guideCard3Li5"><strong>Compatibilidad v3:</strong> Las 6 actividades clásicas se mapean automáticamente a estas 4 estrategias en todo el dashboard.</li>
           </ul>
         </div>
 
-        <!-- TARJETA 4: CALIFICACIÓN FSRS (1–4) Y MODALIDAD -->
+        <!-- TARJETA 4: ESTRUCTURA DE PRÁCTICA E INTERCALACIÓN -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard4Title">⭐️ 4. Calificación FSRS (1–4) y Modalidad</h4>
+          <h4 data-i18n="guideCard4Title">🧱 4. Estructura de Práctica y Fricción Intercalada</h4>
           <ul>
-            <li data-i18n-html="guideCard4Li1"><strong>1 · Again (Olvido / Bloqueo):</strong> Bloqueo total; si me preguntan mañana no me acordaré sin mirar la solución.</li>
-            <li data-i18n-html="guideCard4Li2"><strong>2 · Hard (Esfuerzo extremo):</strong> 'Lo saqué, pero sudé sangre'; fatiga cognitiva intensa y vacilación prolongada.</li>
-            <li data-i18n-html="guideCard4Li3"><strong>3 · Good (Recuerdo normal):</strong> 'Todo en orden con esfuerzo moderado'; comprensión esperada (Default).</li>
-            <li data-i18n-html="guideCard4Li4"><strong>4 · Easy (Fluido / Inmediato):</strong> 'Un paseo por el parque'; dominio total y respuesta inmediata sin titubeos.</li>
-            <li data-i18n-html="guideCard4Li5"><strong>Modalidad:</strong> 🔥 <em>Extracción Esforzada</em> (retención alta), 👀 <em>Reconocimiento Fluido</em> (familiaridad) o 📋 <em>Copia Pasiva</em>.</li>
+            <li data-i18n-html="guideCard4Li1"><strong>🧱 Bloqueado (1 solo tema — 90% de casos):</strong> Estudiar o programar un único tema continuo durante toda la sesión (ej. 1h solo de React Hooks). Oculta el campo de fricción.</li>
+            <li data-i18n-html="guideCard4Li2"><strong>🔀 Intercalado (Problemas mixtos):</strong> Alternar intencionalmente entre varios temas o tipos de problemas en el mismo bloque para forzar al cerebro a elegir qué método usar.</li>
+            <li data-i18n-html="guideCard4Li3"><strong>🟢 Sin Fricción (en Intercalado):</strong> Cambiaste entre temas o ejercicios distintos con fluidez y sin confundir los métodos.</li>
+            <li data-i18n-html="guideCard4Li4"><strong>🧠 Fricción Productiva (+5% XP):</strong> Al mezclar temas dudaste cuál aplicar, forzando a tu mente a comparar y discriminar diferencias clave (máxima retención).</li>
+            <li data-i18n-html="guideCard4Li5"><strong>🔴 Confusión Excesiva (0% bono):</strong> Mezclaste temas demasiado verdes y terminaste abrumado sin consolidar ninguno (conviene volver a <code>🧱 Bloqueado</code>).</li>
           </ul>
         </div>
 
-        <!-- TARJETA 5: DINÁMICAS COGNITIVAS Y DEUDA COGNITIVA -->
+        <!-- TARJETA 5: MODO DE DISEÑO CON IA (TIEMPO 1) -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard5Title">🔄 5. Dinámicas Cognitivas y Deuda Cognitiva</h4>
+          <h4 data-i18n="guideCard5Title">🤖 5. Modo de Diseño con IA (Tiempo 1)</h4>
           <ul>
-            <li data-i18n-html="guideCard5Li1"><strong>👀 Recepción Pasiva (0% ajuste):</strong> Leer, ver o escuchar sin producir aún entregables propios.</li>
-            <li data-i18n-html="guideCard5Li2"><strong>🤖 Delegación / Reproducción (-15% XP si IA &ge; 50%):</strong> Copiar o transcribir algo ya resuelto por la IA sin razonar el porqué.</li>
-            <li data-i18n-html="guideCard5Li3"><strong>🔄 Andamiaje / Co-creación (+5% XP):</strong> Pensar en equipo con la IA debatiendo y deduciendo la lógica.</li>
-            <li data-i18n-html="guideCard5Li4"><strong>🧠 Generación Propia (+10% XP):</strong> El esfuerzo mental pesado salió de tu propia mente.</li>
-            <li data-i18n-html="guideCard5Li5"><strong>Deuda Cognitiva:</strong> Audita la brecha entre intención y realidad. <strong>Intercalado</strong> otorga +5% XP en <em>Fricción Productiva</em>.</li>
+            <li data-i18n-html="guideCard5Li1"><strong>🚫 Sin IA:</strong> Planeas resolver el bloque 100% a pulmón (solo tu mente, compilador o documentación oficial estática).</li>
+            <li data-i18n-html="guideCard5Li2"><strong>🦉 Tutor Andamiaje:</strong> Le pides a la IA explicaciones conceptuales, analogías o pistas graduales <strong>sin que te escriba la solución final</strong>.</li>
+            <li data-i18n-html="guideCard5Li3"><strong>👥 Co-Diseñador:</strong> Pensar en pareja (<em>pair programming</em> / arquitectura): tú propones un diseño y debates pros, contras y mejoras con la IA.</li>
+            <li data-i18n-html="guideCard5Li4"><strong>🤖 Generación Automática:</strong> Le pides a la IA que genere directamente código base, boilerplate, mocks, regex o resúmenes operativos.</li>
+            <li data-i18n-html="guideCard5Li5"><strong>🔍 Evaluador Socrático:</strong> Tú resuelves o explicas primero el tema y usas la IA como examinador para que cuestione tu lógica o busque fallos.</li>
           </ul>
         </div>
 
-        <!-- TARJETA 6: CÓMO LEER EL DASHBOARD Y FÓRMULAS RPG -->
+        <!-- TARJETA 6: DINÁMICA COGNITIVA REAL, % IA Y BRECHA (TIEMPO 2) -->
         <div class="guide-card">
-          <h4 data-i18n="guideCard6Title">📊 6. Lectura del Dashboard y Fórmulas RPG</h4>
+          <h4 data-i18n="guideCard6Title">🔄 6. Dinámica Real, % IA y Brecha de Intención (Tiempo 2)</h4>
           <ul>
-            <li data-i18n-html="guideCard6Li1"><strong>Cuadrante IA (Pestaña 2):</strong> <code>🚀 Sinergia IA</code> (IA &ge; 35% y Calidad &ge; 4), <code>🧠 Dominio Propio</code> (IA &lt; 35% y Calidad &ge; 4), <code>🤖 Ilusión Mecánica</code> (IA &ge; 35% y Calidad &le; 2), <code>🪫 Fricción</code> (IA &lt; 35% y Calidad &le; 2).</li>
-            <li data-i18n-html="guideCard6Li2"><strong>Subtemas en Notas (Pestaña 4):</strong> Escribe <code>[Subtema] Tu nota</code> (ej. <code>[GANs] Resumen del paper</code>) para agrupar automáticamente en el Inspector.</li>
-            <li data-i18n-html="guideCard6Li3"><strong>Fórmula XP (v3.2):</strong> <code>ROUND(Minutos * MAX(0.5, 1 + Calidad*0.25 + BonoReto + BonoAvance + BonoDinamica + BonoFriccion))</code>.</li>
-            <li data-i18n-html="guideCard6Li4"><strong>Curva Exponencial (Nv. 92 = 50% de 99):</strong> <code>XP(L) = 250 * (2^((L-1)/7) - 1)</code>.</li>
+            <li data-i18n-html="guideCard6Li1"><strong>👀 Recepción Pasiva (0% ajuste):</strong> Solo leíste, escuchaste clase o viste videos sin producir ni debatir activamente todavía.</li>
+            <li data-i18n-html="guideCard6Li2"><strong>🤖 Delegación / Reproducción (-15% XP si IA &ge;50%):</strong> La IA resolvió el problema pesado y tú solo copiaste, pegaste o seguiste pasos mecánicamente.</li>
+            <li data-i18n-html="guideCard6Li3"><strong>🔄 Andamiaje / Co-creación (+5% XP):</strong> Dialogaste con la IA, cuestionaste el porqué, depuraste sus ideas y comprendiste cada línea construida.</li>
+            <li data-i18n-html="guideCard6Li4"><strong>🧠 Generación Propia (+10% sin IA / +5% consulta mínima):</strong> La solución salió de tu cabeza (0% IA o solo una consulta puntual de sintaxis).</li>
+            <li data-i18n-html="guideCard6Li5"><strong>⚖️ Regla de la Brecha de Intención:</strong> <strong>No fuerces a que Tiempo 1 y 2 coincidan.</strong> Si planeabas <em>Tutor Andamiaje</em> (T1) pero terminaste en <em>Delegación</em> (T2), regístralo tal cual para medir tu Deuda Cognitiva.</li>
+          </ul>
+        </div>
+
+        <!-- TARJETA 7: FLUIDEZ Y AVANCE DEL BLOQUE (TIEMPO 2) -->
+        <div class="guide-card">
+          <h4 data-i18n="guideCard7Title">🎯 7. Fluidez y Avance del Bloque (Tiempo 2)</h4>
+          <ul>
+            <li data-i18n-html="guideCard7Li1"><strong>Regla de Oro:</strong> Evalúa <strong>cómo fluyó este bloque de tiempo</strong>, NO si ya terminaste todo el entregable. Si paraste antes por algo externo pero estudiaste enfocado, es <em>Flujo limpio</em>.</li>
+            <li data-i18n-html="guideCard7Li2"><strong>✅ Flujo limpio (+10% XP):</strong> Concentración sostenida, ritmo constante y avance sin bloqueos graves en lo que tocaba hoy.</li>
+            <li data-i18n-html="guideCard7Li3"><strong>🧠 Lucha productiva (+10% XP):</strong> Duelo mental intenso contra un bug o concepto duro; aunque avanzaste pocas líneas, probaste hipótesis y aprendiste qué no funciona.</li>
+            <li data-i18n-html="guideCard7Li4"><strong>⚠️ Con fricción (+5% XP):</strong> Lograste avanzar, pero con distracciones, cansancio, interrupciones o ritmo irregular.</li>
+            <li data-i18n-html="guideCard7Li5"><strong>🔴 Parálisis / Abandono (0% bono):</strong> Bloqueo pasivo frente a la pantalla, dar vueltas sin probar nada, procrastinación o abandono del bloque.</li>
+          </ul>
+        </div>
+
+        <!-- TARJETA 8: CALIFICACIÓN FSRS (1–4), MODALIDAD Y FÓRMULAS RPG -->
+        <div class="guide-card">
+          <h4 data-i18n="guideCard8Title">⭐️ 8. Calificación FSRS (1–4), Modalidad y Fórmulas</h4>
+          <ul>
+            <li data-i18n-html="guideCard8Li1"><strong>Grados FSRS (1–4):</strong> <code>1 · Again</code> (olvido/bloqueo, <em>S≈1.2d</em>) · <code>2 · Hard</code> (salió con esfuerzo extremo, <em>S≈3d</em>) · <code>3 · Good</code> (comprensión sólida esperada, <em>S≈6.5d</em>) · <code>4 · Easy</code> (dominio inmediato sin dudas, <em>S≈13d</em>).</li>
+            <li data-i18n-html="guideCard8Li2"><strong>Modalidad Efectiva:</strong> 🔥 <em>Extracción Esforzada</em> (lo sacaste de tu mente/lógica) vs. 👀 <em>Reconocimiento Fluido</em> (lo leíste y dijiste "ah, claro", trampa de familiaridad) vs. 📋 <em>Copia Pasiva</em> (transcripción sin procesar).</li>
+            <li data-i18n-html="guideCard8Li3"><strong>Deuda Cognitiva (<code>🟢 Nulo</code> a <code>🔴 Crítico</code>):</strong> Sube al combinar <code>📋 Copia Pasiva</code> o <code>🤖 Delegación</code> con alto <code>% IA</code> en temas nuevos o al calificar <code>4 · Easy</code> habiendo copiado.</li>
+            <li data-i18n-html="guideCard8Li4"><strong>Fórmula XP (v3.2):</strong> <code>ROUND(Min * MAX(0.5, 1 + Calidad*0.25 + BonoReto + BonoFluidez + BonoDinamica + BonoFriccion))</code>.</li>
+            <li data-i18n-html="guideCard8Li5"><strong>Curvas Matemáticas:</strong> Nivel cuadrático infinito <code>XP(L) = 50 * L * (L - 1)</code> (Nv. 2 = 100 XP, 16 rangos hasta <em>Visionario</em> Nv. 200+) · Olvido FSRS <code>R(t) = (1 + t/(9S))⁻¹</code>.</li>
           </ul>
         </div>
       </div>

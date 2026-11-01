@@ -1,27 +1,30 @@
 /**
- * Capa de Dominio: Reglas de negocio puras del sistema RPG (curva exponencial de niveles
- * donde el Nivel 92 es la mitad del 99), taxonomía cognitiva v3 y analítica de hábitos de estudio.
+ * Capa de Dominio: Reglas de negocio puras del sistema de progresión cuadrática infinita
+ * (Nivel 2 = 100 XP, 16 rangos profesionales hasta Visionario Nv. 200+),
+ * taxonomía cognitiva v3.2 y analítica de hábitos de estudio.
  * No tiene dependencias del DOM ni de almacenamiento externo.
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
 
-  // Curva exponencial estilo RuneScape: el XP requerido se duplica cada 7 niveles (2^((L-1)/7)).
-  // Con ello, el Nivel 92 (2^13 - 1) es exactamente el 50% del XP del Nivel 99 (2^14 - 1).
-  const XP_BASE_CURVA = 250;
-  const NIVEL_MAXIMO = 99;
-
+  // Taxonomía de 16 niveles orientada a la competencia profesional y maestría (nivel infinito).
   const TRAMOS_RANGO = [
-    { minNivel: 99, titulo: "Capa de Maestría (Nivel 99)" },
-    { minNivel: 92, titulo: "Leyenda de la Mitad (Nv. 92+)" },
-    { minNivel: 75, titulo: "Gran Maestro Cognitivo" },
-    { minNivel: 60, titulo: "Sabio del Flujo Profundo" },
-    { minNivel: 45, titulo: "Maestro de la Concentración" },
-    { minNivel: 30, titulo: "Arquitecto del Estudio" },
-    { minNivel: 20, titulo: "Guerrero Pomodoro" },
-    { minNivel: 10, titulo: "Explorador de Datos" },
-    { minNivel: 5, titulo: "Aprendiz Constante" },
-    { minNivel: 1, titulo: "Novato del Enfoque" }
+    { minNivel: 200, titulo: "Visionario" },
+    { minNivel: 150, titulo: "Autoridad" },
+    { minNivel: 120, titulo: "Maestro" },
+    { minNivel: 100, titulo: "Élite" },
+    { minNivel: 80,  titulo: "Senior" },
+    { minNivel: 70,  titulo: "Experto" },
+    { minNivel: 60,  titulo: "Referente" },
+    { minNivel: 50,  titulo: "Consolidado" },
+    { minNivel: 40,  titulo: "Experimentado" },
+    { minNivel: 30,  titulo: "Estratega" },
+    { minNivel: 25,  titulo: "Táctico" },
+    { minNivel: 20,  titulo: "Metódico" },
+    { minNivel: 15,  titulo: "Especialista" },
+    { minNivel: 10,  titulo: "Analista" },
+    { minNivel: 5,   titulo: "Practicante" },
+    { minNivel: 1,   titulo: "Iniciado" }
   ];
 
   const CONTEXTOS = [
@@ -578,17 +581,33 @@
   }
 
   /**
-   * Devuelve el XP total acumulado requerido para alcanzar un nivel determinado (1 a 99).
-   * Sigue la ley exponencial de duplicación cada 7 niveles: XP(L) = round(250 * (2^((L-1)/7) - 1)).
+   * Calcula la experiencia total necesaria para alcanzar un nivel específico.
+   * Fórmula: 50 * Nivel * (Nivel - 1)
    */
-  function calcularXpRequeridoParaNivel(nivel) {
-    const n = Math.max(1, Math.floor(Number(nivel) || 1));
-    if (n <= 1) return 0;
-    return Math.round(XP_BASE_CURVA * (Math.pow(2, (n - 1) / 7) - 1));
+  function calcularXpParaNivel(nivel) {
+    if (nivel <= 1) return 0;
+    return 50 * nivel * (nivel - 1);
   }
 
   /**
-   * Obtiene el título del rango RPG correspondiente al nivel actual.
+   * Alias retrocompatible para calcularXpParaNivel.
+   */
+  function calcularXpRequeridoParaNivel(nivel) {
+    return calcularXpParaNivel(Math.max(1, Math.floor(Number(nivel) || 1)));
+  }
+
+  /**
+   * Calcula el nivel actual basado en la experiencia total acumulada.
+   * Utiliza el despeje de la ecuación cuadrática.
+   */
+  function calcularNivel(xp) {
+    if (xp < 100) return 1;
+    // Fórmula cuadrática despejada: L = (1 + sqrt(1 + 0.08 * xp)) / 2
+    return Math.floor((1 + Math.sqrt(1 + 0.08 * xp)) / 2);
+  }
+
+  /**
+   * Obtiene el título del rango profesional correspondiente al nivel actual.
    */
   function obtenerRangoPorNivel(nivel) {
     const tramo = TRAMOS_RANGO.find((t) => nivel >= t.minNivel);
@@ -596,46 +615,43 @@
   }
 
   /**
-   * Calcula el estado de progreso RPG exponencial a partir del XP total acumulado.
+   * Calcula el estado de progreso cuadrático infinito a partir del XP total acumulado.
    */
   function calcularProgresoRPG(totalXP) {
-    const xpSeguro = Math.max(0, Math.round(Number(totalXP) || 0));
+    const xpActual = Math.max(0, Math.round(Number(totalXP) || 0));
+    const nivelActual = calcularNivel(xpActual);
 
-    let nivel = 1;
-    while (nivel < NIVEL_MAXIMO && xpSeguro >= calcularXpRequeridoParaNivel(nivel + 1)) {
-      nivel += 1;
+    const xpInicioNivel = calcularXpParaNivel(nivelActual);
+    const xpMetaNivel = calcularXpParaNivel(nivelActual + 1);
+
+    const xpEnNivelActual = xpActual - xpInicioNivel;
+    const xpRequeridoTramoActual = Math.max(1, xpMetaNivel - xpInicioNivel);
+    const porcentaje = ((xpActual - xpInicioNivel) / xpRequeridoTramoActual) * 100;
+    const porcentajeBarra = Math.min(100, Math.max(0, +porcentaje.toFixed(1)));
+
+    const rango = obtenerRangoPorNivel(nivelActual);
+
+    // Determinar el próximo tramo de rango profesional (si aún no se alcanzó el máximo de Nv. 200)
+    let proximoTramo = null;
+    for (let i = TRAMOS_RANGO.length - 1; i >= 0; i--) {
+      if (TRAMOS_RANGO[i].minNivel > nivelActual) {
+        proximoTramo = TRAMOS_RANGO[i];
+        break;
+      }
     }
 
-    const xpInicioNivelActual = calcularXpRequeridoParaNivel(nivel);
-    const xpMetaSiguienteNivel =
-      nivel < NIVEL_MAXIMO ? calcularXpRequeridoParaNivel(nivel + 1) : xpInicioNivelActual;
-
-    const xpEnNivelActual = xpSeguro - xpInicioNivelActual;
-    const xpRequeridoTramoActual =
-      nivel < NIVEL_MAXIMO ? Math.max(1, xpMetaSiguienteNivel - xpInicioNivelActual) : 1;
-
-    const porcentajeBarra =
-      nivel >= NIVEL_MAXIMO
-        ? 100
-        : Math.min(100, +((xpEnNivelActual / xpRequeridoTramoActual) * 100).toFixed(1));
-
-    const rango = obtenerRangoPorNivel(nivel);
-    const xpMetaNivel92 = calcularXpRequeridoParaNivel(92);
-    const xpMetaNivel99 = calcularXpRequeridoParaNivel(NIVEL_MAXIMO);
-    const porcentajeHito92 = Math.min(100, +((xpSeguro / Math.max(1, xpMetaNivel92)) * 100).toFixed(2));
-
     return {
-      nivel,
+      nivel: nivelActual,
       rango,
+      proximoRango: proximoTramo ? proximoTramo.titulo : null,
+      nivelProximoRango: proximoTramo ? proximoTramo.minNivel : null,
       xpEnNivelActual,
-      xpSiguienteNivel: nivel < NIVEL_MAXIMO ? xpRequeridoTramoActual : 0,
-      xpMetaTotalSiguiente: xpMetaSiguienteNivel,
-      xpMetaNivel92,
-      xpMetaNivel99,
-      porcentajeHito92,
+      xpSiguienteNivel: xpRequeridoTramoActual,
+      xpInicioNivel,
+      xpMetaTotalSiguiente: xpMetaNivel,
       porcentajeBarra,
-      totalXP: xpSeguro,
-      esNivelMaximo: nivel >= NIVEL_MAXIMO
+      totalXP: xpActual,
+      esNivelMaximo: false
     };
   }
 
@@ -2082,8 +2098,6 @@
   }
 
   StudyTracker.RPG = {
-    XP_BASE_CURVA,
-    NIVEL_MAXIMO,
     TRAMOS_RANGO,
     CONTEXTOS,
     TIPOS_ACTIVIDAD,
@@ -2118,7 +2132,10 @@
     inferirModalidadProcesamiento,
     inferirEstructuraPractica,
     inferirDeudaSesion,
+    calcularXpParaNivel,
     calcularXpRequeridoParaNivel,
+    calcularNivel,
+    obtenerRangoPorNivel,
     calcularProgresoRPG,
     calcularKPIs,
     analizarPorHora,

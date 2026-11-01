@@ -1442,6 +1442,23 @@ tr.row-editing td {
   color: #fca5a5;
 }
 
+.table-modality-sub {
+  margin-top: 4px;
+  font-weight: 500;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+.table-debt-pill {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .xp-cell {
   color: #34d399;
   font-weight: 700;
@@ -1511,7 +1528,7 @@ tr.row-editing td {
 /* Guía y Escalas inferior */
 .guide-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
   margin-top: 12px;
 }
@@ -1519,9 +1536,11 @@ tr.row-editing td {
 .guide-card {
   background: var(--card-alt);
   border: 1px solid var(--border);
+  border-top: 2px solid rgba(99, 102, 241, 0.5);
   border-radius: 12px;
-  padding: 14px 16px;
-  font-size: 0.84rem;
+  padding: 15px 16px;
+  font-size: 0.83rem;
+  line-height: 1.48;
   box-sizing: border-box;
   max-width: 100%;
   overflow-wrap: break-word;
@@ -1529,9 +1548,11 @@ tr.row-editing td {
 }
 
 .guide-card h4 {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   color: #a5b4fc;
-  font-size: 0.95rem;
+  font-size: 0.94rem;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
 }
 
 .guide-card ul {
@@ -1541,11 +1562,24 @@ tr.row-editing td {
 }
 
 .guide-card li {
-  margin-bottom: 5px;
+  margin-bottom: 7px;
+}
+
+.guide-card li:last-child {
+  margin-bottom: 0;
 }
 
 .guide-card li strong {
   color: var(--text);
+}
+
+.guide-card code {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.78rem;
+  color: #c7d2fe;
 }
 
 /* Bloques del Formulario en 2 Tiempos (v3) */

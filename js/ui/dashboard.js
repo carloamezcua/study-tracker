@@ -1,7 +1,7 @@
 /**
- * Capa de UI (Dashboard v3): Renderizado seguro del DOM (prevención de XSS con textContent),
+ * Capa de UI (Dashboard v3.2): Renderizado seguro del DOM (prevención de XSS con textContent),
  * formulario en 2 tiempos, chips dinámicos de Materia, taxonomía de Dinámica Cognitiva y Dominio Previo objetivo,
- * actualización de KPIs, barra RPG exponencial y tabla de historial.
+ * actualización de KPIs, barra de progresión cuadrática infinita y tabla de historial.
  */
 (function (global) {
   const StudyTracker = (global.StudyTracker = global.StudyTracker || {});
@@ -15,6 +15,10 @@
     calcularMinutos,
     calcularXP,
     calcularIndiceDeudaCognitiva,
+    inferirModoDisenoIA,
+    inferirModalidadProcesamiento,
+    inferirEstructuraPractica,
+    inferirDeudaSesion,
     calcularProgresoRPG,
     calcularKPIs,
     filtrarSesionesAvanzado,
@@ -1430,10 +1434,14 @@
           const actNorm = migrarTipoActividad(s.tipoActividad);
           const icAct = ICONOS_ACTIVIDAD[actNorm] || "💻";
           const { subtema } = extraerSubtemaDeNotas(s.notas, s.tema);
+          const calFSRS = Math.min(4, Math.max(1, Math.round(Number(s.calidad) || 3)));
+          const modVal = inferirModalidadProcesamiento(s);
+          const deudaVal = inferirDeudaSesion(s);
+          const infoDeuda = META_DEUDA[deudaVal] || META_DEUDA.Nulo;
           meta.textContent = `${s.fecha} · 📚 ${s.materia} (${subtema}) · ${icAct} ${trVal(
             "tipoActividad",
             actNorm
-          )} · ⭐️ ${s.calidad}/5 · 🤖 ${s.usoIA}%`;
+          )} · ⭐️ ${calFSRS}/4 · ${trVal("modalidadProcesamiento", modVal)} · 🤖 ${s.usoIA}% · ${t(infoDeuda.key)}`;
 
           const text = document.createElement("div");
           text.className = "note-log-text";
@@ -1447,7 +1455,9 @@
   }
 
   /**
-   * Crea una fila <tr> segura para la tabla de historial con Materia, Subtema, Actividad, Dinámica Cognitiva y acciones CRUD.
+   * Crea una fila <tr> segura para la tabla de historial con campos v3.2 completos:
+   * Estrategia + Dominio Previo, Fluidez + Estructura/Fricción, FSRS (1–4) + Modalidad Efectiva,
+   * Dinámica Cognitiva + Modo Diseño IA + % IA + Píldora de Deuda Cognitiva y acciones CRUD.
    */
   function crearFilaSesion(sesion, { onEditar, onEliminar }) {
     const tr = document.createElement("tr");
@@ -1456,7 +1466,7 @@
       tr.classList.add("row-editing");
     }
 
-    // Fecha + Día de la semana y franja
+    // 1. Fecha + Día de la semana y franja
     const tdFecha = document.createElement("td");
     const divFecha = document.createElement("div");
     divFecha.textContent = sesion.fecha;
@@ -1467,11 +1477,11 @@
     subDia.textContent = `${diaTrad} · ${franjaTrad}`;
     tdFecha.append(divFecha, subDia);
 
-    // Horario (Inicio - Fin)
+    // 2. Horario (Inicio - Fin)
     const tdHorario = document.createElement("td");
     tdHorario.textContent = `${sesion.horaInicio} - ${sesion.horaFin}`;
 
-    // Materia + Contexto y Subtema extraído de Notas
+    // 3. Materia + Contexto y Subtema extraído de Notas
     const tdMateriaTema = document.createElement("td");
     const strongMateria = document.createElement("strong");
     strongMateria.textContent = sesion.materia;
@@ -1483,7 +1493,7 @@
     subTema.textContent = `${icCtx} ${trVal("contexto", ctxVal)} · ${subtema}`;
     tdMateriaTema.append(strongMateria, subTema);
 
-    // Actividad + Dominio Previo
+    // 4. Estrategia / Actividad + Dominio Previo
     const tdActividad = document.createElement("td");
     const actVal = migrarTipoActividad(sesion.tipoActividad);
     const iconoAct = ICONOS_ACTIVIDAD[actVal] || "💻";
@@ -1496,36 +1506,53 @@
     subDom.textContent = `${icDom} ${trVal("dominioPrevio", domVal)}`;
     tdActividad.append(divAct, subDom);
 
-    // Contexto Operativo (Energía + Complejidad + Objetivo)
+    // 5. Fluidez del Bloque + Estructura de Práctica (e Intercalación / Fricción)
     const tdContexto = document.createElement("td");
-    const spanContexto = document.createElement("span");
-    spanContexto.className = "context-badges";
-    const icEnergia = ICONOS_ENERGIA[sesion.energiaPrevia] || "⚡";
-    const icComp = ICONOS_COMPLEJIDAD[sesion.complejidad] || "🟡";
+    const divFluidez = document.createElement("div");
+    divFluidez.className = "context-badges";
     const canonObj = migrarEstadoObjetivo(sesion.objetivoCumplido);
     const icObj = ICONOS_OBJETIVO[canonObj] || "✅";
-    spanContexto.textContent = `${icEnergia} ${trVal(
-      "energiaPrevia",
-      sesion.energiaPrevia
-    )} · ${icComp} ${trVal("complejidad", sesion.complejidad)} · ${icObj} ${trVal(
-      "objetivoCumplido",
-      canonObj
-    )}`;
-    tdContexto.appendChild(spanContexto);
+    divFluidez.textContent = `${icObj} ${trVal("objetivoCumplido", canonObj)}`;
 
-    // Duración
+    const subEstructura = document.createElement("small");
+    subEstructura.className = "cell-sub";
+    const estructuraVal = inferirEstructuraPractica(sesion);
+    const friccionRaw = String(
+      sesion.Friccion_Discriminacion_Intercalada || sesion.friccionIntercalada || ""
+    ).trim();
+    if (estructuraVal === "Intercalado") {
+      const catFric =
+        friccionRaw === "Friccion_Productiva" || friccionRaw === "Confusion_Excesiva"
+          ? friccionRaw
+          : "Sin_Friccion";
+      subEstructura.textContent = `${trVal("estructuraPractica", "Intercalado")} · ${trVal(
+        "friccionIntercalada",
+        catFric
+      )}`;
+    } else {
+      subEstructura.textContent = trVal("estructuraPractica", "Bloqueado");
+    }
+    tdContexto.append(divFluidez, subEstructura);
+
+    // 6. Duración
     const tdDuracion = document.createElement("td");
     tdDuracion.textContent = `${sesion.duracion} min`;
 
-    // Asimilación / Calidad
+    // 7. Calificación FSRS (1–4) + Modalidad de Procesamiento Efectiva
     const tdCalidad = document.createElement("td");
     const badgeCalidad = document.createElement("span");
-    const calSegura = Math.min(5, Math.max(1, Number(sesion.calidad) || 3));
-    badgeCalidad.className = `badge badge-q${calSegura}`;
-    badgeCalidad.textContent = `⭐️ ${calSegura} / 5`;
-    tdCalidad.appendChild(badgeCalidad);
+    const calFSRS = Math.min(4, Math.max(1, Math.round(Number(sesion.calidad) || 3)));
+    const NOMBRES_GRADE_FSRS = { 1: "Again", 2: "Hard", 3: "Good", 4: "Easy" };
+    badgeCalidad.className = `badge badge-q${calFSRS}`;
+    badgeCalidad.textContent = `⭐️ ${calFSRS}/4 · ${NOMBRES_GRADE_FSRS[calFSRS]}`;
 
-    // Dinámica Cognitiva + % Uso IA
+    const subModalidad = document.createElement("small");
+    subModalidad.className = "cell-sub table-modality-sub";
+    const modalidadVal = inferirModalidadProcesamiento(sesion);
+    subModalidad.textContent = trVal("modalidadProcesamiento", modalidadVal);
+    tdCalidad.append(badgeCalidad, subModalidad);
+
+    // 8. Dinámica Cognitiva + Modo Diseño IA + % IA + Píldora de Deuda Cognitiva
     const tdIA = document.createElement("td");
     const dinamicaActual = migrarDinamicaCognitiva(
       sesion.dinamicaCognitiva,
@@ -1542,10 +1569,22 @@
         ? "ia-mode-tag ia-mode-aprendizaje"
         : "ia-mode-tag";
     divDinamica.textContent = `${icDin} ${trVal("dinamicaCognitiva", dinamicaActual)}`;
-    const subPorcentajeIA = document.createElement("small");
-    subPorcentajeIA.className = "cell-sub";
-    subPorcentajeIA.textContent = t("tableAiSupportSub", { pct: sesion.usoIA });
-    tdIA.append(divDinamica, subPorcentajeIA);
+
+    const modoDisenoVal = inferirModoDisenoIA(sesion);
+    const subDisenoIA = document.createElement("small");
+    subDisenoIA.className = "cell-sub";
+    subDisenoIA.textContent = `${trVal("modoDisenoIA", modoDisenoVal)} · ${t(
+      "tableAiSupportSub",
+      { pct: sesion.usoIA }
+    )}`;
+
+    const deudaVal = inferirDeudaSesion(sesion);
+    const infoDeuda = META_DEUDA[deudaVal] || META_DEUDA.Nulo;
+    const pillDeuda = document.createElement("span");
+    pillDeuda.className = `table-debt-pill ${infoDeuda.clase}`;
+    pillDeuda.textContent = t(infoDeuda.key);
+
+    tdIA.append(divDinamica, subDisenoIA, pillDeuda);
 
     // XP Ganados
     const tdXP = document.createElement("td");
@@ -1821,23 +1860,28 @@
     actualizarAutocompletado(listaGlobal);
     actualizarContadoresFiltro(listaGlobal);
 
-    // 1. Barra RPG Exponencial
+    // 1. Barra de Progresión Cuadrática Infinita y Rango Profesional
     const kpisGlobales = calcularKPIs(listaGlobal);
     const progreso = calcularProgresoRPG(kpisGlobales.totalXP);
 
     document.getElementById("uiNivel").textContent = progreso.nivel;
     document.getElementById("uiRango").textContent = trVal("rango", progreso.rango);
     document.getElementById("uiXpActual").textContent = progreso.xpEnNivelActual;
-    document.getElementById("uiXpSiguiente").textContent = progreso.esNivelMaximo
-      ? t("rpgMaxLevel")
-      : progreso.xpSiguienteNivel;
+    document.getElementById("uiXpSiguiente").textContent = progreso.xpSiguienteNivel;
     document.getElementById("uiXpBar").style.width = `${progreso.porcentajeBarra}%`;
     document.getElementById("uiXpTotalBadge").textContent = `${progreso.totalXP} XP`;
-    const elHito92 = document.getElementById("uiHito92Badge");
-    if (elHito92) {
-      elHito92.textContent = t("rpgMilestone92Text", {
-        pct: progreso.porcentajeHito92
-      });
+    const elHitoRango = document.getElementById("uiHito92Badge");
+    if (elHitoRango) {
+      if (progreso.proximoRango) {
+        elHitoRango.textContent = t("rpgNextRankText", {
+          rank: trVal("rango", progreso.proximoRango),
+          level: progreso.nivelProximoRango
+        });
+      } else {
+        elHitoRango.textContent = t("rpgMaxRankText", {
+          rank: trVal("rango", progreso.rango)
+        });
+      }
     }
 
     // Aplicar filtros globales combinados
