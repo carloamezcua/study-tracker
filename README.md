@@ -5,7 +5,7 @@
 # ⚔️ StudyTracker v3.2 — Local-First Analytics & CSV Sync
 
 > 🌐 **Idioma / Language:** [🇪🇸 Español](#-español) | [🇬🇧 English](#-english)  
-> 📚 **Documentación / Docs:** [📐 Decisiones & Versiones](docs/DECISIONES.md) · [❓ Preguntas Guía](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🌉 Especificación Puente v3.2](docs/especificaci_n_puente_v3_2_para_agente_antigravity.md) · [📋 Reglas del Formulario](docs/contexto_para_formulario.md) · [🗺️ Ruta v4.0](docs/ruta_de_refactorizaci_n_quir_rgica_v4_0.md)
+> 📚 **Documentación / Docs:** [📐 Decisiones & Versiones](docs/DECISIONES.md) · [❓ Preguntas Guía](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🌉 Especificación Puente v3.2](docs/especificaci_n_puente_v3_2_para_agente_antigravity.md) · [📋 Reglas del Formulario](docs/contexto_para_formulario.md) · [📊 Visualizaciones Dashboard](docs/contecto_visualizaciones_dashboard.md) · [🗺️ Ruta v4.0](docs/ruta_de_refactorizaci_n_quir_rgica_v4_0.md)
 
 ---
 
@@ -13,19 +13,25 @@
 
 Aplicación web **Local-First** gamificada (estilo RPG) ultra-ligera con **micro-servidor local en Node.js** (y soporte directo por navegador vía *File System Access API*) para registrar, editar y eliminar bloques de estudio sin fatiga de decisión, evaluar hábitos cognitivos y sincronizar los datos en tiempo real directamente sobre un archivo CSV local (`data/study-tracker.csv`) con **respaldos automáticos diarios** (`data/backups/YYYY-MM-DD.csv`).
 
-### 🌉 Novedades v3.2 — Puente de Captura Compatible con v4.0
+### 🌉 Novedades v3.2 — Puente de Captura Compatible con v4.0 y Centro Analítico Avanzado
 
-La v3.2 sigue siendo Vanilla JS + CSV, pero captura desde ya los datos que necesitará la v4.0 (FSRS y Deuda Cognitiva), sin romper el histórico de 18 columnas:
+La v3.2 sigue siendo Vanilla JS + CSV, pero captura desde ya los datos que necesitará la v4.0 (FSRS y Deuda Cognitiva) e incorpora un **Centro Analítico Avanzado** basado en el marco de visualización **Tamara Munzner (What–Why–How)** y los modelos cognitivos **FSRS / DSR**:
 
 - **4 columnas nuevas en el CSV (22 en total):** `Estructura_Practica`, `Modo_Diseno_IA`, `Modalidad_Procesamiento_Efectiva`, `Friccion_Discriminacion_Intercalada`.
 - **Estrategia Planificada (`Tipo_Actividad`):** `Recuperacion_Activa`, `Construccion_Generativa` *(por defecto)*, `Consumo_Receptivo`, `Delegacion_Ejecutiva`. Los 6 valores históricos siguen siendo válidos.
 - **Estructura de Práctica:** `Bloqueado` *(por defecto)* o `Intercalado`. Al elegir `Intercalado` aparece la **Fricción de Discriminación** (`Sin_Friccion`, `Friccion_Productiva` *(+5% XP, preseleccionada)*, `Confusion_Excesiva`); en `Bloqueado` se oculta y se guarda vacía.
-- **Modo de Diseño con IA** (`Sin_IA`, `Tutor_Andamiaje`, …): independiente de `Dinamica_Cognitiva` (la discrepancia entre ambos es intencional).
+- **Modo de Diseño con IA** (`Sin_IA`, `Tutor_Andamiaje`, `Co_Disenador`, `Generacion_Automatica`, `Evaluador_Socratico`): independiente de `Dinamica_Cognitiva` (la discrepancia entre ambos es intencional para auditar la brecha de intención).
 - **Modalidad de Procesamiento Efectiva:** `Extraccion_Esforzada` *(por defecto)*, `Reconocimiento_Fluido`, `Copia_Pasiva`.
-- **Calificación FSRS (1–4):** `1 · Again`, `2 · Hard`, `3 · Good` *(por defecto)*, `4 · Easy`. Las sesiones antiguas con calidad 5 se tratan como 4 (mismo XP que antes).
-- **Índice de Deuda Cognitiva en vivo (`Nulo` · `Bajo` · `Moderado` · `Critico`):** fórmula determinista a partir de `% IA`, Dinámica y Modalidad, visible como píldora en la vista previa de XP.
+- **Calificación FSRS (1–4):** `1 · Again`, `2 · Hard`, `3 · Good` *(por defecto)*, `4 · Easy`. Las sesiones antiguas con calidad 5 se normalizan a 4 (mismo multiplicador de XP que antes).
+- **Índice de Deuda Cognitiva en vivo (`Nulo` · `Bajo` · `Moderado` · `Critico`):** fórmula determinista a partir de `% IA`, Dinámica y Modalidad, visible como píldora en la vista previa del formulario y en el header de KPIs.
 - **Formulario simplificado con Guía de Brecha de Intención:** `Contexto`, `Energía Previa` y `Complejidad` quedan ocultos con valores neutros por defecto. Incluye un acordeón de la *Regla de Oro* (auditar la brecha entre intención y realidad) y micro-helpers interactivos en cada campo.
-- **Retrocompatibilidad:** un CSV de 18 columnas se lee sin pérdida (`Estructura_Practica = Bloqueado`, resto vacío) y se reescribe con 22 columnas al guardar. Respaldo previo al puente en `data/backups/study-tracker-v3.1-pre-bridge.csv`.
+- **Banner Superior de 5 KPIs Globales Persistentes:** Volumen de Estudio, Autonomía Cognitiva (% de Generación Propia + Andamiaje), Calidad FSRS Promedio (1–4), Fluidez/Éxito y Deuda Cognitiva Global (con píldora semántica de color y badge del Hito Nv. 92 = 50% de XP).
+- **4 Pestañas Analíticas Interactivas (Tamara Munzner & FSRS/DSR):**
+  1. **📈 Pestaña 1 (Progresión & Circadiano):** Evolución temporal de Horas, XP y Calidad (Día / Semana / Mes), constancia de estudio (racha activa, mejor racha, días activos, día top de la semana) y Mapa de Calor Circadiano 7×4 (Día × Franja de 6h) con ventana dorada de foco y desglose hora por hora.
+  2. **🧠 Pestaña 2 (Salud Cognitiva & IA):** Strip de KPIs (Apalancamiento IA, Extracción Esforzada vs. Copia/Reconocimiento, Brecha de Intención), Gráfico de Anillo (*Doughnut*) de Deuda Cognitiva, Gráfico de Barras Apiladas de Modo Diseño IA × Modalidad Efectiva, Cuadrante de Rendimiento Cognitivo (Bubble plot % IA vs. Asimilación) e Impacto por Materia.
+  3. **📉 Pestaña 3 (FSRS, DSR & Hábitos):** Strip de KPIs (Distribución de grados FSRS 1–4, Retención Estimada $R$, Estabilidad $S$, y tasa de Intercalación con Fricción Productiva), Curva Teórica del Olvido Ebbinghaus/FSRS proyectada a 30 días con línea del 90% de umbral crítico, Mapa de Consolidación DSR (Burbujas: Estabilidad $S$ vs. Dificultad $D$), efectividad comparativa de Práctica Intercalada vs. Bloqueada, Balance Cognitivo y Matriz de Fricción.
+  4. **🔬 Pestaña 4 (Inspector & Notas — Power BI View):** Selector multidimensional de 10 variables, selector de valor (drill-down) y gráfico comparativo interactivo con click-to-filter, 4 tarjetas KPI contextuales en tiempo real, Flujo Multivariable de 5 etapas (`Dominio Previo ➔ Estrategia ➔ Dinámica ➔ Calidad FSRS ➔ Deuda`), Radiografía por Subtemas con curva de dominio y Bitácora cronológica de reflexiones.
+- **Retrocompatibilidad e Inferencia Inteligente:** un CSV de 18 columnas se lee sin pérdida e infiere automáticamente los modos de IA y modalidades para nutrir de inmediato los nuevos gráficos. Respaldo previo al puente en `data/backups/study-tracker-v3.1-pre-bridge.csv`.
 
 ### ✨ Características Principales
 
@@ -81,12 +87,12 @@ La v3.2 sigue siendo Vanilla JS + CSV, pero captura desde ya los datos que neces
 ```mermaid
 flowchart TD
     subgraph UI["Capa de Presentación / Frontend Layer"]
-        HTML["index.html\n(2-Stage Form + Smart Chips)"]
+        HTML["index.html\n(2-Stage Form, 4 Tabs & Power BI View)"]
         CSS["css/styles.css\n(Fluid Grid & Responsive Chips)"]
         I18N["js/ui/i18n.js\n(Bilingual ES / EN Engine)"]
         TIMER["js/ui/timer.js\n(Stopwatch + Pomodoro)"]
-        DASH["js/ui/dashboard.js\n(Smart Defaults, Inspector & KPIs)"]
-        CHARTS["js/ui/charts.js\n(Quadrant, Heatmap & Evolution)"]
+        DASH["js/ui/dashboard.js\n(Smart Defaults, 5 Global KPIs & Tab Views)"]
+        CHARTS["js/ui/charts.js\n(FSRS, DSR, Debt, Quadrant, Heatmap & Inspector)"]
     end
 
     subgraph Controller["Controlador Principal / Main Controller"]
@@ -99,7 +105,7 @@ flowchart TD
     end
 
     subgraph Domain["Capa de Dominio / Domain Layer"]
-        METRICS["js/domain/metrics.js\n(Lv.1-99 Curve, 6h Slots & Analytics)"]
+        METRICS["js/domain/metrics.js\n(Lv.1-99 Curve, DSR Model, FSRS & Analytics)"]
     end
 
     subgraph Sync["Sincronización CSV & Respaldos"]
@@ -159,19 +165,25 @@ No requiere instalar paquetes externos (`node_modules`), ya que tanto el fronten
 
 An ultra-lightweight gamified **Local-First** web application (RPG-style) powered by a **zero-dependency Node.js micro-server** (plus direct browser *File System Access API* support) to log, edit, and delete study blocks without decision fatigue, evaluate cognitive habits, and sync your data in real time directly onto a local CSV file (`data/study-tracker.csv`) with **automatic daily backups** (`data/backups/YYYY-MM-DD.csv`).
 
-### 🌉 What's New in v3.2 — v4.0-Compatible Capture Bridge
+### 🌉 What's New in v3.2 — v4.0-Compatible Capture Bridge & Advanced Analytics Dashboard
 
-v3.2 remains Vanilla JS + CSV, but already captures the data v4.0 (FSRS & Cognitive Debt) will need, without breaking the 18-column history:
+v3.2 remains Vanilla JS + CSV, but already captures the data v4.0 (FSRS & Cognitive Debt) will need, and introduces an **Advanced Analytics Dashboard** powered by the **Tamara Munzner (What–Why–How)** visualization framework and **FSRS / DSR** cognitive models:
 
 - **4 new CSV columns (22 total):** `Estructura_Practica`, `Modo_Diseno_IA`, `Modalidad_Procesamiento_Efectiva`, `Friccion_Discriminacion_Intercalada`.
 - **Planned Strategy (`Tipo_Actividad`):** `Recuperacion_Activa`, `Construccion_Generativa` *(default)*, `Consumo_Receptivo`, `Delegacion_Ejecutiva`. The 6 legacy values remain valid.
 - **Practice Structure:** `Bloqueado` (blocked, *default*) or `Intercalado` (interleaved). Choosing interleaved reveals **Discrimination Friction** (`Sin_Friccion`, `Friccion_Productiva` *(+5% XP, preselected)*, `Confusion_Excesiva`); when blocked it is hidden and stored empty.
-- **AI Design Mode** (`Sin_IA`, `Tutor_Andamiaje`, …): independent from `Dinamica_Cognitiva` (any mismatch is intentional).
+- **AI Design Mode** (`Sin_IA`, `Tutor_Andamiaje`, `Co_Disenador`, `Generacion_Automatica`, `Evaluador_Socratico`): independent from `Dinamica_Cognitiva` (any mismatch is intentional for intention gap auditing).
 - **Effective Processing Modality:** `Extraccion_Esforzada` *(default)*, `Reconocimiento_Fluido`, `Copia_Pasiva`.
-- **FSRS Grade (1–4):** `1 · Again`, `2 · Hard`, `3 · Good` *(default)*, `4 · Easy`. Legacy sessions with quality 5 are treated as 4 (same XP as before).
-- **Live Cognitive Debt Index (`Nulo` · `Bajo` · `Moderado` · `Critico`):** deterministic formula from `% AI`, Dynamic and Modality, shown as a pill in the XP preview.
-- **Simplified Form with Intention Gap Guidance:** `Contexto`, `Energia Previa` and `Complejidad` are hidden with neutral defaults. Includes a *Golden Rule* accordion (auditing intention vs. reality gap) and interactive micro-helpers on each field.
-- **Backward compatible:** an 18-column CSV loads losslessly (`Estructura_Practica = Bloqueado`, the rest empty) and is rewritten with 22 columns on save. Pre-bridge backup at `data/backups/study-tracker-v3.1-pre-bridge.csv`.
+- **FSRS Grade (1–4):** `1 · Again`, `2 · Hard`, `3 · Good` *(default)*, `4 · Easy`. Legacy sessions with quality 5 are normalized to 4 (same XP multiplier as before).
+- **Live Cognitive Debt Index (`Nulo` · `Bajo` · `Moderado` · `Critico`):** deterministic formula from `% AI`, Dynamic, and Modality, visible as a pill in the XP preview and top KPI banner.
+- **Simplified Form with Intention Gap Guidance:** `Contexto`, `Energia Previa`, and `Complejidad` are hidden with neutral defaults. Includes a *Golden Rule* accordion (auditing intention vs. reality gap) and interactive micro-helpers on each field.
+- **Persistent Top Banner with 5 Global Macro KPIs:** Study Volume, Cognitive Autonomy (% Own Generation + Scaffolding), Avg FSRS Quality (1–4), Fluency/Success, and Global Cognitive Debt (with semantic color pill and Lv. 92 = 50% XP milestone badge).
+- **4 Dedicated Interactive Analytics Tabs (Tamara Munzner & FSRS/DSR Framework):**
+  1. **📈 Tab 1 (Progression & Circadian):** Time evolution of Hours, XP, and Quality (Day / Week / Month), study consistency metrics (active streak, best streak, active days, top weekday), and 7×4 Circadian Heatmap (Day × 6h Slot) with golden focus window and collapsible hour-by-hour breakdown.
+  2. **🧠 Tab 2 (Cognitive Health & AI):** KPI strip (AI leverage, Effortful Extraction vs. Passive Copy/Recognition, Intention Gap), Doughnut Chart for Cognitive Debt Index distribution, Stacked Bar Chart for AI Design Mode × Effective Modality, Cognitive Performance Quadrant (Bubble plot % AI vs. Quality), and Subject Learning Impact.
+  3. **📉 Tab 3 (FSRS, DSR & Habits):** KPI strip (FSRS grade distribution 1–4, Estimated Retention $R$, Stability $S$, and Interleaved Practice rate with Productive Friction), 30-day Ebbinghaus/FSRS Forgetting Curve with 90% critical review threshold line, DSR Consolidation Bubble Map (Stability $S$ vs. Difficulty $D$), comparative effectiveness of Blocked vs. Interleaved practice, Cognitive Balance, and Friction Matrix.
+  4. **🔬 Tab 4 (Inspector & Notes — Power BI View):** Multidimensional selector with 10 variables, value selector (drill-down) with click-to-filter bar chart, 4 real-time contextual KPI cards, 5-Stage Multivariable Flow (`Prior Mastery ➔ Strategy ➔ Dynamic ➔ FSRS Quality ➔ Debt`), Subtopic Breakdown with mastery curves, and chronological reflection notes log.
+- **Backward Compatibility & Smart Inference:** an 18-column CSV loads losslessly and intelligently infers AI modes and modalities to immediately populate all new visual charts. Pre-bridge backup saved at `data/backups/study-tracker-v3.1-pre-bridge.csv`.
 
 ### ✨ Key Features
 
