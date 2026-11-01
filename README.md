@@ -5,7 +5,7 @@
 # ⚔️ StudyTracker v3.2 — Local-First Analytics & CSV Sync
 
 > 🌐 **Idioma / Language:** [🇪🇸 Español](#-español) | [🇬🇧 English](#-english)  
-> 📚 **Documentación / Docs:** [📐 Decisiones & Versiones](docs/DECISIONES.md) · [❓ Preguntas Guía](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🌉 Especificación Puente v3.2](docs/especificaci_n_puente_v3_2_para_agente_antigravity.md) · [📋 Reglas del Formulario](docs/contexto_para_formulario.md) · [📊 Visualizaciones Dashboard](docs/contecto_visualizaciones_dashboard.md) · [🗺️ Ruta v4.0](docs/ruta_de_refactorizaci_n_quir_rgica_v4_0.md)
+> 📚 **Documentación / Docs:** [📐 Decisiones & Versiones](docs/DECISIONES.md) · [❓ Preguntas Guía](docs/PREGUNTAS.md) · [💡 Ideas y Roadmap](docs/IDEAS.md) · [🗺️ Ruta v4.0](docs/ruta_de_refactorizaci_n_quir_rgica_v4_0.md) · [🤖 Especificación Sistema XP](docs/agents/refactorizacion_sistema_xp.md)
 
 ---
 
@@ -25,7 +25,7 @@ La v3.2 sigue siendo Vanilla JS + CSV, pero captura desde ya los datos que neces
 - **Calificación FSRS (1–4):** `1 · Again`, `2 · Hard`, `3 · Good` *(por defecto)*, `4 · Easy`. Las sesiones antiguas con calidad 5 se normalizan a 4 (mismo multiplicador de XP que antes).
 - **Índice de Deuda Cognitiva en vivo (`Nulo` · `Bajo` · `Moderado` · `Critico`):** fórmula determinista a partir de `% IA`, Dinámica y Modalidad, visible como píldora en la vista previa del formulario y en el header de KPIs.
 - **Formulario simplificado con Guía de Brecha de Intención:** `Contexto`, `Energía Previa` y `Complejidad` quedan ocultos con valores neutros por defecto. Incluye un acordeón de la *Regla de Oro* (auditar la brecha entre intención y realidad) y micro-helpers interactivos en cada campo.
-- **Banner Superior de 5 KPIs Globales Persistentes:** Volumen de Estudio, Autonomía Cognitiva (% de Generación Propia + Andamiaje), Calidad FSRS Promedio (1–4), Fluidez/Éxito y Deuda Cognitiva Global (con píldora semántica de color y badge del Hito Nv. 92 = 50% de XP).
+- **Banner Superior de 5 KPIs Globales Persistentes:** Volumen de Estudio, Autonomía Cognitiva (% de Generación Propia + Andamiaje), Calidad FSRS Promedio (1–4), Fluidez/Éxito y Deuda Cognitiva Global (con píldora semántica de color e indicador del próximo rango profesional).
 - **4 Pestañas Analíticas Interactivas (Tamara Munzner & FSRS/DSR):**
   1. **📈 Pestaña 1 (Progresión & Circadiano):** Evolución temporal de Horas, XP y Calidad (Día / Semana / Mes), constancia de estudio (racha activa, mejor racha, días activos, día top de la semana) y Mapa de Calor Circadiano 7×4 (Día × Franja de 6h) con ventana dorada de foco y desglose hora por hora.
   2. **🧠 Pestaña 2 (Salud Cognitiva & IA):** Strip de KPIs (Apalancamiento IA, Extracción Esforzada vs. Copia/Reconocimiento, Brecha de Intención), Gráfico de Anillo (*Doughnut*) de Deuda Cognitiva, Gráfico de Barras Apiladas de Modo Diseño IA × Modalidad Efectiva, Cuadrante de Rendimiento Cognitivo (Bubble plot % IA vs. Asimilación) e Impacto por Materia.
@@ -35,10 +35,11 @@ La v3.2 sigue siendo Vanilla JS + CSV, pero captura desde ya los datos que neces
 
 ### ✨ Características Principales
 
-- **Curva Exponencial de Nivel RPG (*"Level 92 is half of 99"*):**
-  - Inspirada en *Old School RuneScape*, la experiencia requerida **se duplica cada 7 niveles**:
-    $$\text{XP}(\text{Nivel } L) = \text{REDONDEAR}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
-  - Subida rápida en los primeros niveles para motivar la constancia, progresión creciente (+10.4% por nivel) y propiedad matemática exacta donde el **Nivel 92 representa el 50% del XP total hacia el Nivel 99**.
+- **Progresión Cuadrática Infinita y 16 Rangos Profesionales (Sin límite de nivel):**
+  - El Nivel 2 requiere exactamente `100 XP` y el incremento entre niveles crece linealmente sin tope artificial:
+    $$\text{XP}(\text{Nivel } L) = 50 \times L \times (L - 1) \quad \Longleftrightarrow \quad L = \left\lfloor \frac{1 + \sqrt{1 + 0.08 \cdot \text{XP}}}{2} \right\rfloor$$
+  - **Taxonomía de 16 Rangos Profesionales:** `Iniciado` (Nv. 1) · `Practicante` (Nv. 5) · `Analista` (Nv. 10) · `Especialista` (Nv. 15) · `Metódico` (Nv. 20) · `Táctico` (Nv. 25) · `Estratega` (Nv. 30) · `Experimentado` (Nv. 40) · `Consolidado` (Nv. 50) · `Referente` (Nv. 60) · `Experto` (Nv. 70) · `Senior` (Nv. 80) · `Élite` (Nv. 100) · `Maestro` (Nv. 120) · `Autoridad` (Nv. 150) · `Visionario` (Nv. 200+).
+  - **Guía de Referencia Exhaustiva de 8 Tarjetas:** Manual campo por campo integrado al pie del Dashboard con criterios prácticos y reglas anti-confusión para Tiempo 1, Tiempo 2, FSRS y fórmulas.
 - **Formulario en 2 Etapas Cognitivas + Pre-llenado Inteligente (*Smart Defaults*):**
   - **🎯 Etapa 1: Punto de Partida (Al Iniciar):** Pre-llena automáticamente la última materia, estrategia habitual y estructura de práctica. Incluye **Chips Rápidos de Materias Recientes** (1 clic para elegir materia o `[+ Nueva]`).
   - **🏁 Etapa 2: Evaluación del Bloque (Al Terminar):** Evalúa la Dinámica Cognitiva, el `% IA`, la Fluidez del bloque, la Calificación FSRS (1–4), la Modalidad de Procesamiento y las Notas con `[Subtema]`.
@@ -105,7 +106,7 @@ flowchart TD
     end
 
     subgraph Domain["Capa de Dominio / Domain Layer"]
-        METRICS["js/domain/metrics.js\n(Lv.1-99 Curve, DSR Model, FSRS & Analytics)"]
+        METRICS["js/domain/metrics.js\n(Infinite Quadratic Curve, 16 Ranks, DSR, FSRS & Analytics)"]
     end
 
     subgraph Sync["Sincronización CSV & Respaldos"]
@@ -145,7 +146,7 @@ El archivo `data/study-tracker.csv` se guarda en texto plano `UTF-8 con BOM` (es
 | **Duración (min)** | Diferencia entre `Hora_Fin` y `Hora_Inicio` (soporta cruce de medianoche sumando `1440` min). En cronómetro/pomodoro se calcula a partir del tiempo neto activo transcurrido (excluyendo pausas). |
 | **XP Ganados** | $\text{REDONDEAR}\Big(\text{Duración} \times \max(0.5,\ 1 + \text{Calidad}\times 0.25 + \text{BonoReto} + \text{BonoFluidez} + \text{BonoDinamica} + \text{BonoFricción})\Big)$ con `Calidad` FSRS 1–4 (el 5 histórico se limita a 4) y `BonoFricción = +0.05` si `Friccion_Productiva` |
 | **Deuda Cognitiva** | `Critico` si Dinámica de delegación o (`IA ≥ 75%` y `Copia_Pasiva`) · `Moderado` si `IA ≥ 50%` y (`Reconocimiento_Fluido` o `Copia_Pasiva`) · `Nulo` si `Generación Propia` y `IA ≤ 10%` · `Bajo` en otro caso |
-| **Nivel Exponencial (1-99)** | $\text{XP}(L) = \text{REDONDEAR}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Nivel 92 = 50% de 99)* |
+| **Nivel Cuadrático Infinito** | $\text{XP}(L) = 50 \cdot L \cdot (L - 1)$ y $L = \lfloor (1 + \sqrt{1 + 0.08 \cdot \text{XP}}) / 2 \rfloor$ *(Nv. 2 = 100 XP · 16 rangos profesionales sin tope)* |
 | **Franja Horaria** | `00:00–05:59 Madrugada` · `06:00–11:59 Mañana` · `12:00–17:59 Tarde` · `18:00–23:59 Noche` |
 | **Fluidez del Bloque** | `Flujo limpio (+10%)` · `Lucha productiva (+10%)` · `Con fricción (+5%)` · `Parálisis / Abandono (0% bono)` |
 | **Bono Dinámica** | `Generación Propia (+10%)` · `Andamiaje (+5%)` · `Recepción Pasiva (0%)` · `Delegación (-15% si IA ≥ 50%)` |
@@ -177,7 +178,7 @@ v3.2 remains Vanilla JS + CSV, but already captures the data v4.0 (FSRS & Cognit
 - **FSRS Grade (1–4):** `1 · Again`, `2 · Hard`, `3 · Good` *(default)*, `4 · Easy`. Legacy sessions with quality 5 are normalized to 4 (same XP multiplier as before).
 - **Live Cognitive Debt Index (`Nulo` · `Bajo` · `Moderado` · `Critico`):** deterministic formula from `% AI`, Dynamic, and Modality, visible as a pill in the XP preview and top KPI banner.
 - **Simplified Form with Intention Gap Guidance:** `Contexto`, `Energia Previa`, and `Complejidad` are hidden with neutral defaults. Includes a *Golden Rule* accordion (auditing intention vs. reality gap) and interactive micro-helpers on each field.
-- **Persistent Top Banner with 5 Global Macro KPIs:** Study Volume, Cognitive Autonomy (% Own Generation + Scaffolding), Avg FSRS Quality (1–4), Fluency/Success, and Global Cognitive Debt (with semantic color pill and Lv. 92 = 50% XP milestone badge).
+- **Persistent Top Banner with 5 Global Macro KPIs:** Study Volume, Cognitive Autonomy (% Own Generation + Scaffolding), Avg FSRS Quality (1–4), Fluency/Success, and Global Cognitive Debt (with semantic color pill and next professional rank milestone badge).
 - **4 Dedicated Interactive Analytics Tabs (Tamara Munzner & FSRS/DSR Framework):**
   1. **📈 Tab 1 (Progression & Circadian):** Time evolution of Hours, XP, and Quality (Day / Week / Month), study consistency metrics (active streak, best streak, active days, top weekday), and 7×4 Circadian Heatmap (Day × 6h Slot) with golden focus window and collapsible hour-by-hour breakdown.
   2. **🧠 Tab 2 (Cognitive Health & AI):** KPI strip (AI leverage, Effortful Extraction vs. Passive Copy/Recognition, Intention Gap), Doughnut Chart for Cognitive Debt Index distribution, Stacked Bar Chart for AI Design Mode × Effective Modality, Cognitive Performance Quadrant (Bubble plot % AI vs. Quality), and Subject Learning Impact.
@@ -187,10 +188,11 @@ v3.2 remains Vanilla JS + CSV, but already captures the data v4.0 (FSRS & Cognit
 
 ### ✨ Key Features
 
-- **Exponential RPG Level Curve (*"Level 92 is half of 99"*):**
-  - Inspired by *Old School RuneScape*, required experience **doubles every 7 levels**:
-    $$\text{XP}(\text{Level } L) = \text{ROUND}\Big( 250 \times \left(2^{(L-1)/7} - 1\right) \Big)$$
-  - Fast early leveling to reward consistency, progressive scaling (+10.4% per level), and the exact mathematical property where **Level 92 equals 50% of the total XP required for Level 99**.
+- **Infinite Quadratic Level Progression & 16 Professional Ranks (Uncapped):**
+  - Level 2 requires exactly `100 XP` and the distance between levels grows linearly with no artificial level cap:
+    $$\text{XP}(\text{Level } L) = 50 \times L \times (L - 1) \quad \Longleftrightarrow \quad L = \left\lfloor \frac{1 + \sqrt{1 + 0.08 \cdot \text{XP}}}{2} \right\rfloor$$
+  - **16 Professional Mastery Ranks:** `Initiate` (`Iniciado`, Lv. 1) · `Practitioner` (Lv. 5) · `Analyst` (Lv. 10) · `Specialist` (Lv. 15) · `Methodical` (Lv. 20) · `Tactician` (Lv. 25) · `Strategist` (Lv. 30) · `Experienced` (Lv. 40) · `Consolidated` (Lv. 50) · `Benchmark` (Lv. 60) · `Expert` (Lv. 70) · `Senior` (Lv. 80) · `Elite` (Lv. 100) · `Master` (Lv. 120) · `Authority` (Lv. 150) · `Visionary` (`Visionario`, Lv. 200+).
+  - **Built-in 8-Card Field-by-Field Reference Manual:** Exhaustive reference guide at the bottom of the Dashboard covering practical criteria and anti-confusion rules for Stage 1, Stage 2, FSRS, and math formulas.
 - **2-Stage Cognitive Form + Smart Defaults:**
   - **🎯 Stage 1: Starting Point (At Start):** Auto-prefills your latest subject, planned strategy, and practice structure for the current time slot. Includes **Recent Subject Quick-Chips** (1 click to pick a subject or `[+ New]`).
   - **🏁 Stage 2: Block Evaluation (At End):** Rate the Cognitive Dynamic, `% AI`, Block Fluency, FSRS Rating (1–4), Processing Modality, and Notes with `[Subtopic]`.
@@ -230,7 +232,7 @@ The generated `data/study-tracker.csv` file is stored in plain-text `UTF-8 with 
 | **Duration (min)** | Difference between `Hora_Fin` and `Hora_Inicio` (supports midnight crossover by adding `1440` min). In timer/pomodoro it is computed from active net elapsed time (excluding pauses). |
 | **XP Earned** | $\text{ROUND}\Big(\text{Duration} \times \max(0.5,\ 1 + \text{Quality}\times 0.25 + \text{ChallengeBonus} + \text{GoalBonus} + \text{DynamicBonus} + \text{FrictionBonus})\Big)$ with FSRS `Quality` 1–4 (legacy 5 is clamped to 4) and `FrictionBonus = +0.05` for `Friccion_Productiva` |
 | **Cognitive Debt** | `Critico` if delegation Dynamic or (`AI ≥ 75%` and `Copia_Pasiva`) · `Moderado` if `AI ≥ 50%` and (`Reconocimiento_Fluido` or `Copia_Pasiva`) · `Nulo` if `Own Generation` and `AI ≤ 10%` · `Bajo` otherwise |
-| **Exponential Level (1-99)** | $\text{XP}(L) = \text{ROUND}\big(250 \times (2^{(L-1)/7} - 1)\big)$ *(Level 92 = 50% of 99)* |
+| **Infinite Quadratic Level** | $\text{XP}(L) = 50 \cdot L \cdot (L - 1)$ and $L = \lfloor (1 + \sqrt{1 + 0.08 \cdot \text{XP}}) / 2 \rfloor$ *(Lv. 2 = 100 XP · 16 uncapped professional ranks)* |
 | **Circadian Slots** | `00:00–05:59 Early Morning` · `06:00–11:59 Morning` · `12:00–17:59 Afternoon` · `18:00–23:59 Night` |
 | **Block Fluency** | `Clean flow (+10%)` · `Productive struggle (+10%)` · `With friction (+5%)` · `Paralysis / Quit (0% bonus)` |
 | **Dynamic Bonus** | `Own Generation (+10%)` · `Scaffolding (+5%)` · `Passive Reception (0%)` · `Delegation (-15% if AI ≥ 50%)` |

@@ -11,7 +11,7 @@ El versionado de este proyecto sigue una adaptación de **Versionado Semántico 
 | Nivel | Cuándo se incrementa | Impacto en el sistema | Ejemplo en StudyTracker |
 | :--- | :--- | :--- | :--- |
 | **MAJOR (v1 → v2 → v3)** | **Ruptura de compatibilidad o cambio de paradigma.**<br>• Modificación de columnas canónicas en la persistencia.<br>• Reestructuración del flujo mental de captura (ej. rediseño del formulario).<br>• Eliminación o sustitución de tecnologías base (ej. descartar librerías de 850 KB). | Requiere migraciones de datos o reaprendizaje del flujo de registro. | **v2:** Migración de `.xlsx` a `.csv` + Dashboard en 4 pestañas.<br>**v3:** Reducción a 18 columnas, formulario en 2 tiempos y Dinámica Cognitiva. |
-| **MINOR (vX.1 → vX.2)** | **Nueva funcionalidad compatible hacia atrás.**<br>• Nuevas vistas o gráficos que consumen los mismos datos sin alterar el CSV.<br>• Herramientas auxiliares (temporizador, i18n, filtros). | Los datos preexistentes funcionan inmediatamente sin migración. | Integración del Pomodoro, soporte bilingüe `ES/EN`, filtros por contexto. |
+| **MINOR (vX.1 → vX.2)** | **Nueva funcionalidad compatible hacia atrás.**<br>• Nuevas vistas o gráficos que consumen los mismos datos (o columnas puente retrocompatibles).<br>• Herramientas auxiliares (temporizador, i18n, filtros, progresión infinita). | Los datos preexistentes funcionan inmediatamente sin pérdida. | **v3.1:** Lucha productiva y cálculo neto de pausas.<br>**v3.2:** Puente FSRS/DSR de 22 columnas, Deuda Cognitiva, Curva Cuadrática Infinita y 16 Rangos Profesionales. |
 | **PATCH (vX.X.1)** | **Corrección de bugs, estilo o mantenimiento.**<br>• Arreglos de CSS (overflow de botones), ajustes de fórmulas matemáticas o textos. | Cero impacto en el esquema o en las reglas de negocio. | Ajuste del grid fluido responsivo para evitar desbordamiento de chips. |
 
 ---
@@ -19,11 +19,10 @@ El versionado de este proyecto sigue una adaptación de **Versionado Semántico 
 ## 📜 Línea de Tiempo y Evolución del Proyecto
 
 ```mermaid
-timeline
-    title Evolución de StudyTracker
-    v1.0 : Prototipo Excel : SheetJS + .xlsx : Formulario de 1 bloque : Fórmulas en hoja de cálculo
-    v2.0 : Era Analítica & CSV : Servidor Node.js nativo : data/study-tracker.csv : Dashboard 4 pestañas : Esquema 20 columnas (Tanda 2)
-    v3.0 : Ergonomía Cognitiva : Formulario en 2 etapas : 18 columnas limpias : 4 Dinámicas Cognitivas (Andamiaje) : Franjas 6h & Backups diarios
+flowchart LR
+    V1["v1.0: Prototipo Excel\n(SheetJS + .xlsx)"] --> V2["v2.0: Era Analítica & CSV\n(Node.js + 20 col + 4 Tabs)"]
+    V2 --> V3["v3.0–v3.1: Ergonomía Cognitiva\n(Formulario 2 Tiempos + 18 col)"]
+    V3 --> V32["v3.2: Puente FSRS/DSR & Progresión Infinita\n(22 col + Deuda Cognitiva + Curva Cuadrática + 16 Rangos)"]
 ```
 
 ### 🟢 v1.0 — El Prototipo (Era Excel / `.xlsx`)
@@ -68,6 +67,19 @@ timeline
 
 ---
 
+### 🟠 v3.2 — El Puente Analítico FSRS/DSR y Progresión Cuadrática Profesional
+* **Commits clave:** `e7eed34` → `2ee1df0` + Refactor Sistema XP
+* **Paradigma:** *Captura Compatible con v4.0, Auditoría de Deuda Cognitiva y Maestría Profesional Infinita.*
+* **Pila técnica:** Vanilla JS + CSV de 22 columnas retrocompatible + Modelos matemáticos FSRS/DSR + Curva cuadrática sin límite de nivel.
+* **Principales innovaciones:**
+  - **Esquema Puente de 22 columnas:** Añade `Estructura_Practica` (`Bloqueado` / `Intercalado`), `Modo_Diseno_IA`, `Modalidad_Procesamiento_Efectiva` y `Friccion_Discriminacion_Intercalada` (condicional).
+  - **Calificación FSRS (1–4) e Índice de Deuda Cognitiva en vivo:** Mide la brecha entre la intención del Tiempo 1 y la ejecución real del Tiempo 2 (`Nulo`, `Bajo`, `Moderado`, `Crítico`).
+  - **Centro Analítico Avanzado (Tamara Munzner & FSRS/DSR):** Curva de Olvido a 30 días, Mapa de Consolidación DSR en burbujas, Efectividad Intercalada e Inspector Profundo (*Power BI View*) de 10 dimensiones y flujo multivariable de 5 etapas.
+  - **Progresión Cuadrática Infinita y 16 Rangos Profesionales:** Sustitución de la curva exponencial OSRS (topada en nivel 99) por $\text{XP}(L) = 50 \cdot L \cdot (L - 1)$ (Nivel 2 = 100 XP) sin límite superior y con 16 rangos profesionales (`Iniciado` a `Visionario`).
+  - **Guía de Referencia Exhaustiva en 8 Tarjetas:** Manual campo por campo bilingüe integrado en el Dashboard.
+
+---
+
 ## 🏛️ Registro de Decisiones de Arquitectura (ADRs)
 
 ### ADR-001: Persistencia Local-First con Micro-Servidor Nativo y File System API
@@ -87,11 +99,11 @@ timeline
 ---
 
 ### ADR-003: Curva de Experiencia Exponencial RuneScape (Nv. 92 = 50% de Nv. 99)
-* **Fecha:** 2026-10-20 | **Estado:** Aceptado
+* **Fecha:** 2026-10-20 | **Estado:** Reemplazado por ADR-011 (2026-11-01)
 * **Contexto:** Las progresiones lineales hacen que subir de nivel al inicio sea aburrido y al final sea trivial o desmotivante.
-* **Decisión:** Adoptar la fórmula matemática inspirada en *Old School RuneScape*, donde el costo de XP se duplica cada 7 niveles:
+* **Decisión:** Adoptar inicialmente la fórmula matemática inspirada en *Old School RuneScape*, donde el costo de XP se duplicaba cada 7 niveles:
   $$\text{XP}(L) = \text{REDONDEAR}\Big(250 \times \left(2^{(L-1)/7} - 1\right)\Big)$$
-* **Consecuencias:** Subida rápida en niveles iniciales (fomenta el hábito temprano) y alta dificultad en niveles altos, con la propiedad matemática exacta donde el **Nivel 92 es el 50% del camino al Nivel 99**.
+* **Consecuencias:** Permitió validar la gamificación en v1–v3.1, pero en v3.2 fue sustituida por una curva cuadrática infinita y rangos profesionales (ver **ADR-011**).
 
 ---
 
@@ -146,7 +158,6 @@ timeline
 * **Decisión:** En `server.js`, antes de ejecutar `fs.writeFileSync(CSV_PATH)`, el servidor verifica y copia automáticamente el archivo a `data/backups/YYYY-MM-DD.csv` si aún no existe un respaldo para el día en curso.
 * **Consecuencias:** Seguridad de datos nivel producción con cero intervención del usuario.
 
-
 ---
 
 ### ADR-009: Lucha Productiva y Rediseño de Fluidez del Bloque sin Sesgo Punitivo en XP
@@ -156,9 +167,35 @@ timeline
   2. **Confusión ante interrupciones externas o retiros tempranos:** Si el estudiante debía retirarse antes por un imprevisto o entregar un avance urgente pero su ritmo fue enfocado y de calidad, se sentía tentado a castigarse como `Parcial`.
 * **Decisión:** 
   1. Rediseñar la escala de `Objetivo_Cumplido` en 4 estados cognitivos claros:
-     - `✅ Flujo limpio (+10% XP)`: Ritmo constante y sin tropiezos graves. Válido también si el usuario debió retirarse antes por causas externas pero el tiempo dedicado fluyó enfocado.
+     - `✅ Flujo limpio (+10% XP)`: Ritmo constante y sin tropiezos graves. Válido también si el usuario debió retirarse antes por causas externas pero el ritmo dedicado fluyó enfocado.
      - `🧠 Lucha productiva (+10% XP)`: Duelo mental activo contra un bug o concepto duro; se descartaron hipótesis y se aprendió qué caminos no tomar, otorgando el mismo bono del 10% que el flujo limpio.
      - `⚠️ Con fricción (+5% XP)`: Hubo progreso pero con distracciones, cansancio, tropiezos o velocidad irregular.
      - `🔴 Parálisis / Abandono (0% bono)`: Bloqueo pasivo, dar vueltas en círculos sin probar caminos, procrastinación o sesión en blanco (conserva la XP base intacta).
   2. Ajustar el cronómetro / pomodoro para calcular la `Hora_Fin` a partir del tiempo neto activo transcurrido (`transcurridoMs`), excluyendo pausas y registrando la duración real sin distorsión.
 * **Consecuencias:** Se elimina el sesgo punitivo de la gamificación, se alinea la experiencia RPG con el esfuerzo cognitivo real y la Matriz de Fricción ahora visualiza 4 niveles apilados por materia y dominio previo.
+
+---
+
+### ADR-010: Puente de Captura v3.2 (22 Columnas), Calificación FSRS (1–4) y Auditoría de Deuda Cognitiva
+* **Fecha:** 2026-11-01 | **Estado:** Aceptado
+* **Contexto:** Antes de migrar la infraestructura completa a TypeScript + SQLite (v4.0), era prioritario capturar desde ya las variables metacognitivas del modelo de memoria DSR/FSRS y auditar la brecha entre la intención inicial (Tiempo 1) y el procesamiento efectivo (Tiempo 2).
+* **Decisión:**
+  1. Expandir el esquema CSV de 18 a **22 columnas** retrocompatibles añadiendo `Estructura_Practica`, `Modo_Diseno_IA`, `Modalidad_Procesamiento_Efectiva` y `Friccion_Discriminacion_Intercalada` (condicional solo cuando se elige `Intercalado`).
+  2. Adoptar la escala estándar **FSRS (1–4)** (`Again`, `Hard`, `Good`, `Easy`) e implementar la función determinista `calcularIndiceDeudaCognitiva` (`Nulo`, `Bajo`, `Moderado`, `Critico`).
+  3. Incorporar el Centro Analítico Avanzado (Curva de Olvido Ebbinghaus/FSRS, Mapa DSR en burbujas, Efectividad Intercalada e Inspector Profundo *Power BI View* de 10 dimensiones) junto con una Guía de Referencia de 8 tarjetas.
+* **Consecuencias:** Los datos capturados hoy en CSV son 100% compatibles con el esquema SQLite de la v4.0 sin pérdida de información histórica.
+
+---
+
+### ADR-011: Progresión Cuadrática Infinita (`50 * L * (L - 1)`) y Taxonomía de 16 Rangos Profesionales
+* **Fecha:** 2026-11-01 | **Estado:** Aceptado (Reemplaza a ADR-003)
+* **Contexto:** La curva exponencial previa estilo RuneScape tenía tres limitaciones prácticas:
+  1. Subía demasiado rápido en el primer nivel (Nivel 2 pedía solo 26 XP) y luego se disparaba exponencialmente.
+  2. Imponía un límite artificial (*Hard Cap*) en el Nivel 99.
+  3. Los nombres de rango estilo fantasía/RPG resultaban poco serios para un entorno de seguimiento académico y profesional.
+* **Decisión:**
+  1. Eliminar cualquier tope de nivel (`NIVEL_MAXIMO`) para que el sistema de niveles sea **infinito**.
+  2. Implementar la **fórmula matemática cuadrática exacta** donde el Nivel 2 exige `100 XP` y el incremento requerido crece linealmente con cada nivel ($+100, +200, +300, \dots$):
+     $$\text{XP}(L) = 50 \times L \times (L - 1) \quad \Longleftrightarrow \quad L = \left\lfloor \frac{1 + \sqrt{1 + 0.08 \cdot \text{XP}}}{2} \right\rfloor$$
+  3. Sustituir `TRAMOS_RANGO` por una taxonomía sobria de **16 rangos orientados a la competencia y maestría profesional**: `Iniciado` (Nv. 1), `Practicante` (Nv. 5), `Analista` (Nv. 10), `Especialista` (Nv. 15), `Metódico` (Nv. 20), `Táctico` (Nv. 25), `Estratega` (Nv. 30), `Experimentado` (Nv. 40), `Consolidado` (Nv. 50), `Referente` (Nv. 60), `Experto` (Nv. 70), `Senior` (Nv. 80), `Élite` (Nv. 100), `Maestro` (Nv. 120), `Autoridad` (Nv. 150) y `Visionario` (Nv. 200+).
+* **Consecuencias:** Progresión predecible, desafiante y sin techo, con cálculo $O(1)$ mediante despeje cuadrático directo y una identidad visual profesional.

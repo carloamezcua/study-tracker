@@ -1,6 +1,6 @@
-# 🗺️ Ruta de Refactorización Quirúrgica: StudyTracker v3.1 $\to$ v4.0
+# 🗺️ Ruta de Refactorización Quirúrgica: StudyTracker v3.2 $\to$ v4.0
 
-> **Propósito de este documento:** Servir como manual de ingeniería paso a paso para evolucionar `study-tracker` desde una arquitectura en Vanilla JS basada en archivos CSV (v3.1) hacia una aplicación **Local-First con tipado estricto (TypeScript), persistencia relacional (SQLite), pruebas unitarias (Vitest) e interfaz reactiva (React + Vite)** impulsada por el modelo de memoria **DSR/FSRS** y auditoría automatizada de **Deuda Cognitiva**.
+> **Propósito de este documento:** Servir como manual de ingeniería paso a paso para evolucionar `study-tracker` desde una arquitectura en Vanilla JS basada en archivos CSV (v3.2 Puente de 22 columnas) hacia una aplicación **Local-First con tipado estricto (TypeScript), persistencia relacional (SQLite), pruebas unitarias (Vitest) e interfaz reactiva (React + Vite)** impulsada por el modelo de memoria **DSR/FSRS**, auditoría automatizada de **Deuda Cognitiva** y **Progresión Cuadrática Infinita con 16 Rangos Profesionales**.
 
 ---
 
@@ -17,13 +17,13 @@ Para dejar de programar por inercia o delegación ciega a la IA y evitar la mism
 
 ---
 
-## 🔬 Radiografía de Transición: ¿Qué cambia de la v3.1 a la v4.0?
+## 🔬 Radiografía de Transición: ¿Qué cambia de la v3.2 a la v4.0?
 
-No vas a tirar tu proyecto a la basura. Tu lógica de negocio, tus fórmulas de experiencia RPG, tus franjas circadianas de 6 horas y la ergonomía del formulario en 2 tiempos son el activo más valioso del sistema. Lo que haremos será **trasplantar ese cerebro a un esqueleto industrial**.
+No vas a tirar tu proyecto a la basura. Tu lógica de negocio, tu progresión cuadrática infinita y 16 rangos profesionales, tus franjas circadianas de 6 horas y la ergonomía del formulario en 2 tiempos son el activo más valioso del sistema. Lo que haremos será **trasplantar ese cerebro a un esqueleto industrial**.
 
-| Archivo / Componente Actual (v3.1) | Destino en la v4.0 | Acción Quirúrgica y Justificación Técnica |
+| Archivo / Componente Actual (v3.2) | Destino en la v4.0 | Acción Quirúrgica y Justificación Técnica |
 |:--- |:--- |:--- |
-| `js/domain/metrics.js` | ♻️ **Se transforma** $\to$ `src/domain/metrics.ts` y `src/domain/fsrs.ts` | Se conserva la curva exponencial de niveles ($1\text{ a }99$), franjas de $6\text{ h}$ y bonos de XP. Se le añade tipado estricto y se separa el nuevo motor matemático DSR/FSRS en su propio archivo. |
+| `js/domain/metrics.js` | ♻️ **Se transforma** $\to$ `src/domain/metrics.ts` y `src/domain/fsrs.ts` | Se conserva la curva cuadrática infinita de niveles ($\text{XP}(L) = 50 \cdot L \cdot (L - 1)$), los 16 rangos profesionales (`TRAMOS_RANGO`), franjas de $6\text{ h}$ y bonos de XP. Se le añade tipado estricto y se separa el motor matemático DSR/FSRS en su propio archivo. |
 | `data/study-tracker.csv` | ♻️ **Evoluciona** $\to$ `data/study-tracker.db` (SQLite) | El CSV deja de ser la base de datos principal para evitar sobrescribir todo el disco en cada clic y permitir consultas relacionales. Se mantiene un exportador/importador CSV para compatibilidad con Excel y Pandas. |
 | `js/services/excel-sync.js` | 🗑️ **Se elimina** $\to$ Reemplazado por `src/server/db/migrate.ts` y `src/client/services/api.ts` | Ya no necesitas parsear texto RFC 4180 en el navegador en cada acción. La lógica de migración histórica se mueve a un script único de base de datos en el servidor. |
 | `server.js` | ♻️ **Se transforma** $\to$ `src/server/index.ts` | Pasa de ser un lector/escritor de texto plano (`GET/PUT /api/csv`) a una API REST local conectada a SQLite con respaldos diarios automáticos (`.db`). |
@@ -145,11 +145,11 @@ No vas a tirar tu proyecto a la basura. Tu lógica de negocio, tus fórmulas de 
   - Si `dinamica === 'Andamiaje_Cocreacion'` y `modalidad === 'Extraccion_Esforzada'` $\to$ `'Bajo'`.
   - Si `usoIaPorcentaje >= 50` y `modalidad === 'Reconocimiento_Fluido'` $\to$ `'Moderado'`.
   - Si `dinamica === 'Delegacion_Mecanica'` o (`usoIaPorcentaje >= 75` y `modalidad === 'Copia_Pasiva'`) $\to$ `'Critico'`.
-- [ ] **Migrar y adaptar la Fórmula de XP y Curva Exponencial (Niveles 1–99):**
+- [ ] **Migrar y adaptar la Fórmula de XP, Progresión Cuadrática Infinita y 16 Rangos Profesionales:**
   Traslada la función de XP de tu `js/domain/metrics.js` adaptándola a las nuevas variables (considerando que si `friccion_discriminacion_intercalada` es `null`, su bono es $0$):
   $$\text{XP} = \text{Math.round}\Big(\text{Duracion} \times \max\big(0.5,\ 1 + \text{Grade}\times 0.25 + \text{BonoFluidez} + \text{BonoDinamica} + \text{BonoFriccionIntercalada}\big)\Big)$$
-  Conserva intacta tu ecuación de nivel estilo RuneScape:
-  $$\text{XP}(L) = \text{Math.round}\left(250 \times \left(2^{\frac{L-1}{7}} - 1\right)\right)$$
+  Conserva intacta la progresión cuadrática infinita (sin límite superior de nivel) y el arreglo `TRAMOS_RANGO` de 16 rangos profesionales (`Iniciado` Nv. 1 hasta `Visionario` Nv. 200+):
+  $$\text{XP}(L) = 50 \times L \times (L - 1) \quad \Longleftrightarrow \quad L = \left\lfloor \frac{1 + \sqrt{1 + 0.08 \cdot \text{XP}}}{2} \right\rfloor$$
 - [ ] **Migrar el extractor de `[Subtema]` en Notas:**
   Traslada la expresión regular que extrae `[Subtema]` del campo de notas para que siga alimentando tu Inspector de Temas sin requerir columnas extra.
 
@@ -167,7 +167,7 @@ No vas a tirar tu proyecto a la basura. Tu lógica de negocio, tus fórmulas de 
   3. Calificar una sesión con `Grade = 4 (Easy)` incrementa la estabilidad $S'$ mucho más que `Grade = 2 (Hard)`, mientras que `Grade = 1 (Again)` reduce la estabilidad $S'$ por olvido.
 - [ ] **Crear `tests/metrics.test.ts`:**
   Escribe pruebas para verificar que:
-  1. El nivel 92 requiere exactamente alrededor del $50\%$ de la experiencia total del nivel 99.
+  1. El Nivel 2 requiere exactamente $100\text{ XP}$ (`calcularXpParaNivel(2) === 100`), `calcularNivel(100) === 2`, y el sistema no tiene tope en el nivel 99 (ej. `calcularNivel(calcularXpParaNivel(200)) === 200` con rango `'Visionario'`).
   2. Una sesión con `Lucha_Productiva` otorga el mismo bono de XP ($+10\%$) que `Flujo_Limpio` (cero sesgo punitivo).
   3. Una sesión con `Delegacion_Mecanica` y $80\%$ de IA aplica la penalización de XP ($-15\%$) y arroja automáticamente un `IndiceDeudaCognitiva` igual a `'Critico'`.
   4. Una sesión en modo `'Bloqueado'` con `friccion_discriminacion_intercalada = null` calcula el XP limpiamente sin errores de nulidad.
@@ -370,8 +370,8 @@ Para mantener absoluta claridad al construir los componentes, así queda la divi
 
 ### 6.4 Migración del Dashboard Analítico y Gráficos (`src/client/components/analytics/`)
 
-- [ ] **Construir la Barra Superior de Nivel RPG (`RpgHeader.tsx`):**
-  Muestra tu nivel actual ($1\text{–}99$), barra de progreso hacia el siguiente nivel, racha de días y estado de conexión con SQLite (`🟢 SQLite Local Activo + Backup Diario`).
+- [ ] **Construir la Barra Superior de Nivel y Rango Profesional (`RpgHeader.tsx`):**
+  Muestra tu nivel actual (sistema infinito `Nivel X` sin límite superior), rango profesional (`Iniciado` a `Visionario`), barra de progreso entre `calcularXpParaNivel(nivelActual)` y `calcularXpParaNivel(nivelActual + 1)`, próximo rango profesional, racha de días y estado de conexión con SQLite (`🟢 SQLite Local Activo + Backup Diario`).
 - [ ] **Migrar las 4 Pestañas Analíticas + Nueva Vista FSRS:**
   - **Pestaña 1 (`EvolutionTab.tsx`):** Horas y XP por día/semana/mes.
   - **Pestaña 2 (`CircadianHeatmapTab.tsx`):** Tu mapa de calor $7 \times 4$ (Días $\times$ Franjas de 6h) cruzado ahora con la tasa de recuerdo exitoso (`Grade >= 3`).

@@ -14,24 +14,22 @@
 
 | Idea                                                         | Esfuerzo | Impacto | Notas                                                                                                        |
 | ------------------------------------------------------------ | :------: | :-----: | ------------------------------------------------------------------------------------------------------------ |
-| **Manejo Correcto de Pausas en el Cronómetro**        |    S    | ⭐⭐⭐ | Descontar el tiempo pausado para que no infle artificialmente la duración al pulsar *Terminar*.           |
 | **Bono de XP por Pomodoros Consecutivos (Combos)**     |    S    |  ⭐⭐  | Recompensar bloques encadenados (ej. 2 o más pomodoros de 25m seguidos con descansos cumplidos).            |
 | **Productivity Tracker (Expansión multi-propósito)** |    M    | ⭐⭐⭐ | Expandir más allá de estudio para cubrir trabajo en proyectos personales sin que se sienta solo "estudio". |
+| **Migración Quirúrgica a v4.0 (TypeScript + SQLite + React)** |    L    | ⭐⭐⭐ | Seguir paso a paso `docs/ruta_de_refactorizaci_n_quir_rgica_v4_0.md` ahora que el puente de 22 columnas está activo. |
 
 ---
 
 ## 🎮 Gamificación (más allá de subir de nivel)
 
-Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP → Nivel 1-99 → Rango**). Ver también [PREGUNTAS.md](PREGUNTAS.md).
+Hoy el sistema cuenta con la **progresión cuadrática infinita** ($\text{XP}(L) = 50 \cdot L \cdot (L - 1)$, donde el Nivel 2 requiere exactamente 100 XP y no existe límite superior de nivel) junto con **16 Rangos Profesionales** (*Iniciado* Nv. 1 hasta *Visionario* Nv. 200+). Ver también [PREGUNTAS.md](PREGUNTAS.md) y [docs/agents/refactorizacion_sistema_xp.md](agents/refactorizacion_sistema_xp.md).
 
 - [ ] **Sistema de Logros y Desafíos** `[M · ⭐⭐⭐]`
   - 🍅 *Combo Pomodoro:* Completar 2 pomodoros seguidos (con descanso de 5 min entre ambos).
   - 🔥 *Rachas de Constancia:* Racha de 2, 5, 10, 30 días seguidos (con al menos 1 pomodoro de 25 min al día).
   - 🧠 *Enfoque Autónomo:* Hito por acumular cierta cantidad de horas de estudio sin usar IA (0% IA).
   - ⏳ *Veterano del Estudio:* Hitos de horas totales acumuladas (ej. 25h, 50h, 100h, 500h).
-- [ ] **Rebalancear la Curva de XP (Escalado Real estilo RuneScape)** `[S · ⭐⭐⭐]`
-  - *Problema actual:* Se sube de nivel demasiado rápido en las primeras sesiones (ej. una sesión de 60 min sube a nivel 4; nivel 2 pide solo 26 XP).
-  - *Objetivo:* Calibrar la constante base o adaptar los valores auténticos de Old School RuneScape (ej. Nivel 2 = 83 XP, Nivel 10 = 1,154 XP) para que el avance sea progresivo y verdaderamente desafiante.
+- [X] **Rebalancear la Curva de XP y Tabla de Rangos Profesionales (Progresión Cuadrática Infinita)** *(Implementado en v3.2: Nivel 2 = 100 XP, fórmula $50 \cdot L \cdot (L - 1)$, eliminación del tope de nivel 99 y 16 rangos profesionales)*
 - [ ] **Avatar Virtual estilo Tamagotchi y Tienda de XP** `[L · ⭐⭐⭐]`
   - Compañero virtual / avatar al que se le puedan dar ítems y cuidados estilo Tamagotchi.
   - Tienda de recompensas donde se compren accesorios y mejoras cosméticas usando la experiencia (XP) o puntos obtenidos al estudiar.
@@ -45,6 +43,7 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 - [X] ¿Cuánto se estudia al día, semana, mes? *(Implementado en Pestaña 1 del Dashboard Analítico)*
 - [X] **Redefinir Franjas Horarias Circadianas (00:00 a 23:59)** *(Implementado en v3.0: 4 franjas simétricas de 6h)*
 - [X] **Resolución del Dilema de Taxonomía Rígida con IA** *(Implementado en v3.0: 6 actividades ortogonales + 4 dinámicas cognitivas)*
+- [X] **Puente de Captura FSRS/DSR, Deuda Cognitiva e Inspector Multidimensional (v3.2)** *(Implementado en v3.2: 22 columnas CSV, grados FSRS 1–4, Curva de Olvido, Mapa DSR e Inspector Power BI de 10 dimensiones)*
 - [ ] **Métrica de Progreso Real vs. Tiempo Invertido (Desacoplar Duración, Dominio y Dificultad)** `[M · ⭐⭐⭐]`
   - *Lucha cognitiva vs. Eficiencia:* Tardar mucho tiempo en una tarea puede ser síntoma de asimilación profunda de un concepto difícil (no de lentitud o ineficiencia). Al revés: avanzar muy rápido suele significar que el tema ya se domina o es intrínsecamente trivial.
   - *Revisar redundancias:* Evaluar si marcar `🌳 Consolidado` y `🟢 Fácil` duplica información, y buscar una forma de medir el *progreso efectivo* realizado en el bloque para contrastarlo contra el tiempo invertido.
@@ -53,38 +52,12 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 
 > **Lección aprendida:** El estudio moderno con LLMs no es blanco o negro (consumo vs. producción pura), sino un proceso de **andamiaje cognitivo**.
 >
-> **Solución implementada en v3.0:**
+> **Solución implementada en v3.0–v3.2:**
 >
-> 1. Fusión de `Teoría` e `Investigación` en **`📖 Estudio Teórico / Conceptual`** (resuelve la duda de si leer un paper o explorar dudas con IA es teoría o investigación).
-> 2. Fusión de `Producción Propia` y `Modo IA` en **4 Dinámicas Cognitivas**, incorporando explícitamente **`🔄 Andamiaje / Co-creación (+5% XP)`** para sesiones socráticas como la preparación de la mesa redonda sobre GANs.
+> 1. Fusión de `Teoría` e `Investigación` en **`📖 Estudio Teórico / Conceptual`** y evolución hacia las 4 Estrategias Planificadas (`Recuperacion_Activa`, `Construccion_Generativa`, `Consumo_Receptivo`, `Delegacion_Ejecutiva`).
+> 2. Separación deliberada entre `Modo_Diseno_IA` (intención en Tiempo 1) y `Dinamica_Cognitiva` + `Modalidad_Procesamiento_Efectiva` (realidad en Tiempo 2) para auditar la **Brecha de Intención** y el **Índice de Deuda Cognitiva**.
 > 3. Sustitución de `Dominio Previo` subjetivo por la **Prueba Objetiva de 3 Niveles** (`🌱 Nuevo`, `🌿 En construcción`, `🌳 Consolidado`) y eliminación de `Dominio_Final`.
 > 4. Subtemas agrupados mediante corchetes `[Subtema]` en Notas.
-
-### 🧩 Rediseño de Fluidez del Bloque y Prevención de Sesgo Punitivo en XP `[S · ⭐⭐⭐]`
-
-> **Problema raíz:** Marcar `❌ No (Bloqueo)` o `⚠️ Parcial` genera fricción psicológica y sensación de "castigo de XP", especialmente cuando la sesión terminó no por un fallo cognitivo, sino por **fuerza mayor** (ej. tener que entregar la tarea como estuviera por límite de tiempo, o una interrupción externa que obligó a retirarse cuando el estudio iba fluido).
-
-#### 🔍 Diagnóstico del Problema y Casos Reales
-
-1. **Aclaración matemática:**
-   - Técnicamente, `❌ No` **NO da 0 XP**: la fórmula otorga el 100% del XP base de los minutos estudiados y la calidad de asimilación. Solo omite el bono multiplicador del `+10%` o `+5%` (en 25 min, la diferencia son apenas ~3 XP).
-   - Sin embargo, la etiqueta con `❌`, la palabra "Bloqueo" y el texto `(0% bono)` producen una sensación punitiva de haber "reprobado" la sesión.
-2. **Confusión entre "Meta de la Tarea Completa" vs. "Flujo del Bloque":**
-   - Si tenías que entregar una tarea a una hora límite y trabajaste 25 min a tope entregando lo que alcanzaste, el bloque de tiempo fue productivo (`✅ Sí`), aunque la tarea total no haya quedado completa.
-3. **Interrupciones externas vs. Bloqueos cognitivos reales:**
-   - Una emergencia, llamada o corte no es un bloqueo mental: es una sesión que duró menos tiempo con buen foco (debe registrarse el tiempo efectivo con flujo normal).
-   - Un bloqueo cognitivo real es quedarse atrapado 30 minutos en un bug o concepto sin lograr destrabarlo (lo cual alimenta la Matriz de Fricción).
-
-#### 💡 Propuestas de Solución a Evaluar
-
-1. **Renombrar etiquetas para eliminar el estigma punitivo:**
-   - `🟢 En ritmo / Flujo (+10% XP)`: Avance constante en lo previsto para este bloque.
-   - `🟡 Accidentado / Con fricción (+5% XP)`: Distracciones, prisa por entrega o avance lento, pero hubo progreso.
-   - `🔴 Atorado / Sin avance (XP Base)`: Obstáculo técnico o conceptual; se visibiliza el cuello de botella pero se premia el tiempo y esfuerzo invertido.
-2. **Guía en vivo para Interrupciones Externas:**
-   - Aclarar en la ayuda dinámica que si hubo que retirarse antes por un factor externo cuando todo iba bien, se registra el tiempo efectivo transcurrido y se califica con flujo normal (`🟢 En ritmo`).
-3. **Condición con Asistencia de IA:**
-   - Si se delegó mecánicamente a la IA para salir del paso por prisa, ese ajuste ya lo descuenta la Dinámica Cognitiva (`-15% XP`), evitando penalizar dos veces.
 
 ---
 
@@ -93,6 +66,7 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 - [X] **Formulario en 2 Etapas Cognitivas** *(Implementado en v3.0: Bloque 1 Inicio + Bloque 2 Fin)*
 - [X] **Valores por defecto inteligentes y chips rápidos de materias** *(Implementado en v3.0)*
 - [X] **Manejo Correcto de Pausas y Retiro Temprano en el Cronómetro** *(Implementado en v3.1: se calcula Hora_Fin desde tiempo activo neto transcurridoMs, excluyendo pausas y sin distorsión al salir antes)*
+- [X] **Guía de Referencia Exhaustiva de 8 Tarjetas y Acordeón de Regla de Oro** *(Implementado en v3.2)*
 - [ ] Modo oscuro / temas visuales adicionales `[S · ⭐⭐]`
 - [ ] Atajos de teclado para inicio rápido (ej. `Espacio` para pausar/reanudar, `Ctrl+Enter` para guardar) `[S · ⭐⭐]`
 
@@ -102,7 +76,7 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 
 - [X] **Migrar a persistencia CSV pura sin SheetJS** *(Implementado)*
 - [X] **Respaldos automáticos diarios antes de escribir en disco** *(Implementado en v3.0 en server.js)*
-- [ ] ¿Cuándo mudar a SQLite / PostgreSQL local? *(Evaluar solo si el archivo supera los 10,000 registros)* `[L · ⭐]`
+- [ ] ¿Cuándo mudar a SQLite / PostgreSQL local? *(Planificado en `docs/ruta_de_refactorizaci_n_quir_rgica_v4_0.md`)* `[L · ⭐]`
 
 ---
 
@@ -121,7 +95,6 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 - [ ] **Rediseño del Layout del Formulario (Evitar columna izquierda alargada)** `[M · ⭐⭐]`
   - *Problema:* El formulario ocupa una columna lateral fija de 420px a la izquierda, lo que alarga mucho la página verticalmente cuando hay varias opciones en pantalla.
   - *Objetivo:* Explorar layouts alternativos (ej. formulario horizontal colapsable, vista compacta por pestañas o disposición balanceada) para que no canse visualmente.
-- [ ] Quitar lo de la experiencia de RuneScape no poner límite de niveles y cambiarles los nombres
 
 ---
 
@@ -131,6 +104,7 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 | ------------------------------------------ | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Actividad `🗂️ Preparación / Contexto` | 2026-10-20 | No es estudio real sino logística previa; se eliminó del sistema para no ensuciar las métricas cognitivas ni inflar minutos/XP. |
 | Campo `Dominio_Final` en el formulario   | 2026-10-26 | Nadie domina un tema nuevo en 25 minutos; pedir calificar el dominio al final reintroducía fatiga de decisión y redundancia.     |
+| Curva Exponencial RuneScape con tope Nivel 99 y nombres fantasía | 2026-11-01 | Subía demasiado rápido al inicio, imponía un límite artificial en 99 y tenía nombres poco profesionales; reemplazada por la curva cuadrática infinita y 16 rangos profesionales. |
 
 ---
 
@@ -138,6 +112,8 @@ Hoy el sistema cuenta con la curva exponencial estilo Old School RuneScape (**XP
 
 | Idea                                                                                                                                                                                                                                           | Fecha      | Commit/PR        |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------- |
+| **Refactorización del Sistema de XP y Rangos Profesionales (v3.2)**: Curva cuadrática infinita $\text{XP}(L) = 50 \cdot L \cdot (L - 1)$ (Nivel 2 = 100 XP, sin tope de nivel) y 16 rangos profesionales (`Iniciado` a `Visionario`)         | 2026-11-01 | v3.2 XP Refactor |
+| **Centro Analítico FSRS/DSR, Puente de 22 Columnas, Deuda Cognitiva y Guía de 8 Tarjetas (v3.2)**: Grados FSRS 1–4, Curva de Olvido, Mapa DSR en burbujas, Efectividad Intercalada e Inspector Profundo (*Power BI View*)                       | 2026-11-01 | v3.2 Bridge      |
 | **Lucha Productiva y Rediseño de Fluidez del Bloque sin Sesgo Punitivo en XP (v3.1)**: Escala de 4 estados (`Flujo limpio`, `Lucha productiva`, `Con fricción`, `Parálisis / Abandono`) con +10% de bono para lucha cognitiva | 2026-10-26 | v3.1 Feature     |
 | **Cálculo Exacto de Tiempo al Retirarse o Pausar en Cronómetro/Pomodoro (v3.1)**: `Hora_Fin` proyectada a partir del tiempo neto activo real, sin distorsión de duración                                                           | 2026-10-26 | v3.1 Feature     |
 | **Documento de Decisiones de Arquitectura e Historial de Versiones (`docs/DECISIONES.md`)**                                                                                                                                            | 2026-10-26 | Docs             |
