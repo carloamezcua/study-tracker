@@ -50,7 +50,7 @@
     return val;
   }
 
-  // Plugin ligero para dibujar las líneas divisorias del Cuadrante Cognitivo (X=35% IA, Y=3.0 Calidad)
+  // Plugin ligero para dibujar las líneas divisorias del Cuadrante Cognitivo (X=35% IA, Y=2.5 Calificación FSRS entre 1-2 y 3-4)
   const pluginLineasCuadrante = {
     id: "lineasCuadrante",
     beforeDraw(chart) {
@@ -58,7 +58,7 @@
       if (!chartArea || !scales.x || !scales.y) return;
 
       const xMid = scales.x.getPixelForValue(35);
-      const yMid = scales.y.getPixelForValue(3);
+      const yMid = scales.y.getPixelForValue(2.5);
 
       ctx.save();
       ctx.strokeStyle = "rgba(148, 163, 184, 0.35)";
@@ -73,7 +73,7 @@
         ctx.stroke();
       }
 
-      // Línea horizontal divisoria de Asimilación (3.0)
+      // Línea horizontal divisoria de Calificación FSRS (2.5: separa 1-2 de 3-4)
       if (yMid >= chartArea.top && yMid <= chartArea.bottom) {
         ctx.beginPath();
         ctx.moveTo(chartArea.left, yMid);
@@ -154,7 +154,7 @@
             type: "linear",
             position: "right",
             min: 0,
-            max: 5,
+            max: 4.5,
             title: { display: true, text: t("chartAxisAssimilation"), color: "#34d399" },
             ticks: { color: "#34d399", stepSize: 1 },
             grid: { drawOnChartArea: false }
@@ -165,7 +165,7 @@
   }
 
   /**
-   * 2. Gráfico de Burbujas del Cuadrante de Rendimiento Cognitivo (% IA vs. Asimilación 1-5).
+   * 2. Gráfico de Burbujas del Cuadrante de Rendimiento Cognitivo (% IA vs. Calificación FSRS 1-4).
    */
   function actualizarGraficoCuadranteIA(datosCuadrante) {
     const canvas = document.getElementById("chartCuadranteIA");
@@ -220,19 +220,31 @@
             callbacks: {
               label(context) {
                 const raw = context.raw || {};
-                const dinTrad = trVal(
-                  "dinamicaCognitiva",
-                  raw.dinamicaCognitiva || raw.modoIA || "Andamiaje / Co-creación"
-                );
-                const domTrad = trVal(
-                  "dominioPrevio",
-                  raw.dominioPrevio || "En construcción"
-                );
+                const sesion = raw.rawSessionData || raw || {};
+                const ia =
+                  sesion.Porcentaje_IA ?? sesion.usoIA ?? raw.iaReal ?? context.parsed.x;
+                const grade =
+                  sesion.Calidad ?? sesion.calidad ?? raw.calidadReal ?? Math.round(context.parsed.y);
+                const fluidezBruta =
+                  sesion.Objetivo_Cumplido ||
+                  sesion.objetivoCumplido ||
+                  sesion.calidad_asimilacion_fluidez ||
+                  raw.objetivoCumplido ||
+                  "Flujo limpio";
+                const asimilacionText = trVal("objetivoCumplido", fluidezBruta);
+                const dinamicaBruta =
+                  sesion.Dinamica_Cognitiva ||
+                  sesion.dinamicaCognitiva ||
+                  raw.dinamicaCognitiva ||
+                  raw.modoIA ||
+                  context.dataset.label ||
+                  "Andamiaje / Co-creación";
+                const dinamica = trVal("dinamicaCognitiva", dinamicaBruta);
                 return [
-                  `📚 ${raw.materia || ""} — ${raw.tema || ""}`,
-                  `⭐️ ${t("thAssimilation")}: ${raw.calidadReal}/5 | 🤖 IA: ${raw.iaReal}%`,
-                  `🔄 ${dinTrad} | 🌱 ${domTrad}`,
-                  `⏱️ ${t("thDuration")}: ${raw.duracion} min (${raw.fecha || ""})`
+                  `📚 ${raw.materia || sesion.materia || ""} — ${raw.tema || sesion.tema || ""}`,
+                  `IA: ${ia}% | Grade FSRS: ⭐ ${grade}`,
+                  `Dinámica: ${dinamica}`,
+                  `Fluidez real: ${asimilacionText}`
                 ];
               }
             }
@@ -253,12 +265,12 @@
           y: {
             type: "linear",
             min: 0.5,
-            max: 5.5,
+            max: 4.5,
             title: { display: true, text: t("chartAxisAssimilation"), color: "#10b981" },
             ticks: {
               color: "#10b981",
               stepSize: 1,
-              callback: (v) => (v >= 1 && v <= 5 ? `⭐️ ${v}` : "")
+              callback: (v) => (v >= 1 && v <= 4 ? "⭐️ " + v : "")
             },
             grid: { color: "rgba(51,65,85,0.35)" }
           }
@@ -336,7 +348,7 @@
             type: "linear",
             position: "right",
             min: 0,
-            max: 5,
+            max: 4.5,
             title: { display: true, text: t("chartAxisAssimilation"), color: "#10b981" },
             ticks: { color: "#10b981", stepSize: 1 },
             grid: { drawOnChartArea: false }
@@ -440,7 +452,7 @@
             type: "linear",
             position: "right",
             min: 0,
-            max: 5,
+            max: 4.5,
             title: { display: true, text: t("chartAxisAssimilation"), color: "#10b981" },
             ticks: { color: "#10b981", stepSize: 1 },
             grid: { drawOnChartArea: false }
@@ -523,7 +535,7 @@
             type: "linear",
             position: "right",
             min: 0,
-            max: 5,
+            max: 4.5,
             title: { display: true, text: t("chartAxisAssimilation"), color: "#a855f7" },
             ticks: { color: "#a855f7", stepSize: 1 },
             grid: { drawOnChartArea: false }
@@ -534,7 +546,7 @@
   }
 
   /**
-   * 6. Gráfico de Matriz de Fricción (Barras Apiladas de 4 niveles por Complejidad y Dominio Previo).
+   * 6. Gráfico de Matriz de Fricción (Barras Apiladas de 4 niveles por Dominio Previo y Estructura de Práctica).
    */
   function actualizarGraficoMatrizFriccion(datosHabitos) {
     const canvas = document.getElementById("chartMatrizFriccion");
@@ -544,6 +556,10 @@
     const labels = filas.map((f) =>
       f.tipo === "complejidad"
         ? trVal("complejidad", f.clave)
+        : f.tipo === "estructuraPractica"
+        ? trVal("estructuraPractica", f.clave)
+        : f.tipo === "modalidadProcesamiento"
+        ? trVal("modalidadProcesamiento", f.clave)
         : trVal("dominioPrevio", f.clave)
     );
     const dataFlujo = filas.map((f) => f.flujo ?? f.si);

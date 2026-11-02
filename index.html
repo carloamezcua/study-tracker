@@ -503,8 +503,8 @@
               </div>
               <div class="mini-segmented" id="heatmapMetricBtns">
                 <button type="button" class="seg-btn active" data-metric="minutos" data-i18n="heatBtnMin">⏱️ Minutos</button>
-                <button type="button" class="seg-btn" data-metric="calidad" data-i18n="heatBtnQual">⭐️ Asimilación</button>
-                <button type="button" class="seg-btn" data-metric="energia" data-i18n="heatBtnEnergy">🔋 Energía</button>
+                <button type="button" class="seg-btn" data-metric="calidad" data-i18n="heatBtnQual">⭐️ Calificación FSRS</button>
+                <button type="button" class="seg-btn" data-metric="energia" data-i18n="heatBtnEnergy" style="display: none;">🔋 Energía</button>
               </div>
             </div>
             <div id="heatmapGoldenBadge" class="golden-window-pill"></div>
@@ -553,15 +553,15 @@
 
           <div class="panel">
             <h2>
-              <span data-i18n="chartQuadTitle">🎯 Cuadrante de Rendimiento Cognitivo (% IA vs. Asimilación)</span>
+              <span data-i18n="chartQuadTitle">🎯 Cuadrante de Rendimiento Cognitivo (% IA vs. Calificación FSRS)</span>
               <small class="chart-hint" data-i18n="chartQuadHint">Tamaño de burbuja = Duración · Color = Dinámica Cognitiva</small>
             </h2>
             <div class="subtitle" data-i18n="chartQuadSubtitle">Detecta si la IA está potenciando tu aprendizaje (arriba-derecha) o generando ilusión de fluidez con baja retención (abajo-derecha).</div>
             <div class="quadrant-badges-grid" id="quadrantSummaryBadges">
-              <div class="quad-badge quad-synergy" id="quadBadgeSynergy">🚀 Sinergia IA: 0</div>
-              <div class="quad-badge quad-auton" id="quadBadgeAuton">🧠 Dominio Propio: 0</div>
-              <div class="quad-badge quad-mech" id="quadBadgeMech">🤖 Ilusión Mecánica: 0</div>
-              <div class="quad-badge quad-fatigue" id="quadBadgeFatigue">🪫 Fricción / Fatiga: 0</div>
+              <div class="quad-badge quad-synergy" id="quadBadgeSynergy">🚀 Sinergia IA (≥35% IA, ⭐️ 3-4): 0</div>
+              <div class="quad-badge quad-auton" id="quadBadgeAuton">🧠 Dominio Propio (&lt;35% IA, ⭐️ 3-4): 0</div>
+              <div class="quad-badge quad-mech" id="quadBadgeMech">🤖 Ilusión Mecánica (≥35% IA, ⭐️ 1-2): 0</div>
+              <div class="quad-badge quad-fatigue" id="quadBadgeFatigue">🪫 Fricción / Fatiga (&lt;35% IA, ⭐️ 1-2): 0</div>
             </div>
             <div class="chart-box chart-box-tall">
               <canvas id="chartCuadranteIA"></canvas>
@@ -573,7 +573,7 @@
               <span data-i18n="chart2Title">📚 Impacto de IA y Aprendizaje por Materia</span>
               <small class="chart-hint" data-i18n="chart2ClickHint">💡 Haz clic en una barra para filtrar por esa materia</small>
             </h2>
-            <div class="subtitle" data-i18n="chart2Subtitle">Contrasta tus minutos de aprendizaje activo (Generación Propia y Andamiaje) frente a las sesiones de delegación mecánica y tu asimilación (1-5).</div>
+            <div class="subtitle" data-i18n="chart2Subtitle">Contrasta tus minutos de aprendizaje real (Generación Propia, Andamiaje o Recepción) frente a la delegación mecánica y tu calificación FSRS (1-4).</div>
             <div class="chart-box">
               <canvas id="chartPorMateria"></canvas>
             </div>
@@ -622,10 +622,10 @@
 
           <div class="panel">
             <h2>
-              <span data-i18n="chart3Title">🧠 Patrones de Hábito: Actividades y Balance Cognitivo</span>
+              <span data-i18n="chart3Title">🧠 Patrones de Hábito: Estrategias y Balance Cognitivo</span>
               <small class="chart-hint" data-i18n="chart3Hint">Comportamiento por tipo de tarea y método</small>
             </h2>
-            <div class="subtitle" data-i18n="chart3Subtitle">Minutos y asimilación promedio según las actividades de estudio y proporción entre recepción pasiva y producción / co-creación activa.</div>
+            <div class="subtitle" data-i18n="chart3Subtitle">Minutos y calificación FSRS promedio según las estrategias de estudio y proporción entre recepción pasiva y producción / co-creación activa.</div>
             <div id="balanceCognitivoBox" class="balance-cognitivo-box"></div>
             <div class="chart-box">
               <canvas id="chartPorActividad"></canvas>
@@ -635,9 +635,9 @@
           <div class="panel">
             <h2>
               <span data-i18n="frictionChartTitle">🧱 Matriz de Fricción: Fluidez vs. Tropiezos y Bloqueos</span>
-              <small class="chart-hint" data-i18n="frictionChartHint">Por Complejidad y Dominio Previo</small>
+              <small class="chart-hint" data-i18n="frictionChartHint">Por Dominio Previo y Estructura de Práctica</small>
             </h2>
-            <div class="subtitle" data-i18n="frictionChartSubtitle">Proporción de bloques con flujo limpio (✅ Sí), con tropiezos (⚠️ Parcial) o bloqueos (❌ No) según el nivel de reto y tu dominio previo del concepto.</div>
+            <div class="subtitle" data-i18n="frictionChartSubtitle">Proporción de bloques en Flujo limpio (✅), Lucha productiva (🧠), Con fricción (⚠️) o Parálisis / Abandono (🔴) según tu dominio previo y la estructura de práctica.</div>
             <div class="chart-box">
               <canvas id="chartMatrizFriccion"></canvas>
             </div>
@@ -645,16 +645,16 @@
 
           <div class="panel">
             <h2>
-              <span data-i18n="habitMatrixTitle">🧠 Impacto de Dinámica Cognitiva, Dominio Previo, Energía y Reto</span>
+              <span data-i18n="habitMatrixTitle">🧠 Impacto de Dinámica Cognitiva, Dominio Previo, Modalidad y Estructura</span>
             </h2>
-            <div class="subtitle" data-i18n="habitMatrixSubtitle">Descubre cómo cambia tu retención promedio y el uso de IA según la dinámica cognitiva, tu dominio previo del tema y tu energía inicial.</div>
+            <div class="subtitle" data-i18n="habitMatrixSubtitle">Descubre cómo cambia tu calificación FSRS promedio y el uso de IA según la dinámica cognitiva, tu dominio previo del tema, la modalidad de procesamiento y la estructura de práctica.</div>
             <h4 class="sub-section-title" data-i18n="habitByProductionTitle">🔄 Por Dinámica Cognitiva</h4>
             <div id="resumenProduccionBar" class="habit-summary-bar"></div>
             <h4 class="sub-section-title" data-i18n="habitByMasteryTitle">🌱 Por Dominio Previo del Tema</h4>
             <div id="resumenDominioBar" class="habit-summary-bar"></div>
-            <h4 class="sub-section-title" data-i18n="habitByEnergyTitle">🔋 Por Energía Inicial</h4>
+            <h4 class="sub-section-title" data-i18n="habitByEnergyTitle">🔥 Por Modalidad de Procesamiento Efectiva</h4>
             <div id="resumenHabitosBar" class="habit-summary-bar"></div>
-            <h4 class="sub-section-title" data-i18n="habitByComplexityTitle">🎯 Por Complejidad del Tema</h4>
+            <h4 class="sub-section-title" data-i18n="habitByComplexityTitle">🔀 Por Estructura de Práctica (Bloqueado vs. Intercalado)</h4>
             <div id="resumenComplejidadBar" class="habit-summary-bar"></div>
           </div>
         </div>

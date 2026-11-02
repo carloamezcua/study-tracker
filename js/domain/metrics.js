@@ -781,8 +781,9 @@
       if (!mapaHoras[horaStr]) {
         mapaHoras[horaStr] = { minutos: 0, sumaCalidad: 0, conteo: 0 };
       }
+      const calFSRS = Math.min(4, Math.max(1, Number(s.calidad || s.Calidad) || 3));
       mapaHoras[horaStr].minutos += Number(s.duracion) || 0;
-      mapaHoras[horaStr].sumaCalidad += Number(s.calidad) || 0;
+      mapaHoras[horaStr].sumaCalidad += calFSRS;
       mapaHoras[horaStr].conteo += 1;
     });
 
@@ -815,7 +816,7 @@
    * Agrupa las sesiones por materia/proyecto contrastando:
    * - Minutos de Aprendizaje Activo / Asimilación
    * - Minutos de Delegación / Reproducción con IA alta
-   * - Calidad de Asimilación promedio (1-5)
+   * - Calificación FSRS promedio (1-4)
    */
   function analizarPorMateria(sesiones) {
     const mapaMaterias = {};
@@ -833,6 +834,7 @@
       }
       const dur = Number(s.duracion) || 0;
       const din = s.dinamicaCognitiva || "Andamiaje / Co-creación";
+      const calFSRS = Math.min(4, Math.max(1, Number(s.calidad || s.Calidad) || 3));
       mapaMaterias[mat].minutos += dur;
       if (din === "Delegación / Reproducción" && Number(s.usoIA) >= 50) {
         mapaMaterias[mat].minutosMecanicos += dur;
@@ -840,7 +842,7 @@
         mapaMaterias[mat].minutosAprendizaje += dur;
       }
       mapaMaterias[mat].sumaIA += Number(s.usoIA) || 0;
-      mapaMaterias[mat].sumaCalidad += Number(s.calidad) || 0;
+      mapaMaterias[mat].sumaCalidad += calFSRS;
       mapaMaterias[mat].conteo += 1;
     });
 
@@ -866,10 +868,12 @@
   }
 
   /**
-   * Analiza los patrones de comportamiento por Tipo de Actividad, Dinámica Cognitiva, Dominio Previo y Objetivos.
+   * Analiza los patrones de comportamiento por Tipo de Actividad, Dinámica Cognitiva, Dominio Previo,
+   * Modalidad de Procesamiento Efectiva, Estructura de Práctica y Objetivos.
    */
   function analizarHabitos(sesiones) {
     const lista = Array.isArray(sesiones) ? sesiones : [];
+    const normCal = (s) => Math.min(4, Math.max(1, Number(s.calidad || s.Calidad) || 3));
 
     // 1. Por Tipo de Actividad
     const mapaActividades = {};
@@ -879,7 +883,7 @@
         mapaActividades[act] = { minutos: 0, sumaCalidad: 0, sumaIA: 0, conteo: 0 };
       }
       mapaActividades[act].minutos += Number(s.duracion) || 0;
-      mapaActividades[act].sumaCalidad += Number(s.calidad) || 0;
+      mapaActividades[act].sumaCalidad += normCal(s);
       mapaActividades[act].sumaIA += Number(s.usoIA) || 0;
       mapaActividades[act].conteo += 1;
     });
@@ -890,12 +894,12 @@
       (a) => +(mapaActividades[a].sumaCalidad / mapaActividades[a].conteo).toFixed(2)
     );
 
-    // 2. Calidad promedio según Nivel de Energía Previa
+    // 2. Calidad promedio según Nivel de Energía Previa (retrocompatible)
     const resumenEnergia = NIVELES_ENERGIA.map((niv) => {
       const filtradas = lista.filter((s) => s.energiaPrevia === niv.valor);
       const conteo = filtradas.length;
       const calidadProm = conteo
-        ? +(filtradas.reduce((acc, s) => acc + (Number(s.calidad) || 0), 0) / conteo).toFixed(1)
+        ? +(filtradas.reduce((acc, s) => acc + normCal(s), 0) / conteo).toFixed(1)
         : 0;
       return {
         ...niv,
@@ -925,13 +929,13 @@
       };
     });
 
-    // 5. Calidad y bloqueos según Complejidad
+    // 5. Calidad y bloqueos según Complejidad (retrocompatible)
     const resumenComplejidad = NIVELES_COMPLEJIDAD.map((comp) => {
       const filtradas = lista.filter((s) => s.complejidad === comp.valor);
       const conteo = filtradas.length;
       const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
       const calidadProm = conteo
-        ? +(filtradas.reduce((acc, s) => acc + (Number(s.calidad) || 0), 0) / conteo).toFixed(1)
+        ? +(filtradas.reduce((acc, s) => acc + normCal(s), 0) / conteo).toFixed(1)
         : 0;
       const bloqueos = filtradas.filter(
         (s) => migrarEstadoObjetivo(s.objetivoCumplido) === "Parálisis / Abandono"
@@ -945,19 +949,74 @@
       };
     });
 
+    // 5b. Resumen por Modalidad de Procesamiento Efectiva (v3.2)
+    const metaModalidades = [
+      { valor: "Extraccion_Esforzada", icono: "🔥", etiqueta: "Extracción Esforzada" },
+      { valor: "Reconocimiento_Fluido", icono: "👀", etiqueta: "Reconocimiento Fluido" },
+      { valor: "Copia_Pasiva", icono: "📋", etiqueta: "Copia Pasiva" }
+    ];
+    const resumenModalidad = metaModalidades.map((mod) => {
+      const filtradas = lista.filter((s) => inferirModalidadProcesamiento(s) === mod.valor);
+      const conteo = filtradas.length;
+      const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
+      const calidadProm = conteo
+        ? +(filtradas.reduce((acc, s) => acc + normCal(s), 0) / conteo).toFixed(1)
+        : 0;
+      const iaProm = conteo
+        ? Math.round(filtradas.reduce((acc, s) => acc + (Number(s.usoIA) || 0), 0) / conteo)
+        : 0;
+      return {
+        ...mod,
+        conteo,
+        minutos,
+        calidadProm,
+        iaProm
+      };
+    });
+
+    // 5c. Resumen por Estructura de Práctica (v3.2: Bloqueado vs. Intercalado)
+    const metaEstructuras = [
+      { valor: "Bloqueado", icono: "🧱", etiqueta: "Bloqueado" },
+      { valor: "Intercalado", icono: "🔀", etiqueta: "Intercalado" }
+    ];
+    const resumenEstructura = metaEstructuras.map((est) => {
+      const filtradas = lista.filter((s) => inferirEstructuraPractica(s) === est.valor);
+      const conteo = filtradas.length;
+      const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
+      const calidadProm = conteo
+        ? +(filtradas.reduce((acc, s) => acc + normCal(s), 0) / conteo).toFixed(1)
+        : 0;
+      const fluidos = filtradas.filter((s) => {
+        const obj = migrarEstadoObjetivo(s.objetivoCumplido);
+        return obj === "Flujo limpio" || obj === "Lucha productiva";
+      }).length;
+      const pctFluidez = conteo ? Math.round((fluidos / conteo) * 100) : 0;
+      return {
+        ...est,
+        conteo,
+        minutos,
+        calidadProm,
+        pctFluidez
+      };
+    });
+
     // 6. Balance Cognitivo: Ingesta / Recepción vs. Práctica / Co-creación / Generación
     const actividadesConsumo = new Set([
       "Clase / Cátedra",
-      "Estudio Teórico / Conceptual"
+      "Clase en Vivo",
+      "Estudio Teórico / Conceptual",
+      "Consumo_Receptivo"
     ]);
     let minConsumo = 0;
     let minProduccion = 0;
     lista.forEach((s) => {
       const dur = Number(s.duracion) || 0;
       const din = s.dinamicaCognitiva || "";
+      const actNorm = migrarTipoActividad(s.tipoActividad);
       if (
         din === "Recepción Pasiva" ||
-        (din === "" && actividadesConsumo.has(migrarTipoActividad(s.tipoActividad)))
+        actNorm === "Consumo_Receptivo" ||
+        (din === "" && actividadesConsumo.has(actNorm))
       ) {
         minConsumo += dur;
       } else {
@@ -976,7 +1035,7 @@
       const conteo = filtradas.length;
       const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
       const calidadProm = conteo
-        ? +(filtradas.reduce((acc, s) => acc + (Number(s.calidad) || 0), 0) / conteo).toFixed(1)
+        ? +(filtradas.reduce((acc, s) => acc + normCal(s), 0) / conteo).toFixed(1)
         : 0;
       const iaProm = conteo
         ? Math.round(filtradas.reduce((acc, s) => acc + (Number(s.usoIA) || 0), 0) / conteo)
@@ -998,7 +1057,7 @@
       const conteo = filtradas.length;
       const minutos = filtradas.reduce((acc, s) => acc + (Number(s.duracion) || 0), 0);
       const calidadProm = conteo
-        ? +(filtradas.reduce((acc, s) => acc + (Number(s.calidad) || 0), 0) / conteo).toFixed(1)
+        ? +(filtradas.reduce((acc, s) => acc + normCal(s), 0) / conteo).toFixed(1)
         : 0;
       const iaProm = conteo
         ? Math.round(filtradas.reduce((acc, s) => acc + (Number(s.usoIA) || 0), 0) / conteo)
@@ -1018,20 +1077,19 @@
       };
     });
 
-    // 9. Matriz de Fricción: distribución Flujo / Lucha / Fricción / Parálisis por Complejidad y Dominio Previo
+    // 9. Matriz de Fricción: distribución Flujo / Lucha / Fricción / Parálisis por Dominio Previo y Estructura de Práctica
     const categoriasFriccion = [
-      { clave: "Fácil", tipo: "complejidad", etiqueta: "🟢 Fácil" },
-      { clave: "Desafiante", tipo: "complejidad", etiqueta: "🟡 Desafiante" },
-      { clave: "Muy difícil", tipo: "complejidad", etiqueta: "🔴 Muy difícil" },
       { clave: "Nuevo", tipo: "dominioPrevio", etiqueta: "🌱 Nuevo" },
       { clave: "En construcción", tipo: "dominioPrevio", etiqueta: "🌿 En construcción" },
-      { clave: "Consolidado", tipo: "dominioPrevio", etiqueta: "🌳 Consolidado" }
+      { clave: "Consolidado", tipo: "dominioPrevio", etiqueta: "🌳 Consolidado" },
+      { clave: "Bloqueado", tipo: "estructuraPractica", etiqueta: "🧱 Bloqueado" },
+      { clave: "Intercalado", tipo: "estructuraPractica", etiqueta: "🔀 Intercalado" }
     ];
 
     const matrizFriccion = categoriasFriccion.map((cat) => {
       const sub = lista.filter((s) =>
-        cat.tipo === "complejidad"
-          ? (s.complejidad || "Desafiante") === cat.clave
+        cat.tipo === "estructuraPractica"
+          ? inferirEstructuraPractica(s) === cat.clave
           : migrarDominioPrevio(s.dominioPrevio) === cat.clave
       );
       const total = sub.length;
@@ -1068,6 +1126,8 @@
       resumenContextos,
       resumenObjetivos,
       resumenComplejidad,
+      resumenModalidad,
+      resumenEstructura,
       resumenDinamica,
       resumenProduccion: resumenDinamica, // Alias retrocompatible
       resumenDominio,
@@ -1160,8 +1220,9 @@
       if (!mapa[clave]) {
         mapa[clave] = { minutos: 0, sumaCalidad: 0, conteo: 0, xp: 0 };
       }
+      const calFSRS = Math.min(4, Math.max(1, Number(s.calidad || s.Calidad) || 3));
       mapa[clave].minutos += Number(s.duracion) || 0;
-      mapa[clave].sumaCalidad += Number(s.calidad) || 0;
+      mapa[clave].sumaCalidad += calFSRS;
       mapa[clave].conteo += 1;
       mapa[clave].xp += Number(s.xp) || 0;
     });
@@ -1263,9 +1324,10 @@
       if (!matriz[dia] || !matriz[dia][franja]) return;
 
       const celda = matriz[dia][franja];
+      const calFSRS = Math.min(4, Math.max(1, Number(s.calidad || s.Calidad) || 3));
       celda.minutos += Number(s.duracion) || 0;
       celda.sesiones += 1;
-      celda.sumaCalidad += Number(s.calidad) || 0;
+      celda.sumaCalidad += calFSRS;
       celda.sumaEnergia += pesoEnergia[s.energiaPrevia] || 2;
       celda.calidadProm = +(celda.sumaCalidad / celda.sesiones).toFixed(1);
       celda.energiaProm = +(celda.sumaEnergia / celda.sesiones).toFixed(1);
@@ -1300,7 +1362,7 @@
   }
 
   /**
-   * Analiza el Cuadrante de Rendimiento Cognitivo (% Uso IA vs. Asimilación 1-5),
+   * Analiza el Cuadrante de Rendimiento Cognitivo (% Uso IA vs. Calificación FSRS 1-4),
    * agrupando por Dinámica Cognitiva y desplazando puntos superpuestos en espiral.
    */
   function analizarCuadranteIA(sesiones) {
@@ -1308,22 +1370,23 @@
     const conteoCoordenadas = {};
     const puntos = [];
 
-    let qSinergia = 0; // IA >= 35% y Calidad >= 4
-    let qAutonomo = 0; // IA < 35% y Calidad >= 4
-    let qMecanico = 0; // IA >= 35% y Calidad <= 2
-    let qFatiga = 0; // IA < 35% y Calidad <= 2
+    let qSinergia = 0; // IA >= 35% y Calificación FSRS >= 3 (3-4)
+    let qAutonomo = 0; // IA < 35% y Calificación FSRS >= 3 (3-4)
+    let qMecanico = 0; // IA >= 35% y Calificación FSRS <= 2 (1-2)
+    let qFatiga = 0; // IA < 35% y Calificación FSRS <= 2 (1-2)
 
     lista.forEach((s) => {
-      const ia = Math.min(100, Math.max(0, Number(s.usoIA) || 0));
-      const cal = Math.min(5, Math.max(1, Number(s.calidad) || 3));
-      const dur = Math.max(5, Number(s.duracion) || 15);
-      const dinamica = s.dinamicaCognitiva || "Andamiaje / Co-creación";
+      const ia = Math.min(100, Math.max(0, Number(s.usoIA ?? s.Porcentaje_IA) || 0));
+      const cal = Math.min(4, Math.max(1, Number(s.calidad || s.Calidad) || 3));
+      const dur = Math.max(5, Number(s.duracion || s.Duracion_Minutos) || 15);
+      const dinamica = s.dinamicaCognitiva || s.Dinamica_Cognitiva || "Andamiaje / Co-creación";
+      const fluidezReal = migrarEstadoObjetivo(s.objetivoCumplido || s.Objetivo_Cumplido);
       const { subtema } = extraerSubtemaDeNotas(s.notas, s.tema);
 
-      if (cal >= 4 && ia >= 35) qSinergia += 1;
-      else if (cal >= 4 && ia < 35) qAutonomo += 1;
-      else if (cal <= 2 && ia >= 35) qMecanico += 1;
-      else if (cal <= 2 && ia < 35) qFatiga += 1;
+      if (ia >= 35 && cal >= 3) qSinergia += 1;
+      else if (ia < 35 && cal >= 3) qAutonomo += 1;
+      else if (ia >= 35 && cal <= 2) qMecanico += 1;
+      else if (ia < 35 && cal <= 2) qFatiga += 1;
 
       const key = `${ia}_${cal}`;
       const indiceRepetido = conteoCoordenadas[key] || 0;
@@ -1333,8 +1396,8 @@
       const offsetRadio = indiceRepetido === 0 ? 0 : Math.min(3.5, 1.3 + indiceRepetido * 0.45);
       const xJitter = Math.min(100, Math.max(0, +(ia + Math.cos(angulo) * offsetRadio).toFixed(1)));
       const yJitter = Math.min(
-        5.25,
-        Math.max(0.75, +(cal + Math.sin(angulo) * (offsetRadio * 0.06)).toFixed(2))
+        4.35,
+        Math.max(0.65, +(cal + Math.sin(angulo) * (offsetRadio * 0.06)).toFixed(2))
       );
 
       puntos.push({
@@ -1343,14 +1406,16 @@
         r: Math.min(22, Math.max(6, Math.round(Math.sqrt(dur) * 1.85))),
         iaReal: ia,
         calidadReal: cal,
-        duracion: Number(s.duracion) || 0,
-        materia: s.materia || "General",
+        duracion: Number(s.duracion || s.Duracion_Minutos) || 0,
+        materia: s.materia || s.Materia || "General",
         tema: subtema,
         dinamicaCognitiva: dinamica,
         modoIA: dinamica, // Alias retrocompatible
-        tipoActividad: migrarTipoActividad(s.tipoActividad),
-        dominioPrevio: migrarDominioPrevio(s.dominioPrevio),
-        fecha: s.fecha || ""
+        objetivoCumplido: fluidezReal,
+        tipoActividad: migrarTipoActividad(s.tipoActividad || s.Tipo_Actividad),
+        dominioPrevio: migrarDominioPrevio(s.dominioPrevio || s.Dominio_Previo),
+        fecha: s.fecha || s.Fecha || "",
+        rawSessionData: s
       });
     });
 

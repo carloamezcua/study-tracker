@@ -1159,16 +1159,16 @@
             const alpha = +(0.18 + Math.min(1, celda.minutos / maxMin) * 0.68).toFixed(2);
             bg = `rgba(99, 102, 241, ${alpha})`;
             textoPrincipal = `${celda.minutos} min`;
-            textoSecundario = `⭐️ ${celda.calidadProm} · ${celda.sesiones}s`;
+            textoSecundario = `⭐️ ${celda.calidadProm}/4 · ${celda.sesiones}s`;
           } else if (metricaHeatmapActual === "calidad") {
-            if (celda.calidadProm >= 4) {
+            if (celda.calidadProm >= 3.3) {
               bg = "rgba(16, 185, 129, 0.45)";
-            } else if (celda.calidadProm >= 3) {
+            } else if (celda.calidadProm >= 2.3) {
               bg = "rgba(245, 158, 11, 0.38)";
             } else {
               bg = "rgba(239, 68, 68, 0.42)";
             }
-            textoPrincipal = `⭐️ ${celda.calidadProm}`;
+            textoPrincipal = `⭐️ ${celda.calidadProm}/4`;
             textoSecundario = `${celda.minutos} min (${celda.sesiones}s)`;
           } else if (metricaHeatmapActual === "energia") {
             if (celda.energiaProm >= 2.5) {
@@ -1274,7 +1274,7 @@
 
         const val = document.createElement("strong");
         val.textContent = item.conteo
-          ? `⭐️ ${item.calidadProm} · 🤖 ${item.iaProm}% · ${item.minutos}m (${item.conteo} ${t("habitSessionsShort")})`
+          ? `⭐️ ${item.calidadProm}/4 · 🤖 ${item.iaProm}% · ${item.minutos}m (${item.conteo} ${t("habitSessionsShort")})`
           : t("habitNoRecords");
 
         pill.append(title, val);
@@ -1297,7 +1297,7 @@
 
         const val = document.createElement("strong");
         val.textContent = item.conteo
-          ? `⭐️ ${item.calidadProm} · 🤖 ${item.iaProm}% · ✅ ${item.pctFluidez}% (${item.conteo} ${t("habitSessionsShort")})`
+          ? `⭐️ ${item.calidadProm}/4 · 🤖 ${item.iaProm}% · ✅ ${item.pctFluidez}% (${item.conteo} ${t("habitSessionsShort")})`
           : t("habitNoRecords");
 
         pill.append(title, val);
@@ -1305,22 +1305,25 @@
       });
     }
 
-    // Resumen por Energía Previa
+    // Resumen por Modalidad de Procesamiento Efectiva (v3.2, reemplaza Energía Previa oculta)
     const contenedorEnergia = document.getElementById("resumenHabitosBar");
     if (contenedorEnergia) {
       contenedorEnergia.replaceChildren();
-      datosHabitos.resumenEnergia.forEach((item) => {
+      const listaMod = Array.isArray(datosHabitos.resumenModalidad)
+        ? datosHabitos.resumenModalidad
+        : datosHabitos.resumenEnergia || [];
+      listaMod.forEach((item) => {
         const pill = document.createElement("div");
         pill.className = "habit-stat-pill";
 
         const title = document.createElement("span");
         title.className = "habit-stat-title";
-        const energiaTrad = trVal("energiaPrevia", item.etiqueta);
-        title.textContent = `${item.icono} ${t("habitEnergyPrefix")} ${energiaTrad}:`;
+        const modTrad = trVal("modalidadProcesamiento", item.valor);
+        title.textContent = `${modTrad}:`;
 
         const val = document.createElement("strong");
         val.textContent = item.conteo
-          ? `⭐️ ${item.calidadProm} (${item.conteo} ${t("habitSessionsShort")})`
+          ? `⭐️ ${item.calidadProm}/4 · 🤖 ${item.iaProm ?? 0}% · ${item.minutos ?? 0}m (${item.conteo} ${t("habitSessionsShort")})`
           : t("habitNoRecords");
 
         pill.append(title, val);
@@ -1328,22 +1331,25 @@
       });
     }
 
-    // Resumen por Complejidad
+    // Resumen por Estructura de Práctica (v3.2: Bloqueado vs. Intercalado, reemplaza Complejidad oculta)
     const contenedorComp = document.getElementById("resumenComplejidadBar");
-    if (contenedorComp && Array.isArray(datosHabitos.resumenComplejidad)) {
+    if (contenedorComp) {
       contenedorComp.replaceChildren();
-      datosHabitos.resumenComplejidad.forEach((item) => {
+      const listaEst = Array.isArray(datosHabitos.resumenEstructura)
+        ? datosHabitos.resumenEstructura
+        : datosHabitos.resumenComplejidad || [];
+      listaEst.forEach((item) => {
         const pill = document.createElement("div");
         pill.className = "habit-stat-pill";
 
         const title = document.createElement("span");
         title.className = "habit-stat-title";
-        const compTrad = trVal("complejidad", item.etiqueta);
-        title.textContent = `${item.icono} ${compTrad}:`;
+        const estTrad = trVal("estructuraPractica", item.valor);
+        title.textContent = `${estTrad}:`;
 
         const val = document.createElement("strong");
         val.textContent = item.conteo
-          ? `⭐️ ${item.calidadProm} · ${item.minutos}m (${item.conteo} ${t("habitSessionsShort")})`
+          ? `⭐️ ${item.calidadProm}/4 · ✅ ${item.pctFluidez ?? 0}% · ${item.minutos}m (${item.conteo} ${t("habitSessionsShort")})`
           : t("habitNoRecords");
 
         pill.append(title, val);
@@ -1393,7 +1399,7 @@
           statsWrap.className = "topic-card-stats";
           let statsTexto = `⏱️ ${st.minutos}m (${st.sesiones} ${t(
             "habitSessionsShort"
-          )}) · ⭐️ ${st.calidadProm} · 🤖 ${st.iaProm}% · +${st.xp} XP`;
+          )}) · ⭐️ ${st.calidadFSRS ?? st.calidadProm}/4 · 🤖 ${st.iaProm}% · +${st.xp} XP`;
           if (Array.isArray(st.curvaDominio) && st.curvaDominio.length > 0) {
             const curvaStr = st.curvaDominio
               .map((d) => `${ICONOS_DOMINIO[d] || ""} ${trVal("dominioPrevio", d)}`)
